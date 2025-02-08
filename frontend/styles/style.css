@@ -7,6 +7,7 @@ body {
   height: 100vh;
   margin: 0;
 }
+
 .container {
   background: white;
   padding: 20px;
@@ -15,9 +16,11 @@ body {
   width: 300px;
   text-align: center;
 }
+
 h2 {
   margin-bottom: 20px;
 }
+
 input {
   width: 90%;
   padding: 10px;
@@ -25,6 +28,7 @@ input {
   border: 1px solid #ddd;
   border-radius: 5px;
 }
+
 button {
   width: 98%;
   padding: 10px;
@@ -45,7 +49,45 @@ button:hover {
 #create-btn:hover {
   background: #eeeeee;
 }
+#logout-btn {
+  background: #a72828;
+}
+#logout-btn:hover {
+  background: #811f1f;
+}
 
 #register-container {
   display: none;
+}
+
+#movie-list {
+  display: none;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 80%;
+  text-align: center;
+}
+.movies-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+}
+.movie {
+  background: #fff;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  width: 180px;
+}
+.movie img {
+  width: 100%;
+  border-radius: 8px;
+}
+.movie h3 {
+  font-size: 16px;
+  margin: 10px 0 0;
 }
