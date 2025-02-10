@@ -1,6 +1,6 @@
 ﻿
 
-namespace Movie.Application.Services
+namespace MovieRadar.Application.Services
 {
     public class UserService /*: IService<User>*/
     {

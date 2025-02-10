@@ -1,4 +1,4 @@
-﻿namespace Movie.Domain.Interfaces
+﻿namespace MovieRadar.Domain.Interfaces
 {
     public interface IRepository<T> where T : class
     {

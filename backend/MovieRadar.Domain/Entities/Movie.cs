@@ -1,6 +1,6 @@
 ﻿
 
-namespace Movie.Domain.Entities
+namespace MovieRadar.Domain.Entities
 {
     public class Movie
     {

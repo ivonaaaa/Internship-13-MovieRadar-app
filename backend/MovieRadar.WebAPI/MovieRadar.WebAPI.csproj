@@ -12,13 +12,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Movie.Application\MovieRadar.Application.csproj" />
-    <ProjectReference Include="..\Movie.Domain\MovieRadar.Domain.csproj" />
-    <ProjectReference Include="..\Movie.Infrastructure\MovieRadar.Infrastructure.csproj" />
+    <ProjectReference Include="..\MovieRadar.Application\MovieRadar.Application.csproj" />
+    <ProjectReference Include="..\MovieRadar.Domain\MovieRadar.Domain.csproj" />
+    <ProjectReference Include="..\MovieRadar.Infrastructure\MovieRadar.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

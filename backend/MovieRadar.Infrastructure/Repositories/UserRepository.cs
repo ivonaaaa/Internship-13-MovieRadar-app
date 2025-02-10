@@ -1,10 +1,10 @@
 ﻿
 using System.Data;
 using Dapper;
-using Movie.Domain.Entities;
-using Movie.Domain.Interfaces;
+using MovieRadar.Domain.Entities;
+using MovieRadar.Domain.Interfaces;
 
-namespace Movie.Infrastructure.Repositories
+namespace MovieRadar.Infrastructure.Repositories
 {
     public class UserRepository : IRepository<User>
     {
