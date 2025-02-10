@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Movie.Domain.Entities
+namespace MovieRadar.Domain.Entities
 {
     public class User
     {

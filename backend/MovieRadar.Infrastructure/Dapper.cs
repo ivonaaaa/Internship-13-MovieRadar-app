@@ -2,7 +2,7 @@
 using System.Data;
 using Microsoft.Extensions.Configuration;
 
-namespace Movie.Infrastructure
+namespace MovieRadar.Infrastructure
 {
     public class Dapper
     {

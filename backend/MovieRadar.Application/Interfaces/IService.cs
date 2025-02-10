@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-
-
-namespace Movie.Application.Services
+﻿namespace MovieRadar.Application.Services
 {
     public interface IService<T> where T : class
     {
