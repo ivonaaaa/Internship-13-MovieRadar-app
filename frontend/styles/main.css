@@ -60,6 +60,7 @@ button:hover {
   display: none;
 }
 
+/* prominila sam ove nazive u htmlu i svakako ovo treba odvojit u drugi css file */
 #movie-list {
   display: none;
   background: white;
