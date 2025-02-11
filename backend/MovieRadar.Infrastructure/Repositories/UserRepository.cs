@@ -23,8 +23,8 @@ namespace MovieRadar.Infrastructure.Repositories
         public async Task<User?> GetById(int id)
         {
             var getByIdQuery = @"SELECT id AS Id, first_name AS FirstName, last_name AS LastName, email AS Email, password AS Password,
-                is_admin AS IsAdmin FROM users WHERE id = @UserId";
-            return await _connection.QuerySingleOrDefaultAsync<User>(getByIdQuery, new { UserId = id });
+                is_admin AS IsAdmin FROM users WHERE id = @Id";
+            return await _connection.QuerySingleOrDefaultAsync<User>(getByIdQuery, new { Id = id });
         }
 
         public async Task<int> Add(User newUser)
@@ -36,7 +36,7 @@ namespace MovieRadar.Infrastructure.Repositories
 
         public async Task<bool> Update(User user)
         {
-            var updateUserQuery = "UPDATE users SET first_name = @FirstName, last_name = @LastName, email = @Email, password = @Password WHERE id = @UserId";
+            var updateUserQuery = "UPDATE users SET first_name = @FirstName, last_name = @LastName, email = @Email, password = @Password WHERE id = @Id";
             int rows = await _connection.ExecuteAsync(updateUserQuery, user);
 
             return rows > 0;
@@ -44,8 +44,8 @@ namespace MovieRadar.Infrastructure.Repositories
 
         public async Task<bool> Delete(int id)
         {
-            var deleteQuery = "DELETE FROM users WHERE id = @UserId";
-            int rows = await _connection.ExecuteAsync(deleteQuery, new { UserId = id });
+            var deleteQuery = "DELETE FROM users WHERE id = @Id";
+            int rows = await _connection.ExecuteAsync(deleteQuery, new { Id = id });
 
             return rows > 0;
         }
