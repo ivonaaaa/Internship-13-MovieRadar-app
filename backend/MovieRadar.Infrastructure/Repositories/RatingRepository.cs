@@ -15,7 +15,7 @@ namespace MovieRadar.Infrastructure.Repositories
 
         public async Task<IEnumerable<Rating>> GetAll()
         {
-            var getAllQuery = @"SELECT id AS RatingId, user_id AS UserId, movie_id AS MovieId, 
+            var getAllQuery = @"SELECT id AS Id, user_id AS UserId, movie_id AS MovieId, 
                                        review AS Review, grade AS Grade, created_at AS CreatedAt
                                 FROM ratings ";
             return await connection.QueryAsync<Rating>(getAllQuery);
@@ -23,7 +23,7 @@ namespace MovieRadar.Infrastructure.Repositories
 
         public async Task<Rating?> GetById(int id)
         {
-            var getByIdQuery = @"SELECT id AS RatingId, user_id AS UserId, movie_id AS MovieId, 
+            var getByIdQuery = @"SELECT id AS Id, user_id AS UserId, movie_id AS MovieId, 
                                        review AS Review, grade AS Grade, created_at AS CreatedAt
                                 FROM ratings
                             WHERE id = @RatingId";
