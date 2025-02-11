@@ -16,13 +16,13 @@ namespace MovieRadar.Infrastructure.Repositories
 
         public async Task<IEnumerable<User>> GetAll()
         {
-            var getQuery = "SELECT * FROM users";
+            var getQuery = "SELECT id AS Id, first_name AS FirstName, last_name AS LastName, email AS Email, password AS Password, is_admin AS IsAdmin FROM users";
             return await _connection.QueryAsync<User>(getQuery);
         }
 
         public async Task<User?> GetById(int id)
         {
-            var getByIdQuery = @"SELECT id AS UserId, first_name AS FirstName, last_name AS LastName, email AS Email, password AS Password,
+            var getByIdQuery = @"SELECT id AS Id, first_name AS FirstName, last_name AS LastName, email AS Email, password AS Password,
                 is_admin AS IsAdmin FROM users WHERE id = @UserId";
             return await _connection.QuerySingleOrDefaultAsync<User>(getByIdQuery, new { UserId = id });
         }
