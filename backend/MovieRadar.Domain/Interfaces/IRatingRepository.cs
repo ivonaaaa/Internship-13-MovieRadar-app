@@ -4,6 +4,5 @@ namespace MovieRadar.Domain.Interfaces
 {
     public interface IRatingRepository : IRepository<Rating>
     {
-
     }
 }

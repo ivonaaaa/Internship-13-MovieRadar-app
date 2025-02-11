@@ -1,6 +1,4 @@
-﻿
-
-namespace MovieRadar.Domain.Entities
+﻿namespace MovieRadar.Domain.Entities
 {
     public class Rating
     {

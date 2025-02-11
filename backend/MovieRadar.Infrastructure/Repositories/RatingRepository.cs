@@ -1,12 +1,7 @@
 ﻿using Dapper;
 using MovieRadar.Domain.Entities;
 using MovieRadar.Domain.Interfaces;
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MovieRadar.Infrastructure.Repositories
 {
