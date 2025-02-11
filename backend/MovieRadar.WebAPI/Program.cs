@@ -4,12 +4,27 @@ using MovieRadar.Domain.Interfaces;
 using MovieRadar.Infrastructure.Repositories;
 using MovieRadar.Application.Services;
 using MovieRadar.Application.Interfaces;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
+//builder.Services.AddEndpointsApiExplorer();
+//builder.Services.AddSwaggerGen(c =>
+//{
+//    c.SwaggerDoc("v1", new OpenApiInfo { Title = "MovieRadar API", Version = "v1" });
+//});
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsPolicy", policyBuilder =>
+    {
+        policyBuilder.AllowAnyMethod().AllowAnyHeader().WithOrigins("http://localhost:5500"); /*.AllowAnyOrigin(); */ //ili .WithOrigins("http://localhost:5000"); ili koji je vec na FE port
+    });
+});
+
 builder.Services.AddControllers();
 
-builder.Services.AddTransient<IDbConnection>(_ => new NpgsqlConnection(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddScoped<IDbConnection>(_ => new NpgsqlConnection(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IRatingRepository, RatingRepository>(); 
 builder.Services.AddScoped<IRatingService, RatingService>();
@@ -25,13 +40,17 @@ builder.Services.AddScoped<IMovieService, MovieService>();
 
 var app = builder.Build();
 
-//if(app.Environment.IsDevelopment())
+//if (app.Environment.IsDevelopment())
 //{
 //    app.UseSwagger();
 //    app.UseSwaggerUI();
 //}
 
-app.UseHttpsRedirection();
+app.UseCors("CorsPolicy");
+
+if(!app.Environment.IsDevelopment())
+    app.UseHttpsRedirection();
+
 //app.UseAuthentication();
 //app.UseAuthorization(); 
 app.MapControllers();
