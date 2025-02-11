@@ -16,9 +16,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("CorsPolicy", policyBuilder =>
+    options.AddPolicy(name: "CorsPolicy", policyBuilder =>
     {
-        policyBuilder.AllowAnyMethod().AllowAnyHeader().WithOrigins("http://localhost:5500"); /*.AllowAnyOrigin(); */ //ili .WithOrigins("http://localhost:5000"); ili koji je vec na FE port
+        policyBuilder.AllowAnyMethod().AllowAnyHeader().WithOrigins("http://localhost:5500", "http://127.0.0.1:5500"); /*.AllowAnyOrigin(); */ //ili .WithOrigins("http://localhost:5000"); ili koji je vec na FE port
     });
 });
 
@@ -26,7 +26,7 @@ builder.Services.AddControllers();
 
 builder.Services.AddScoped<IDbConnection>(_ => new NpgsqlConnection(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddScoped<IRatingRepository, RatingRepository>(); 
+builder.Services.AddScoped<IRatingRepository, RatingRepository>();
 builder.Services.AddScoped<IRatingService, RatingService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
@@ -48,11 +48,11 @@ var app = builder.Build();
 
 app.UseCors("CorsPolicy");
 
-if(!app.Environment.IsDevelopment())
+if (!app.Environment.IsDevelopment())
     app.UseHttpsRedirection();
 
 //app.UseAuthentication();
-//app.UseAuthorization(); 
+app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
