@@ -13,26 +13,26 @@ namespace MovieRadar.WebAPI.Controllers
     //}
 
     [ApiController]
-    [Route("api/[comments]")]
-    public class CommentController : ControllerBase
+    [Route("api/[controller]")]
+    public class RatingController : ControllerBase
     {
-        private readonly ICommentService commentService;
-        public CommentController(ICommentService commentService)
+        private readonly IRatingService ratingService;
+        public RatingController(IRatingService ratingService)
         {
-            this.commentService = commentService;
+            this.ratingService = ratingService;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Comment>>> GetAllComments()
+        public async Task<ActionResult<IEnumerable<Rating>>> GetAllComments()
         {
-            var allComments = await commentService.GetAll();
+            var allComments = await ratingService.GetAll();
             return Ok(allComments);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Comment>> GetCommentById(int id)
+        public async Task<ActionResult<Rating>> GetCommentById(int id)
         {
-            var comment = await commentService.GetById(id);
+            var comment = await ratingService.GetById(id);
             if(comment == null)
                 return NotFound();
 
@@ -40,26 +40,26 @@ namespace MovieRadar.WebAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> AddComment(Comment newComment)
+        public async Task<ActionResult> AddComment(Rating newComment)
         {
-            var id = await commentService.Add(newComment);
+            var id = await ratingService.Add(newComment);
             return CreatedAtAction(nameof(GetCommentById), new { id }, newComment);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateComment(Comment updatedComment, int id)
+        public async Task<IActionResult> UpdateComment(Rating updatedComment, int id)
         {
-            if(id != updatedComment.CommentId)
+            if(id != updatedComment.RatingId)
                 return BadRequest();
 
-            var updated = await commentService.Update(updatedComment);
+            var updated = await ratingService.Update(updatedComment);
             return updated ? NoContent() : NotFound();
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteComment(int id)
         {
-            var deleted = await commentService.DeleteById(id);
+            var deleted = await ratingService.DeleteById(id);
             return deleted ? NoContent() : NotFound();
         }
     }

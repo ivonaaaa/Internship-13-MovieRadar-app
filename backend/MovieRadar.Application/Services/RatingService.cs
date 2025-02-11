@@ -1,26 +1,22 @@
 ﻿using MovieRadar.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MovieRadar.Domain.Interfaces;
+using MovieRadar.Application.Interfaces;
 
 namespace MovieRadar.Application.Services
 {
-    public class CommentService : IService<Comment>
+    public class RatingService : IRatingService
     {
-        private readonly ICommentRepository commentRepository;
-        public CommentService(ICommentRepository commentRepository)
+        private readonly IRatingRepository ratingRepository;
+        public RatingService(IRatingRepository ratingRepository)
         {
-            this.commentRepository = commentRepository;
+            this.ratingRepository = ratingRepository;
         }
 
-        public async Task<IEnumerable<Comment>> GetAll()
+        public async Task<IEnumerable<Rating>> GetAll()
         {
             try
             {
-                return await commentRepository.GetAll();
+                return await ratingRepository.GetAll();
             }
             catch (Exception ex)
             {
@@ -28,11 +24,11 @@ namespace MovieRadar.Application.Services
             }
         }
 
-        public async Task<Comment> GetById(int id)
+        public async Task<Rating> GetById(int id)
         {
             try
             {
-                return await commentRepository.GetById(id);
+                return await ratingRepository.GetById(id);
             }
             catch (Exception ex)
             {
@@ -40,11 +36,11 @@ namespace MovieRadar.Application.Services
             }
         }
 
-        public async Task<int> Add(Comment comment)
+        public async Task<int> Add(Rating comment)
         {
             try
             {
-                return await commentRepository.Add(comment);
+                return await ratingRepository.Add(comment);
             }
             catch (Exception ex)
             {
@@ -52,11 +48,11 @@ namespace MovieRadar.Application.Services
             }
         }
 
-        public async Task<bool> Update(Comment comment)
+        public async Task<bool> Update(Rating comment)
         {
             try
             {
-                return await commentRepository.Update(comment);
+                return await ratingRepository.Update(comment);
             }
             catch (Exception ex)
             {
@@ -68,7 +64,7 @@ namespace MovieRadar.Application.Services
         {
             try
             {
-                return await commentRepository.Delete(id);
+                return await ratingRepository.Delete(id);
             }
             catch (Exception ex)
             {
