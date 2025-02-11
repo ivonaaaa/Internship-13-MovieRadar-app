@@ -1,12 +1,11 @@
-﻿
-using System.Data;
+﻿using System.Data;
 using Dapper;
 using MovieRadar.Domain.Entities;
 using MovieRadar.Domain.Interfaces;
 
 namespace MovieRadar.Infrastructure.Repositories
 {
-    public class UserRepository : IRepository<User>
+    public class UserRepository : IUserRepository
     {
         private readonly IDbConnection _connection;
 
