@@ -13,6 +13,8 @@ builder.Services.AddTransient<IDbConnection>(_ => new NpgsqlConnection(builder.C
 
 builder.Services.AddScoped<IRatingRepository, RatingRepository>(); 
 builder.Services.AddScoped<IRatingService, RatingService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 //builder.Services.AddAuthentication(); //za jwt dodat .AddJwtBearer();
 //builder.Services.AddAuthorization();
