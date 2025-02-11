@@ -4,14 +4,6 @@ using MovieRadar.Domain.Entities;
 
 namespace MovieRadar.WebAPI.Controllers
 {
-    //public class CommentController : Controller
-    //{
-    //    public IActionResult Index()
-    //    {
-    //        return View();
-    //    }
-    //}
-
     [ApiController]
     [Route("api/[controller]")]
     public class RatingController : ControllerBase
