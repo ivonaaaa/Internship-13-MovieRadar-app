@@ -1,0 +1,50 @@
+#movies-container {
+  padding: 20px;
+}
+
+#movies-container h2 {
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.movie-item {
+  width: 200px;
+  margin: 10px;
+  display: inline-block;
+  vertical-align: top;
+  text-align: center;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.movie-item img {
+  width: 100%;
+  height: auto;
+}
+
+.movie-item h3 {
+  font-size: 18px;
+  margin: 10px 0;
+}
+
+.movie-item p {
+  font-size: 14px;
+  color: #666;
+  margin: 0 10px 10px;
+}
+
+.movie-item button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px;
+  width: 100%;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.movie-item button:hover {
+  background-color: #0056b3;
+}
