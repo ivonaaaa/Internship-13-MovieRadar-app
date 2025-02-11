@@ -32,14 +32,14 @@ namespace MovieRadar.WebAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> AddUser(User newUser)
+        public async Task<ActionResult> AddUser([FromBody] User newUser)
         {
             var id = await userService.Add(newUser);
             return CreatedAtAction(nameof(GetUserById), new { id }, newUser);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(User updatedUser, int id)
+        public async Task<IActionResult> UpdateUser([FromBody] User updatedUser, int id)
         {
             if (id != updatedUser.Id)
                 return BadRequest();

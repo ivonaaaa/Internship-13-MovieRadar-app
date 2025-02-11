@@ -40,14 +40,14 @@ namespace MovieRadar.WebAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> AddComment(Rating newComment)
+        public async Task<ActionResult> AddComment([FromBody] Rating newComment)
         {
             var id = await ratingService.Add(newComment);
             return CreatedAtAction(nameof(GetCommentById), new { id }, newComment);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateComment(Rating updatedComment, int id)
+        public async Task<IActionResult> UpdateComment([FromBody] Rating updatedComment, int id)
         {
             if(id != updatedComment.Id)
                 return BadRequest();

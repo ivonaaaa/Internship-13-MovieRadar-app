@@ -30,8 +30,8 @@ namespace MovieRadar.Infrastructure.Repositories
         public async Task<int> Add(User newUser)
         {
             var addUserQuery = @"INSERT INTO users(first_name, last_name, email, password) VALUES (@FirstName, @LastName, @Email, @Password) 
-                RETURNING first_name AS FirstName, last_name AS LastName, email AS Email, password AS Password";
-            return await _connection.ExecuteScalarAsync<int>(addUserQuery, newUser);
+                RETURNING Id";
+            return await _connection.QuerySingleAsync<int>(addUserQuery, newUser);
         }
 
         public async Task<bool> Update(User user)
