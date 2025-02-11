@@ -41,7 +41,7 @@ namespace MovieRadar.WebAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(User updatedUser, int id)
         {
-            if (id != updatedUser.UserId)
+            if (id != updatedUser.Id)
                 return BadRequest();
 
             var updated = await userService.Update(updatedUser);

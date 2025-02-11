@@ -3,7 +3,7 @@ using MovieRadar.Domain.Interfaces;
 
 namespace MovieRadar.Application.Services
 {
-    public class UserService : IUserService/*: IService<User>*/
+    public class UserService : IUserService
     {
         private readonly IUserRepository userRepository;
         public UserService(IUserRepository userRepository)

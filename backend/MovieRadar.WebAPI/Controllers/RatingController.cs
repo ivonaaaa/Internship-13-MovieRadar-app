@@ -49,7 +49,7 @@ namespace MovieRadar.WebAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateComment(Rating updatedComment, int id)
         {
-            if(id != updatedComment.RatingId)
+            if(id != updatedComment.Id)
                 return BadRequest();
 
             var updated = await ratingService.Update(updatedComment);
