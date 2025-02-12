@@ -23,7 +23,7 @@ namespace MovieRadar.WebAPI.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Movie>> GetMovieByIf(int id)
+        public async Task<ActionResult<Movie>> GetMovieById(int id)
         {
             var movie = await movieService.GetById(id);
             if (movie == null)
@@ -36,7 +36,7 @@ namespace MovieRadar.WebAPI.Controllers
         public async Task<ActionResult> AddMovie([FromBody] Movie newMovie)
         {
             var newMovieId = await movieService.Add(newMovie);
-            return CreatedAtAction(nameof(GetMovieByIf), new { id = newMovieId }, newMovie);
+            return CreatedAtAction(nameof(GetMovieById), new { id = newMovieId }, newMovie);
         }
 
         [HttpPut("{id}")]
