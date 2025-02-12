@@ -1,7 +1,7 @@
-import { generateJWT, saveAuthToken } from "./auth.js";
-import { mockUsers } from "../../marul-test/marul-mock-data.js";
+import { saveAuthToken } from "./auth.js";
 import { initAdminApp } from "./admin-app.js";
 import { initUserApp } from "./user-app.js";
+import { getAllUsers } from "../api/api.js";
 
 document.addEventListener("DOMContentLoaded", function () {
   const loginContainer = document.getElementById("login-container");
@@ -15,35 +15,39 @@ document.addEventListener("DOMContentLoaded", function () {
     const passwordInput = loginContainer.querySelector(
       "input[placeholder='Password']"
     );
-    const username = usernameInput.value.trim();
+    const email = usernameInput.value.trim();
     const password = passwordInput.value.trim();
 
-    if (!username || !password) {
-      alert("Molimo unesite korisničko ime i lozinku.");
+    if (!email || !password) {
+      alert("Please enter email and password.");
       return;
     }
 
-    let registeredUsers =
-      JSON.parse(localStorage.getItem("registeredUsers")) || [];
-    const allUsers = [...mockUsers, ...registeredUsers];
+    try {
+      const allUsers = await getAllUsers();
 
-    //test sa mock podacima
-    const user = allUsers.find(
-      (u) => u.username === username && u.password === password
-    );
-    if (user) {
-      const token = generateJWT(user);
-      saveAuthToken(token);
-
-      //! ode treba pozvat ralizite funkcije ovisno o tome je li admin ili ne
-      loginContainer.style.display = "none";
-      try {
-        if (user.admin) initAdminApp();
-        else initUserApp();
-      } catch (error) {
-        console.error("Greška pri učitavanju modula:", error);
+      const user = allUsers.find(
+        (u) => u.email === email && u.password === password
+      );
+      if (user) {
+        loginContainer.style.display = "none";
+        try {
+          // Pozivamo funkcije ovisno o tome je li korisnik admin
+          if (user.is_admin) {
+            initAdminApp();
+          } else {
+            initUserApp();
+          }
+        } catch (error) {
+          console.error("Error while loading module:", error);
+        }
+      } else {
+        alert("Invalid username or password.");
       }
-    } else alert("Neispravno korisničko ime ili lozinka.");
+    } catch (error) {
+      console.error("An error occurred:", error);
+      alert("An error occurred while accessing the server.");
+    }
   });
 
   const createBtn = document.getElementById("create-btn");
