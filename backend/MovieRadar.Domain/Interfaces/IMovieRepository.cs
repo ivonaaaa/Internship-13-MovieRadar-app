@@ -2,7 +2,7 @@
 
 namespace MovieRadar.Domain.Interfaces
 {
-    public interface IRatingRepository : IRepository<Rating>
+    public interface IMovieRepository : IRepository<Movie>
     {
     }
 }

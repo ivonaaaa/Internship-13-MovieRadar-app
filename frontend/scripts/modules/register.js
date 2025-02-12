@@ -1,4 +1,3 @@
-
 import { generateJWT, saveAuthToken } from "./auth.js";
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -7,9 +6,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const registerButton = registerContainer.querySelector("button");
   registerButton.addEventListener("click", function () {
-    const usernameInput = registerContainer.querySelector("input[placeholder='Username']");
-    const emailInput = registerContainer.querySelector("input[placeholder='Email']");
-    const passwordInput = registerContainer.querySelector("input[placeholder='Password']");
+    const usernameInput = registerContainer.querySelector(
+      "input[placeholder='Username']"
+    );
+    const emailInput = registerContainer.querySelector(
+      "input[placeholder='Email']"
+    );
+    const passwordInput = registerContainer.querySelector(
+      "input[placeholder='Password']"
+    );
 
     const username = usernameInput.value.trim();
     const email = emailInput.value.trim();
@@ -20,10 +25,10 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    
     //koristenje localstorage za test
-    let registeredUsers = JSON.parse(localStorage.getItem("registeredUsers")) || [];
-    const emailExists = registeredUsers.some(u => u.email === email);
+    let registeredUsers =
+      JSON.parse(localStorage.getItem("registeredUsers")) || [];
+    const emailExists = registeredUsers.some((u) => u.email === email);
     if (emailExists) {
       alert("A user with this email already exists.");
       return;

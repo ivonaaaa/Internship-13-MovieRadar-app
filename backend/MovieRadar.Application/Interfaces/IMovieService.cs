@@ -3,7 +3,7 @@ using MovieRadar.Domain.Entities;
 
 namespace MovieRadar.Application.Interfaces
 {
-    public interface IRatingService : IService<Rating>
+    public interface IMovieService : IService<Movie>
     {
     }
 }
