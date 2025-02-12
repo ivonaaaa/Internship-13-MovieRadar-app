@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Runtime.CompilerServices;
 using MovieRadar.Application.Interfaces;
 using MovieRadar.Domain.Entities;
 
@@ -16,10 +15,16 @@ namespace MovieRadar.WebAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Movie>>> GetAllMovies()
+        public async Task<ActionResult<IEnumerable<Movie>>> GetAllMovies([FromQuery] string? filter, [FromQuery] string? parameter)
         {
-            var allMovies = await movieService.GetAll();
-            return Ok(allMovies);
+            IEnumerable<Movie> movies;
+
+            if (!string.IsNullOrEmpty(filter) && !string.IsNullOrEmpty(parameter))
+                movies = await movieService.GetFilteredMovies(filter, parameter);
+            else
+                movies = await movieService.GetAll();
+                
+            return (movies == null || !movies.Any())? NotFound() : Ok(movies);
         }
 
         [HttpGet("{id}")]

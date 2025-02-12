@@ -67,5 +67,17 @@ namespace MovieRadar.Application.Services
                 throw new Exception($"Error deleting movie: {ex.Message}, inner: {ex.InnerException}");
             }
         }
+
+        public async Task<IEnumerable<Movie>> GetFilteredMovies(string filter, string parameter)
+        {
+            try
+            {
+                return await movieRepository.GetFilteredMovies(filter, parameter);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error getting filtered movies: {ex.Message}, inner: {ex.InnerException}");
+            }
+        }
     }
 }
