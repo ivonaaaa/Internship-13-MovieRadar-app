@@ -18,13 +18,12 @@ export function initAdminApp() {
       movieElement.innerHTML = `
         <h3>${movie.title} (${movie.release_year})</h3>
         <p>${movie.summary}</p>
-        <button data-id="${movie.id}" class="view-details">Pogledaj detalje</button>
+        <button data-id="${movie.id}" class="view-details">Details</button>
       `;
 
       moviesContainer.appendChild(movieElement);
     });
 
-    //! Ovo treba dovršiti dalje
     document.querySelectorAll(".view-details").forEach((button) => {
       button.addEventListener("click", async (e) => {
         const movieId = parseInt(e.target.dataset.id, 10);

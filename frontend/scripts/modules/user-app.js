@@ -7,7 +7,7 @@ export function initUserApp() {
 
     let movies = await getMovieList();
     if (!movies || movies.length === 0) {
-      moviesContainer.innerHTML = "<p>Nema dostupnih filmova.</p>";
+      moviesContainer.innerHTML = "<p>No movies available.</p>";
       return;
     }
 
@@ -18,13 +18,12 @@ export function initUserApp() {
       movieElement.innerHTML = `
         <h3>${movie.title} (${movie.release_year})</h3>
         <p>${movie.summary}</p>
-        <button data-id="${movie.id}" class="view-details">Pogledaj detalje</button>
+        <button data-id="${movie.id}" class="view-details">Details</button>
       `;
 
       moviesContainer.appendChild(movieElement);
     });
 
-    //! Ovo treba dovršiti dalje
     document.querySelectorAll(".view-details").forEach((button) => {
       button.addEventListener("click", async (e) => {
         const movieId = parseInt(e.target.dataset.id, 10);
@@ -39,12 +38,14 @@ export function initUserApp() {
 
     document.getElementById(
       "movies-container"
-    ).innerHTML = `<p>Učitavanje detalja filma...</p>`;
+    ).innerHTML = `<p>Loading the details data...</p>`;
 
     displayMovieDetails(movieId);
   }
 
-  if (document.readyState === "loading")
+  if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", initialize);
-  else initialize();
+  } else {
+    initialize();
+  }
 }

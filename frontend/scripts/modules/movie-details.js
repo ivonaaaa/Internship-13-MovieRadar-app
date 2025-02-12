@@ -19,7 +19,7 @@ const displayMovieDetails = async (movieId) => {
     document.getElementById("movies-container").innerHTML = `
       <h2>${movieData.title} (${movieData.releaseYear})</h2>
       <p>${movieData.summary}</p>
-      <h3>Komentari</h3>
+      <h3>Comments</h3>
       <div id="comments-section">
         ${
           movieRatings.length
@@ -29,7 +29,7 @@ const displayMovieDetails = async (movieId) => {
                     `<p><strong>${c.userId}:</strong> ${c.review} (⭐ ${c.grade})</p>`
                 )
                 .join("")
-            : "<p>Nema dostupnih komentara.</p>"
+            : "<p>No available comments.</p>"
         }
       </div>
     `;

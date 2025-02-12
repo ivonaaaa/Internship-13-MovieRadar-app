@@ -14,7 +14,7 @@ async function fetchMovies(url, options) {
   }
 }
 async function getMovieList() {
-  const url = "http://localhost:5000/api/movie";
+  const url = "http://localhost:50845/api/movie";
   const options = {
     method: "GET",
     headers: {
@@ -26,7 +26,6 @@ async function getMovieList() {
   return await fetchMovies(url, options);
 }
 
-//! ode treba dodat fetcheve za comments
 async function fetchRatings(url, options) {
   try {
     const response = await fetch(url, options);
@@ -41,7 +40,7 @@ async function fetchRatings(url, options) {
   }
 }
 async function getRatingsList() {
-  const url = `http://localhost:5000/api/rating`;
+  const url = `http://localhost:50845/api/rating`;
   const options = {
     method: "GET",
     headers: {
