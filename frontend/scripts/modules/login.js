@@ -1,5 +1,6 @@
 import { generateJWT, saveAuthToken } from "./auth.js";
 import { mockUsers } from "../../marul-test/marul-mock-data.js";
+import { initAdminApp } from "./admin-app.js";
 import { initUserApp } from "./user-app.js";
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -38,8 +39,7 @@ document.addEventListener("DOMContentLoaded", function () {
       loginContainer.style.display = "none";
       try {
         if (user.admin) {
-          const adminModule = await import("./admin-app.js");
-          adminModule.initAdminApp();
+          initAdminApp();
         } else {
           initUserApp();
         }
