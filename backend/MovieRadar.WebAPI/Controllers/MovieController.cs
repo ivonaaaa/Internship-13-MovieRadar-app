@@ -19,6 +19,11 @@ namespace MovieRadar.WebAPI.Controllers
         {
             IEnumerable<Movie> movies;
 
+            var filters = new string[] { "release_year", "genre" };
+
+            if(!filters.Contains(filter))
+                return BadRequest();
+
             if (!string.IsNullOrEmpty(filter) && !string.IsNullOrEmpty(parameter))
                 movies = await movieService.GetFilteredMovies(filter, parameter);
             else
@@ -35,6 +40,16 @@ namespace MovieRadar.WebAPI.Controllers
                 return NotFound();
 
             return Ok(movie);
+        }
+
+        [HttpGet("order")]
+        public async Task<ActionResult<IEnumerable<Movie>>> GetOrderedMoviesByRatingGrade([FromQuery] string orderDirection)
+        {
+            if(orderDirection != "asc" && orderDirection != "desc")
+                return BadRequest();
+
+            var movies = await movieService.GetOrderedMoviesByGrade(orderDirection);
+            return (movies == null || !movies.Any()) ? NotFound() : Ok(movies);
         }
 
         [HttpPost]

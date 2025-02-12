@@ -79,5 +79,17 @@ namespace MovieRadar.Application.Services
                 throw new Exception($"Error getting filtered movies: {ex.Message}, inner: {ex.InnerException}");
             }
         }
+
+        public async Task<IEnumerable<Movie>> GetOrderedMoviesByGrade(string orderDirection)
+        {
+            try
+            {
+                return await movieRepository.OrderByRating(orderDirection);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error getting ordered movies: {ex.Message}, inner: {ex.InnerException}");
+            }
+        }
     }
 }
