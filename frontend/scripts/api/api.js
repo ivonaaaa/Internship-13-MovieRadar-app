@@ -1,5 +1,3 @@
-//! ZASTO NE RADIIIIiiiii
-
 //! ode treba dodat fetcheve za users
 
 async function fetchMovies(url, options) {
