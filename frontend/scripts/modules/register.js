@@ -1,4 +1,6 @@
 import { initUserApp } from "./user-app.js";
+import { getAllUsers, createUser } from "../api/api.js";
+
 document.addEventListener("DOMContentLoaded", function () {
   const registerContainer = document.getElementById("register-container");
   if (!registerContainer) return;
@@ -21,17 +23,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     try {
-      // Provjera postoji li već korisnik s tim emailom
-      const getResponse = await fetch("https://localhost:50844/api/User", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json"
-        }
-      });
-      if (!getResponse.ok) {
-        throw new Error(`Error fetching users: ${getResponse.statusText}`);
-      }
-      const allUsers = await getResponse.json();
+      const allUsers = await getAllUsers();
       const emailExists = allUsers.some(u => u.email === email);
       if (emailExists) {
         alert("A user with this email already exists.");
@@ -47,16 +39,9 @@ document.addEventListener("DOMContentLoaded", function () {
         is_admin: false
       };
 
-      const postResponse = await fetch("https://localhost:50844/api/User", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(newUser)
-      });
-
-      if (!postResponse.ok) {
-        throw new Error(`Error creating user: ${postResponse.statusText}`);
+      const createdUser = await createUser(newUser);
+      if (!createdUser) {
+        throw new Error("User creation failed or returned null.");
       }
 
       registerContainer.style.display = "none";

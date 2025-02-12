@@ -1,6 +1,7 @@
 import { saveAuthToken } from "./auth.js";
 import { initAdminApp } from "./admin-app.js";
 import { initUserApp } from "./user-app.js";
+import { getAllUsers } from "../api/api.js";
 
 document.addEventListener("DOMContentLoaded", function () {
   const loginContainer = document.getElementById("login-container");
@@ -23,19 +24,8 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     try {
-      // Dohvaćamo sve korisnike iz baze
-      const response = await fetch("https://localhost:50844/api/User", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json"
-        }
-      });
-      if (!response.ok) {
-        throw new Error(`Error fetching users: ${response.statusText}`);
-      }
-      const allUsers = await response.json();
+      const allUsers = await getAllUsers();
 
-      // Tražimo korisnika s odgovarajućim podacima
       const user = allUsers.find(u => u.email === email && u.password === password);
       if (user) {
         loginContainer.style.display = "none";
