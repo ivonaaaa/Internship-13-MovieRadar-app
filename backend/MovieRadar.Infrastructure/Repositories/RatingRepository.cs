@@ -26,21 +26,22 @@ namespace MovieRadar.Infrastructure.Repositories
             var getByIdQuery = @"SELECT id AS Id, user_id AS UserId, movie_id AS MovieId, 
                                        review AS Review, grade AS Grade, created_at AS CreatedAt
                                 FROM ratings
-                            WHERE id = @Id";
+                                WHERE id = @Id";
             return await connection.QuerySingleOrDefaultAsync<Rating>(getByIdQuery, new { Id = id });
         }
 
         public async Task<int> Add(Rating newComment)
         {
             var addCommentQuery = @"INSERT INTO ratings(user_id, movie_id, grade, review) 
-                                    VALUES (@UserId, @MovieId, @Grade, @Review)
-                                    RETURNING id AS Id";
+                                        VALUES (@UserId, @MovieId, @Grade, @Review)
+                                        RETURNING id AS Id";
             return await connection.ExecuteScalarAsync<int>(addCommentQuery, newComment);
         }
 
         public async Task<bool> Update(Rating newComment)
         {
-            var updateCommentQuery = "UPDATE ratings SET grade = @Grade, review = @Review WHERE id = @Id";
+            var updateCommentQuery = @"UPDATE ratings SET grade = @Grade, review = @Review 
+                                       WHERE id = @Id";
 
             return await connection.ExecuteAsync(updateCommentQuery, newComment) > 0;
         }
