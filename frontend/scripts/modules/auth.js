@@ -24,16 +24,6 @@ export function setCookie(name, value, minutes) {
     document.cookie = name + "=; Max-Age=-99999999; path=/";
   }
   
-  export function generateJWT(user) {
-    const payload = {
-      id: user.id,
-      username: user.username,
-      email: user.email,
-      is_admin: user.is_admin,
-      exp: Date.now() + 30 * 60 * 1000, // token traje 30 minuta
-    };
-    return btoa(JSON.stringify(payload));
-  }
   
   export function saveAuthToken(token) {
     setCookie("authToken", token, 30);
@@ -47,12 +37,4 @@ export function setCookie(name, value, minutes) {
     eraseCookie("authToken");
   }
   
-  export function decodeJWT(token) {
-    try {
-      return JSON.parse(atob(token));
-    } catch (error) {
-      console.error("Invalid token", error);
-      return null;
-    }
-  }
   

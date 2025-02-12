@@ -1,5 +1,4 @@
-import { generateJWT, saveAuthToken } from "./auth.js";
-import { mockUsers } from "../../marul-test/marul-mock-data.js";
+import { saveAuthToken } from "./auth.js";
 import { initAdminApp } from "./admin-app.js";
 import { initUserApp } from "./user-app.js";
 
@@ -15,61 +14,41 @@ document.addEventListener("DOMContentLoaded", function () {
     const passwordInput = loginContainer.querySelector(
       "input[placeholder='Password']"
     );
-    const username = usernameInput.value.trim();
+    const email = usernameInput.value.trim();
     const password = passwordInput.value.trim();
 
-    if (!username || !password) {
-      alert("Please enter username and password.");
+    if (!email || !password) {
+      alert("Please enter email and password.");
       return;
     }
 
-    let registeredUsers =
-      JSON.parse(localStorage.getItem("registeredUsers")) || [];
-    const allUsers = [...mockUsers, ...registeredUsers];
-
-    //test sa mock podacima
-    const user = allUsers.find(
-      (u) => u.username === username && u.password === password
-    );
-    if (user) {
-      const token = generateJWT(user);
-      saveAuthToken(token);
-
-      //! ode treba pozvat ralizite funkcije ovisno o tome je li admin ili ne
-      loginContainer.style.display = "none";
-      try {
-        if (user.admin) {
-          initAdminApp();
-        } else {
-          initUserApp();
-        }
-      } catch (error) {
-        console.error("Greška pri učitavanju modula:", error);
-      }
-    } else {
-      alert("Neispravno korisničko ime ili lozinka.");
     try {
-      // Dohvaćamo sve korisnike s backend-a
-      const response = await fetch("http://localhost:50845/api/User", {
+      // Dohvaćamo sve korisnike iz baze
+      const response = await fetch("https://localhost:50844/api/User", {
         method: "GET",
         headers: {
           "Content-Type": "application/json"
         }
       });
-      
       if (!response.ok) {
         throw new Error(`Error fetching users: ${response.statusText}`);
       }
-
       const allUsers = await response.json();
 
-      // Pretražujemo korisnike i provjeravamo postoji li onaj s istim username i password
-      const user = allUsers.find(u => u.username === username && u.password === password);
+      // Tražimo korisnika s odgovarajućim podacima
+      const user = allUsers.find(u => u.email === email && u.password === password);
       if (user) {
-        const token = generateJWT(user);
-        saveAuthToken(token);
-        // Preusmjeravamo na landing page
-        window.location.href = "ivona-test.html";
+        loginContainer.style.display = "none";
+        try {
+          // Pozivamo funkcije ovisno o tome je li korisnik admin
+          if (user.is_admin) {
+            initAdminApp();
+          } else {
+            initUserApp();
+          }
+        } catch (error) {
+          console.error("Error while loading module:", error);
+        }
       } else {
         alert("Invalid username or password.");
       }
@@ -77,7 +56,7 @@ document.addEventListener("DOMContentLoaded", function () {
       console.error("An error occurred:", error);
       alert("An error occurred while accessing the server.");
     }
-  }});
+  });
 
   const createBtn = document.getElementById("create-btn");
   if (createBtn) {
