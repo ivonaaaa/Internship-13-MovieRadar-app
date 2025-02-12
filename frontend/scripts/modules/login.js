@@ -8,29 +8,44 @@ document.addEventListener("DOMContentLoaded", function () {
 
   
   const loginButton = loginContainer.querySelector("button");
-  loginButton.addEventListener("click", function () {
+  loginButton.addEventListener("click",async function () {
     const usernameInput = loginContainer.querySelector("input[placeholder='Username']");
     const passwordInput = loginContainer.querySelector("input[placeholder='Password']");
     const username = usernameInput.value.trim();
     const password = passwordInput.value.trim();
 
     if (!username || !password) {
-      alert("Molimo unesite korisničko ime i lozinku.");
+      alert("Please enter username and password.");
       return;
     }
+    try {
+      // Dohvaćamo sve korisnike s backend-a
+      const response = await fetch("http://localhost:50845/api/User", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Error fetching users: ${response.statusText}`);
+      }
 
-    let registeredUsers = JSON.parse(localStorage.getItem("registeredUsers")) || []; 
-    const allUsers = [...mockUsers, ...registeredUsers];
+      const allUsers = await response.json();
 
-    //test sa mock podacima
-    const user = allUsers.find(u => u.username === username && u.password === password);
-    if (user) {
-      const token = generateJWT(user);
-      saveAuthToken(token);
-      //preusmjeravanje na landing page
-      window.location.href = "ivona-test.html";
-    } else {
-      alert("Neispravno korisničko ime ili lozinka.");
+      // Pretražujemo korisnike i provjeravamo postoji li onaj s istim username i password
+      const user = allUsers.find(u => u.username === username && u.password === password);
+      if (user) {
+        const token = generateJWT(user);
+        saveAuthToken(token);
+        // Preusmjeravamo na landing page
+        window.location.href = "ivona-test.html";
+      } else {
+        alert("Invalid username or password.");
+      }
+    } catch (error) {
+      console.error("An error occurred:", error);
+      alert("An error occurred while accessing the server.");
     }
   });
 

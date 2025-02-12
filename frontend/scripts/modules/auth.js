@@ -51,7 +51,7 @@ export function setCookie(name, value, minutes) {
     try {
       return JSON.parse(atob(token));
     } catch (error) {
-      console.error("Neispravan token", error);
+      console.error("Invalid token", error);
       return null;
     }
   }

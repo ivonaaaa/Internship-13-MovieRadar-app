@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const password = passwordInput.value.trim();
 
     if (!username || !email || !password) {
-      alert("Sva polja su obavezna.");
+      alert("All fields are required.");
       return;
     }
 
@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let registeredUsers = JSON.parse(localStorage.getItem("registeredUsers")) || [];
     const emailExists = registeredUsers.some(u => u.email === email);
     if (emailExists) {
-      alert("Korisnik s tim emailom već postoji.");
+      alert("A user with this email already exists.");
       return;
     }
 
