@@ -37,6 +37,7 @@ namespace MovieRadar.Application.Services
 
         public async Task<int> Add(User user)
         {
+            Console.WriteLine($"\n\n\n{user.Id.ToString()} {user.IsAdmin} {user.FirstName} {user.LastName} {user.Email} {user.Password}");
             try
             {
                 return await userRepository.Add(user);

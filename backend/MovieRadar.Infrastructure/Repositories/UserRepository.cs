@@ -29,7 +29,7 @@ namespace MovieRadar.Infrastructure.Repositories
 
         public async Task<int> Add(User newUser)
         {
-            var addUserQuery = @"INSERT INTO users(first_name, last_name, email, password) VALUES (@FirstName, @LastName, @Email, @Password) 
+            var addUserQuery = @"INSERT INTO users(first_name, last_name, email, password) VALUES (@FirstName, @LastName, @Email, @Password)
                 RETURNING Id";
             return await _connection.QuerySingleAsync<int>(addUserQuery, newUser);
         }
@@ -52,7 +52,8 @@ namespace MovieRadar.Infrastructure.Repositories
 
         public async Task<User?> GetByEmail(string email)
         {
-            string query = "SELECT * FROM Users WHERE email = @Email";
+            string query = @"SELECT id AS Id, first_name AS FirstName, last_name AS LastName, email AS Email, password AS Password, 
+                   is_admin AS IsAdmin FROM users WHERE email = @Email";
             return await _connection.QueryFirstOrDefaultAsync<User>(query, new { Email = email });
         }
     }
