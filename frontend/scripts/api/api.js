@@ -15,7 +15,7 @@ async function fetchMovies(url, options) {
 }
 
 async function getMovieList() {
-  const url = "https://localhost:50844/api/movie";
+  const url = "http://localhost:50845/api/movie";
   const options = {
     method: "GET",
     headers: {
@@ -29,7 +29,7 @@ async function getMovieList() {
 
 async function getAllUsers() {
   try {
-    const response = await fetch("https://localhost:50844/api/User", {
+    const response = await fetch("http://localhost:50845/api/User", {
       method: "GET",
       headers: {
         "Content-Type": "application/json"
@@ -48,7 +48,7 @@ async function getAllUsers() {
 
 async function createUser(newUser) {
   try {
-    const response = await fetch("https://localhost:50844/api/User", {
+    const response = await fetch("http://localhost:50845/api/User", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
