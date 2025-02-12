@@ -38,17 +38,12 @@ document.addEventListener("DOMContentLoaded", function () {
       //! ode treba pozvat ralizite funkcije ovisno o tome je li admin ili ne
       loginContainer.style.display = "none";
       try {
-        if (user.admin) {
-          initAdminApp();
-        } else {
-          initUserApp();
-        }
+        if (user.admin) initAdminApp();
+        else initUserApp();
       } catch (error) {
         console.error("Greška pri učitavanju modula:", error);
       }
-    } else {
-      alert("Neispravno korisničko ime ili lozinka.");
-    }
+    } else alert("Neispravno korisničko ime ili lozinka.");
   });
 
   const createBtn = document.getElementById("create-btn");
@@ -56,9 +51,7 @@ document.addEventListener("DOMContentLoaded", function () {
     createBtn.addEventListener("click", function () {
       loginContainer.style.display = "none";
       const registerContainer = document.getElementById("register-container");
-      if (registerContainer) {
-        registerContainer.style.display = "block";
-      }
+      if (registerContainer) registerContainer.style.display = "block";
     });
   }
 });

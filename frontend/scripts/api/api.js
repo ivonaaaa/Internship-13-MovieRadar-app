@@ -13,7 +13,6 @@ async function fetchMovies(url, options) {
     return null;
   }
 }
-
 async function getMovieList() {
   const url = "http://localhost:5000/api/movie";
   const options = {
@@ -28,6 +27,30 @@ async function getMovieList() {
 }
 
 //! ode treba dodat fetcheve za comments
+async function fetchRatings(url, options) {
+  try {
+    const response = await fetch(url, options);
+    if (!response.ok) {
+      throw new Error("Failed to fetch comments.");
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching comments:", error);
+    return null;
+  }
+}
+async function getRatingsList() {
+  const url = `http://localhost:5000/api/rating`;
+  const options = {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    mode: "cors",
+  };
 
-//! treba exportat funkcije s fetchanim podacima za users i comments i koristit ih dalje
-export { getMovieList };
+  return await fetchRatings(url, options);
+}
+
+export { getMovieList, getRatingsList };

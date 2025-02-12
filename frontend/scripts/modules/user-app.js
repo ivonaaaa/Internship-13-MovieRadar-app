@@ -1,17 +1,11 @@
 import { getMovieList } from "../api/api.js";
-// import { displayMovieDetails } from "./movies.js"; ?
+import { displayMovieDetails } from "./movie-details.js";
 
-console.log("aaaaaa");
 export function initUserApp() {
-  console.log("bbbbbb");
-
   async function initialize() {
-    console.log("cccccc");
-
     const moviesContainer = document.getElementById("movies-container");
 
     let movies = await getMovieList();
-
     if (!movies || movies.length === 0) {
       moviesContainer.innerHTML = "<p>Nema dostupnih filmova.</p>";
       return;
@@ -30,7 +24,7 @@ export function initUserApp() {
       moviesContainer.appendChild(movieElement);
     });
 
-    // Ovo treba dovršiti dalje
+    //! Ovo treba dovršiti dalje
     document.querySelectorAll(".view-details").forEach((button) => {
       button.addEventListener("click", async (e) => {
         const movieId = parseInt(e.target.dataset.id, 10);
@@ -50,9 +44,7 @@ export function initUserApp() {
     displayMovieDetails(movieId);
   }
 
-  if (document.readyState === "loading") {
+  if (document.readyState === "loading")
     document.addEventListener("DOMContentLoaded", initialize);
-  } else {
-    initialize();
-  }
+  else initialize();
 }
