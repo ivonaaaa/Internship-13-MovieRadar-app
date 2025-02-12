@@ -4,9 +4,13 @@ using MovieRadar.Domain.Interfaces;
 using MovieRadar.Infrastructure.Repositories;
 using MovieRadar.Application.Services;
 using MovieRadar.Application.Interfaces;
-using Microsoft.OpenApi.Models;
+using System.Reflection;
+
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(UserCommandHandler).Assembly));
+
 
 //builder.Services.AddEndpointsApiExplorer();
 //builder.Services.AddSwaggerGen(c =>
