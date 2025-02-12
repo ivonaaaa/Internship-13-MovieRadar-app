@@ -49,5 +49,11 @@ namespace MovieRadar.Infrastructure.Repositories
 
             return rows > 0;
         }
+
+        public async Task<User?> GetByEmail(string email)
+        {
+            string query = "SELECT * FROM Users WHERE email = @Email";
+            return await _connection.QueryFirstOrDefaultAsync<User>(query, new { Email = email });
+        }
     }
 }
