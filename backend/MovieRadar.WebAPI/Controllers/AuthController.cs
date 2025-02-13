@@ -34,9 +34,11 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<ActionResult> Register([FromBody] User newUser)
     {
-        if (!UserHelper.isUserValid(newUser))
+        var userValidity = UserHelper.isUserValid(newUser);
+
+        if (!userValidity.Item1)
         {
-            return BadRequest("Invalid register request!");
+            return BadRequest(new { message = userValidity.Item2 });
         }
 
         var user = await userService.GetByEmail(newUser.Email);

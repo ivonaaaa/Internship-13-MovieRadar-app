@@ -37,9 +37,9 @@ builder.Services.AddScoped<IMovieRepository, MovieRepository>();
 builder.Services.AddScoped<IMovieService, MovieService>();
 builder.Services.AddSingleton<TokenService>();
 
-var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
-
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+
+var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
 
 builder.Services
     .AddAuthentication(options =>

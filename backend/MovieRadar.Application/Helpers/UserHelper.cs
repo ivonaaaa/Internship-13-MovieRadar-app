@@ -5,17 +5,25 @@ namespace MovieRadar.Application.Helpers
 {
     public class UserHelper
     {
-        static public bool isUserValid(User user)
+        static public (bool, string) isUserValid(User user)
         {
-            if (user == null || !isPasswordValid(user.Password) || !isEmailValid(user.Email) || !isNameValid(user.FirstName) || !isNameValid(user.LastName))
-                return false;
+            if (user == null)
+                return (false, "The user is null!");
+            else if (!isEmailValid(user.Email))
+                return (false, "The email is invalid!");
+            else if (!isPasswordValid(user.Password))
+                return (false, "The password is invalid!");
+            else if (!isNameValid(user.FirstName))
+                return (false, "The first name is invalid!");
+            else if (!isLastNameValid(user.LastName))
+                return (false, "The last name is invalid!");
 
-            return true;
+            return (true, "User is valid");
         }
 
         static public bool isPasswordValid(string password)
         {
-            if (password == null || password.Length < 8 || !Regex.IsMatch(password, @"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).+$")) 
+            if (string.IsNullOrEmpty(password) || password.Length < 8 || !Regex.IsMatch(password, @"^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_]).+$")) 
                 return false;
 
             return true;
@@ -23,7 +31,7 @@ namespace MovieRadar.Application.Helpers
 
         static public bool isEmailValid(string email)
         {
-            if (email == null || !Regex.IsMatch(email, @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"))
+            if (string.IsNullOrEmpty(email) || !Regex.IsMatch(email, @"^(?!.*\.\.)[a-zA-Z0-9]+@[a-zA-Z0-9]{2,}\.[a-zA-Z]{2,}$"))
                 return false;
 
             return true;
@@ -31,7 +39,17 @@ namespace MovieRadar.Application.Helpers
 
         static public bool isNameValid(string name)
         {
-            if (name == null || !Regex.IsMatch(name, @"^[a-zA-Z]+$"))
+            if (string.IsNullOrEmpty(name) || !Regex.IsMatch(name, @"^[a-zA-Z]+$"))
+                return false;
+
+            return true;
+        }
+
+        static public bool isLastNameValid(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+                return true;
+            else if (!Regex.IsMatch(name, @"^[a-zA-Z]+$"))
                 return false;
 
             return true;
