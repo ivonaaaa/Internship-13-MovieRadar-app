@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Runtime.CompilerServices;
 using MovieRadar.Application.Interfaces;
 using MovieRadar.Domain.Entities;
 
@@ -16,10 +15,26 @@ namespace MovieRadar.WebAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Movie>>> GetAllMovies()
+        public async Task<ActionResult<IEnumerable<Movie>>> GetAllMovies([FromQuery] string? filter, [FromQuery] string? value)
         {
-            var allMovies = await movieService.GetAll();
-            return Ok(allMovies);
+            var validFilters = new HashSet<string> { "release_year", "genre" };
+
+            if (string.IsNullOrEmpty(filter) && string.IsNullOrEmpty(value))
+            {
+                var allMovies = await movieService.GetAll();
+                return (allMovies == null || !allMovies.Any()) ? NotFound() : Ok(allMovies);
+            }
+
+
+            if (!validFilters.Contains(filter))
+                return BadRequest($"Invalid filter: '{filter}'");
+
+            if(string.IsNullOrWhiteSpace(value))
+                return BadRequest("Value cannot be empty");
+
+            var filteredMovies = await movieService.GetFilteredMovies(filter, value);
+    
+            return (filteredMovies == null || !filteredMovies.Any())? NotFound() : Ok(filteredMovies);
         }
 
         [HttpGet("{id}")]
@@ -30,6 +45,16 @@ namespace MovieRadar.WebAPI.Controllers
                 return NotFound();
 
             return Ok(movie);
+        }
+
+        [HttpGet("order")]
+        public async Task<ActionResult<IEnumerable<Movie>>> GetOrderedMoviesByRatingGrade([FromQuery] string orderDirection)
+        {
+            if(orderDirection != "asc" && orderDirection != "desc")
+                return BadRequest();
+
+            var movies = await movieService.GetOrderedMoviesByGrade(orderDirection);
+            return (movies == null || !movies.Any()) ? NotFound() : Ok(movies);
         }
 
         [HttpPost]
