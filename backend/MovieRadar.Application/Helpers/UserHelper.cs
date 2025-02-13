@@ -9,16 +9,24 @@ namespace MovieRadar.Application.Helpers
         {
             if (user == null)
                 return (false, "The user is null!");
-            else if (!isEmailValid(user.Email))
-                return (false, "The email is invalid!");
-            else if (!isPasswordValid(user.Password))
-                return (false, "The password is invalid!");
-            else if (!isNameValid(user.FirstName))
-                return (false, "The first name is invalid!");
-            else if (!isLastNameValid(user.LastName))
-                return (false, "The last name is invalid!");
 
-            return (true, "User is valid");
+            switch (true)
+            {
+                case var _ when !isEmailValid(user.Email):
+                    return (false, "The email is invalid!");
+
+                case var _ when !isPasswordValid(user.Password):
+                    return (false, "The password is invalid!");
+
+                case var _ when !isNameValid(user.FirstName):
+                    return (false, "The first name is invalid!");
+
+                case var _ when !isLastNameValid(user.LastName):
+                    return (false, "The last name is invalid!");
+
+                default:
+                    return (true, "User is valid");
+            }
         }
 
         static public bool isPasswordValid(string password)
