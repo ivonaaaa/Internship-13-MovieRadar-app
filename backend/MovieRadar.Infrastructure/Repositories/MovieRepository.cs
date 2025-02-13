@@ -64,11 +64,6 @@ namespace MovieRadar.Infrastructure.Repositories
 
         public async Task<IEnumerable<Movie>> OrderByRating(string orderDirection)
         {
-            //var orderQuery = @$"SELECT m.id AS Id, title AS Title, summary AS Summary, release_year AS ReleaseYear, genre AS Genre, ROUND(AVG(r.grade), 2) AS AverageGrade
-            //                    FROM movies m
-            //                    JOIN ratings r ON m.id = r.movie_id
-            //                    GROUP BY m.id, m.title, m.summary, m.release_year, m.genre
-            //                    ORDER BY AverageGrade {orderDirection}";
             var orderQuery = @$"SELECT id AS Id, title AS Title, summary AS Summary, release_year AS ReleaseYear, genre AS Genre, avg_rating AS AvgRating, created_at AS CreatedAt, last_modified_at AS LastModifiedAt
                                 FROM movies
                                 ORDER BY avg_rating {orderDirection}";
