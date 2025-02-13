@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MovieRadar.Application.Interfaces;
 using MovieRadar.Domain.Entities;
+using MovieRadar.Application.Helpers;
 
 namespace MovieRadar.WebAPI.Controllers
 {
@@ -62,6 +63,9 @@ namespace MovieRadar.WebAPI.Controllers
         [HttpPost]
         public async Task<ActionResult> AddMovie([FromBody] Movie newMovie)
         {
+            if(!MovieHelper.IsMovieValid(newMovie) || newMovie == null)
+                return BadRequest("Invalid movie");
+
             var newMovieId = await movieService.Add(newMovie);
             return CreatedAtAction(nameof(GetMovieById), new { id = newMovieId }, newMovie);
         }
