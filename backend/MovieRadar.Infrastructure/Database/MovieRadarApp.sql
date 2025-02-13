@@ -16,9 +16,9 @@ CREATE TABLE movies(
     id SERIAL PRIMARY KEY,
     title TEXT NOT NULL UNIQUE,
     summary TEXT,
-    genre TEXT,
+    genre TEXT NOT NULL,
     release_year INT,
-    added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     last_modified_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     avg_rating DECIMAL(3, 1) DEFAULT NULL
 

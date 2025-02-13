@@ -64,7 +64,7 @@ namespace MovieRadar.WebAPI.Controllers
             return CreatedAtAction(nameof(GetMovieById), new { id = newMovieId }, newMovie);
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("update/{id}")]
         public async Task<IActionResult> UpdateMovie([FromBody] Movie updatedMovie, int id)
         {
             if(id != updatedMovie.Id)
