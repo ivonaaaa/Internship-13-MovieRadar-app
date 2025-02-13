@@ -15,21 +15,26 @@ namespace MovieRadar.WebAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Movie>>> GetAllMovies([FromQuery] string? filter, [FromQuery] string? parameter)
+        public async Task<ActionResult<IEnumerable<Movie>>> GetAllMovies([FromQuery] string? filter, [FromQuery] string? value)
         {
-            IEnumerable<Movie> movies;
+            var validFilters = new HashSet<string> { "release_year", "genre" };
 
-            var filters = new string[] { "release_year", "genre" };
+            if (string.IsNullOrEmpty(filter) && string.IsNullOrEmpty(value))
+            {
+                var allMovies = await movieService.GetAll();
+                return (allMovies == null || !allMovies.Any()) ? NotFound() : Ok(allMovies);
+            }
 
-            if(!filters.Contains(filter))
-                return BadRequest();
 
-            if (!string.IsNullOrEmpty(filter) && !string.IsNullOrEmpty(parameter))
-                movies = await movieService.GetFilteredMovies(filter, parameter);
-            else
-                movies = await movieService.GetAll();
-                
-            return (movies == null || !movies.Any())? NotFound() : Ok(movies);
+            if (!validFilters.Contains(filter))
+                return BadRequest($"Invalid filter: '{filter}'");
+
+            if(string.IsNullOrWhiteSpace(value))
+                return BadRequest("Value cannot be empty");
+
+            var filteredMovies = await movieService.GetFilteredMovies(filter, value);
+    
+            return (filteredMovies == null || !filteredMovies.Any())? NotFound() : Ok(filteredMovies);
         }
 
         [HttpGet("{id}")]
