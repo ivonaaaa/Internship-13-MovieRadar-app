@@ -16,13 +16,14 @@ namespace MovieRadar.Application.Services
             _jwtSettings = jwtSettings.Value;
         }
 
-        public string GenerateToken(int userId, string username)
+        public string GenerateToken(int userId, string username, bool isAdmin)
         {
             var claims = new[]
             {
             new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
             new Claim(JwtRegisteredClaimNames.UniqueName, username),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            new Claim(ClaimTypes.Role, isAdmin ? "Admin" : "User")
         };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));

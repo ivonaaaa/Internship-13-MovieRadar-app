@@ -27,7 +27,7 @@ public class AuthController : ControllerBase
             return Unauthorized(new { message = "Invalid email or password!" });
         }
 
-        var token = tokenService.GenerateToken(user.Id, user.Email);
+        var token = tokenService.GenerateToken(user.Id, user.Email, user.IsAdmin);
         return Ok(new { token });
     }
 

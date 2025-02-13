@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using MovieRadar.Application.Interfaces;
 using MovieRadar.Domain.Entities;
 
@@ -31,6 +32,7 @@ namespace MovieRadar.WebAPI.Controllers
             return Ok(comment);
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult> AddComment([FromBody] Rating newComment)
         {
@@ -38,6 +40,7 @@ namespace MovieRadar.WebAPI.Controllers
             return CreatedAtAction(nameof(GetCommentById), new { id }, newComment);
         }
 
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateComment([FromBody] Rating updatedComment, int id)
         {
@@ -48,6 +51,7 @@ namespace MovieRadar.WebAPI.Controllers
             return updated ? NoContent() : NotFound();
         }
 
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteComment(int id)
         {

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MovieRadar.Domain.Entities;
 using MovieRadar.Application.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MovieRadar.WebAPI.Controllers
 {
@@ -31,13 +32,7 @@ namespace MovieRadar.WebAPI.Controllers
             return Ok(user);
         }
 
-        [HttpPost]
-        public async Task<ActionResult> AddUser([FromBody] User newUser)
-        {
-            var id = await userService.Add(newUser);
-            return CreatedAtAction(nameof(GetUserById), new { id }, newUser);
-        }
-
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser([FromBody] User updatedUser, int id)
         {
@@ -48,6 +43,7 @@ namespace MovieRadar.WebAPI.Controllers
             return updated ? NoContent() : NotFound();
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
