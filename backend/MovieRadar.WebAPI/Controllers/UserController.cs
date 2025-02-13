@@ -32,7 +32,7 @@ namespace MovieRadar.WebAPI.Controllers
             return Ok(user);
         }
 
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult> AddUser([FromBody] User newUser)
         {
@@ -40,7 +40,7 @@ namespace MovieRadar.WebAPI.Controllers
             return CreatedAtAction(nameof(GetUserById), new { id }, newUser);
         }
 
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser([FromBody] User updatedUser, int id)
         {
@@ -51,7 +51,7 @@ namespace MovieRadar.WebAPI.Controllers
             return updated ? NoContent() : NotFound();
         }
 
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {

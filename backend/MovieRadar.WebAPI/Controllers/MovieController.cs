@@ -58,7 +58,7 @@ namespace MovieRadar.WebAPI.Controllers
             return (movies == null || !movies.Any()) ? NotFound() : Ok(movies);
         }
 
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult> AddMovie([FromBody] Movie newMovie)
         {
@@ -66,7 +66,7 @@ namespace MovieRadar.WebAPI.Controllers
             return CreatedAtAction(nameof(GetMovieById), new { id = newMovieId }, newMovie);
         }
 
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateMovie([FromBody] Movie updatedMovie, int id)
         {
@@ -77,9 +77,9 @@ namespace MovieRadar.WebAPI.Controllers
             return updated ? NoContent() : NotFound();
         }
 
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteComment(int id)
+        public async Task<IActionResult> DeleteMovie(int id)
         {
             var deleted = await movieService.DeleteById(id);
             return deleted ? NoContent() : NotFound();
