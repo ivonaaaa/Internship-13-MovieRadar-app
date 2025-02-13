@@ -70,5 +70,17 @@ namespace MovieRadar.Application.Services
                 throw new Exception($"Error deleting user: {ex.Message}, inner: {ex.InnerException}");
             }
         }
+
+        public async Task<User?> GetByEmail(string email)
+        {
+            try
+            {
+                return await userRepository.GetByEmail(email);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error getting user by email: {ex.Message}, inner: {ex.InnerException}");
+            }
+        }
     }
 }
