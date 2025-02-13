@@ -18,15 +18,14 @@ CREATE TABLE movies(
     summary TEXT,
     genre TEXT,
     release_year INT,
+    added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    last_modified_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    avg_rating DECIMAL(4, 2) DEFAULT NULL
 
     CONSTRAINT release_year_check CHECK (release_year <= EXTRACT(YEAR FROM CURRENT_DATE))
 );
-ALTER TABLE movies
-    ADD COLUMN added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    ADD COLUMN last_modified_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;  
 ALTER TABLE movies ALTER COLUMN release_year SET NOT NULL;  
-ALTER TABLE movies
-  ADD COLUMN avg_rating DECIMAL(3, 1) DEFAULT 0;     
+  
 
 CREATE TABLE ratings(
     id SERIAL PRIMARY KEY,
@@ -39,10 +38,7 @@ CREATE TABLE ratings(
     CONSTRAINT rating_check CHECK (grade >= 1.0 AND grade <= 10.0),
     CONSTRAINT unique_user_movie UNIQUE(user_id, movie_id)
 );
--- ALTER TABLE comments 
---     RENAME COLUMN rating TO grade;
--- ALTER TABLE comments 
---     RENAME TO ratings;
+
 
 CREATE TABLE ratings_comments (
     id SERIAL PRIMARY KEY, 
@@ -70,7 +66,6 @@ BEFORE UPDATE ON movies
 FOR EACH ROW
 EXECUTE FUNCTION update_last_modified_at();  
 
-
 CREATE OR REPLACE FUNCTION update_avg_movie_rating()
 RETURNS TRIGGER AS $$
 BEGIN 
@@ -81,10 +76,19 @@ BEGIN
     WHERE movie_id = NEW.movie_id
   )
   WHERE id = NEW.movie_id;
+  IF (TG_OP = 'DELETE') THEN
+    UPDATE movies
+    SET avg_rating = (
+      SELECT AVG(grade)
+      FROM ratings
+      WHERE movie_id = OLD.movie_id
+    )
+    WHERE id = OLD.movie_id;
+  END IF;
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER trigger_update_column_avg_rating
-AFTER INSERT ON ratings FOR EACH row
+AFTER INSERT OR DELETE OR UPDATE ON ratings FOR EACH row
 EXECUTE FUNCTION update_avg_movie_rating();
