@@ -15,6 +15,7 @@ async function getAllUsers() {
     return [];
   }
 }
+
 async function createUser(newUser) {
   try {
     const response = await fetch("https://localhost:50844/api/User", {
@@ -34,6 +35,71 @@ async function createUser(newUser) {
   }
 }
 
+async function loginUser(email, password) {
+  try {
+    const response = await fetch("http://localhost:50845/api/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ Email: email, Password: password }),
+    });
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        throw new Error("Invalid email address or password.");
+      } else {
+        throw new Error("An error occurred during login.");
+      }
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error logging in user:", error);
+    throw error;
+  }
+}
+
+async function getUserById(userId) {
+  try {
+    const response = await fetch(`http://localhost:50845/api/User/${userId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    if (!response.ok) {
+      throw new Error(`Error retrieving user: ${response.statusText}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error retrieving user:", error);
+    throw error;
+  }
+}
+
+async function registerUser(newUser) {
+  try {
+    const response = await fetch("http://localhost:50845/api/auth/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(newUser),
+    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(
+        errorData.message || "An error occurred during registration."
+      );
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error registering user:", error);
+    throw error;
+  }
+}
+
 async function fetchMovies(url, options) {
   try {
     const response = await fetch(url, options);
@@ -47,70 +113,9 @@ async function fetchMovies(url, options) {
     return null;
   }
 }
-//! FILTRIRANJE NE RADI KAKO TREBA
-// async function getMovieList({ genre, year, sort } = {}) {
-//   let url = "http://localhost:50845/api/movie";
-//   const queryParams = [];
 
-//   console.log("🔎 Initial URL:", url);
-//   console.log("📌 Filter parameters received:", { genre, year, sort });
-
-//   if (genre) {
-//     queryParams.push(`filter=genre&parameter=${genre}`);
-//     console.log("✅ Genre filter added:", `filter=genre&parameter=${genre}`);
-//   }
-//   if (year) {
-//     queryParams.push(`filter=release_year&parameter=${year}`);
-//     console.log(
-//       "✅ Year filter added:",
-//       `filter=release_year&parameter=${year}`
-//     );
-//   }
-//   if (sort) {
-//     const orderDirection = sort === "rating_desc" ? "desc" : "asc";
-//     queryParams.push(`orderDirection=${orderDirection}`);
-//     console.log("✅ Sorting added:", `orderDirection=${orderDirection}`);
-//   }
-
-//   if (queryParams.length > 0) {
-//     url += `?${queryParams.join("&")}`;
-//   }
-
-//   console.log("🚀 Final URL being fetched:", url);
-
-//   const options = {
-//     method: "GET",
-//     headers: {
-//       "Content-Type": "application/json",
-//     },
-//     mode: "cors",
-//   };
-
-//   try {
-//     const data = await fetchMovies(url, options);
-//     console.log("🎬 Movies fetched:", data);
-//     return data;
-//   } catch (error) {
-//     console.error("❌ Error fetching movies:", error);
-//     return null;
-//   }
-// }
-
-async function fetchRatings(url, options) {
-  try {
-    const response = await fetch(url, options);
-    if (!response.ok) {
-      throw new Error("Failed to fetch comments.");
-    }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Error fetching comments:", error);
-    return null;
-  }
-}
-async function getRatingsList() {
-  const url = `http://localhost:50845/api/rating`;
+async function getMovieList() {
+  const url = "https://localhost:50844/api/movie";
   const options = {
     method: "GET",
     headers: {
@@ -119,7 +124,37 @@ async function getRatingsList() {
     mode: "cors",
   };
 
-  return await fetchRatings(url, options);
+  return await fetchMovies(url, options);
 }
 
-export { getMovieList, getAllUsers, createUser, getRatingsList };
+async function postComment(commentData, token) {
+  try {
+    const response = await fetch("http://localhost:50845/api/rating", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        // Ako API očekuje Authorization header:
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(commentData),
+    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Error posting comment");
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error posting comment:", error);
+    throw error;
+  }
+}
+
+export {
+  getAllUsers,
+  createUser,
+  loginUser,
+  getUserById,
+  registerUser,
+  getMovieList,
+  postComment,
+};

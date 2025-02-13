@@ -50,5 +50,23 @@ namespace MovieRadar.Infrastructure.Repositories
             var deleteMovieQuery = "DELETE FROM movies WHERE id = @Id";
             return await connection.ExecuteAsync(deleteMovieQuery, new { Id = id }) > 0;
         }
+
+        public async Task<IEnumerable<Movie>> GetFilteredMovies(string filter, string parameter)
+        {
+            var getFilteredMoviesQuery = $@"SELECT id AS Id, title AS Title, summary AS Summary, release_year AS ReleaseYear, genre AS Genre 
+                                            FROM movies 
+                                            WHERE {filter} = '{parameter}'";
+            return await connection.QueryAsync<Movie>(getFilteredMoviesQuery);
+        }
+
+        public async Task<IEnumerable<Movie>> OrderByRating(string orderDirection)
+        {
+            var orderQuery = @$"SELECT m.id AS Id, title AS Title, summary AS Summary, release_year AS ReleaseYear, genre AS Genre, ROUND(AVG(r.grade), 2) AS AverageGrade
+                                FROM movies m
+                                JOIN ratings r ON m.id = r.movie_id
+                                GROUP BY m.id, m.title, m.summary, m.release_year, m.genre
+                                ORDER BY AverageGrade {orderDirection}";
+            return await connection.QueryAsync<Movie>(orderQuery);
+        }
     }
 }
