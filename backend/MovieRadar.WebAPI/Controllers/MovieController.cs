@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using MovieRadar.Application.Interfaces;
 using MovieRadar.Domain.Entities;
 
@@ -57,6 +58,7 @@ namespace MovieRadar.WebAPI.Controllers
             return (movies == null || !movies.Any()) ? NotFound() : Ok(movies);
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult> AddMovie([FromBody] Movie newMovie)
         {
@@ -64,6 +66,7 @@ namespace MovieRadar.WebAPI.Controllers
             return CreatedAtAction(nameof(GetMovieById), new { id = newMovieId }, newMovie);
         }
 
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateMovie([FromBody] Movie updatedMovie, int id)
         {
@@ -74,6 +77,7 @@ namespace MovieRadar.WebAPI.Controllers
             return updated ? NoContent() : NotFound();
         }
 
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteComment(int id)
         {
