@@ -2,6 +2,16 @@
 {
     public class User
     {
+        public User() { }
+
+        public User(string firstName, string lastName, string email, string password)
+        {
+            FirstName = firstName;
+            LastName = lastName;
+            Email = email;
+            Password = password;
+        }
+
         public int Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
