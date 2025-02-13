@@ -79,7 +79,7 @@ BEGIN
     WHERE id = NEW.movie_id;
   END IF;
 
-  IF (TG_OP = 'DELETE') THEN
+  ELSIF (TG_OP = 'DELETE') THEN
     UPDATE movies
     SET avg_rating = (
       SELECT AVG(grade)
