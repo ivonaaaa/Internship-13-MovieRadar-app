@@ -5,6 +5,7 @@ using MovieRadar.Infrastructure.Repositories;
 using MovieRadar.Application.Services;
 using MovieRadar.Application.Interfaces;
 using System.Reflection;
+using MovieRadar.Application.Handlers;
 
 
 var builder = WebApplication.CreateBuilder(args);

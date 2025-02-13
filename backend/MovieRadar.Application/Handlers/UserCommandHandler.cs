@@ -4,7 +4,7 @@ using MovieRadar.Application.Commands;
 using MovieRadar.Application.Queries;
 using MovieRadar.Domain.Entities;
 
-namespace MovieRadar.Application.Services
+namespace MovieRadar.Application.Handlers
 {
     public class UserCommandHandler : IRequestHandler<GetAll, IEnumerable<User>>
     {
