@@ -47,18 +47,54 @@ async function fetchMovies(url, options) {
     return null;
   }
 }
-async function getMovieList() {
-  const url = "http://localhost:50845/api/movie";
-  const options = {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    mode: "cors",
-  };
+//! FILTRIRANJE NE RADI KAKO TREBA
+// async function getMovieList({ genre, year, sort } = {}) {
+//   let url = "http://localhost:50845/api/movie";
+//   const queryParams = [];
 
-  return await fetchMovies(url, options);
-}
+//   console.log("🔎 Initial URL:", url);
+//   console.log("📌 Filter parameters received:", { genre, year, sort });
+
+//   if (genre) {
+//     queryParams.push(`filter=genre&parameter=${genre}`);
+//     console.log("✅ Genre filter added:", `filter=genre&parameter=${genre}`);
+//   }
+//   if (year) {
+//     queryParams.push(`filter=release_year&parameter=${year}`);
+//     console.log(
+//       "✅ Year filter added:",
+//       `filter=release_year&parameter=${year}`
+//     );
+//   }
+//   if (sort) {
+//     const orderDirection = sort === "rating_desc" ? "desc" : "asc";
+//     queryParams.push(`orderDirection=${orderDirection}`);
+//     console.log("✅ Sorting added:", `orderDirection=${orderDirection}`);
+//   }
+
+//   if (queryParams.length > 0) {
+//     url += `?${queryParams.join("&")}`;
+//   }
+
+//   console.log("🚀 Final URL being fetched:", url);
+
+//   const options = {
+//     method: "GET",
+//     headers: {
+//       "Content-Type": "application/json",
+//     },
+//     mode: "cors",
+//   };
+
+//   try {
+//     const data = await fetchMovies(url, options);
+//     console.log("🎬 Movies fetched:", data);
+//     return data;
+//   } catch (error) {
+//     console.error("❌ Error fetching movies:", error);
+//     return null;
+//   }
+// }
 
 async function fetchRatings(url, options) {
   try {
