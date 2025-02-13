@@ -33,14 +33,6 @@ namespace MovieRadar.WebAPI.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpPost]
-        public async Task<ActionResult> AddUser([FromBody] User newUser)
-        {
-            var id = await userService.Add(newUser);
-            return CreatedAtAction(nameof(GetUserById), new { id }, newUser);
-        }
-
-        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser([FromBody] User updatedUser, int id)
         {
