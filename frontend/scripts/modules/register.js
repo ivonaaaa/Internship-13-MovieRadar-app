@@ -1,5 +1,5 @@
 import { initUserApp } from "./user-app.js";
-import { getAllUsers, createUser } from "../api/api.js";
+import { registerUser } from "../api/api.js";
 
 document.addEventListener("DOMContentLoaded", function () {
   const registerContainer = document.getElementById("register-container");
@@ -23,15 +23,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     try {
-      const allUsers = await getAllUsers();
-      const emailExists = allUsers.some(u => u.email === email);
-      if (emailExists) {
-        alert("A user with this email already exists.");
-        return;
-      }
-
-      // Kreiranje novog korisnika
-      const newUser = {
+       const newUser = {
         firstName,
         lastName,
         email,
@@ -39,18 +31,10 @@ document.addEventListener("DOMContentLoaded", function () {
         is_admin: false
       };
 
-      const createdUser = await createUser(newUser);
-      if (!createdUser) {
-        throw new Error("User creation failed or returned null.");
-      }
+      await registerUser(newUser);
 
       registerContainer.style.display = "none";
-      try {
-        initUserApp();
-      } catch (error) {
-        console.error("Error while loading user app:", error);
-      }
-
+      initUserApp();
     } catch (error) {
       console.error("An error occurred during registration:", error);
       alert("An error occurred while accessing the server.");
