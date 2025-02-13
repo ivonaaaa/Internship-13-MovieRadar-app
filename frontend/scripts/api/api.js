@@ -15,7 +15,7 @@ async function fetchMovies(url, options) {
 }
 
 async function getMovieList() {
-  const url = "https://localhost:50844/api/movie";
+  const url = "http://localhost:50845/api/movie";
   const options = {
     method: "GET",
     headers: {
@@ -29,7 +29,7 @@ async function getMovieList() {
 
 async function getAllUsers() {
   try {
-    const response = await fetch("https://localhost:50844/api/User", {
+    const response = await fetch("http://localhost:50845/api/User", {
       method: "GET",
       headers: {
         "Content-Type": "application/json"
@@ -48,7 +48,7 @@ async function getAllUsers() {
 
 async function createUser(newUser) {
   try {
-    const response = await fetch("https://localhost:50844/api/User", {
+    const response = await fetch("http://localhost:50845/api/User", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -65,11 +65,102 @@ async function createUser(newUser) {
   }
 }
 
+async function loginUser(email, password) {
+  try {
+    const response = await fetch("http://localhost:50845/api/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ Email: email, Password: password }),
+    });
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        throw new Error("Invalid email address or password.");
+      } else {
+        throw new Error("An error occurred during login.");
+      }
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error logging in user:", error);
+    throw error;
+  }
+}
+
+async function getUserById(userId) {
+  try {
+    const response = await fetch(`http://localhost:50845/api/User/${userId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    if (!response.ok) {
+      throw new Error(`Error retrieving user: ${response.statusText}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error retrieving user:", error);
+    throw error;
+  }
+}
+
+async function registerUser(newUser) {
+  try {
+    const response = await fetch("http://localhost:50845/api/auth/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(newUser)
+    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "An error occurred during registration.");
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error registering user:", error);
+    throw error;
+  }
+}
+
+async function postComment(commentData, token) {
+  try {
+    const response = await fetch("http://localhost:50845/api/rating", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        // Ako API očekuje Authorization header:
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify(commentData)
+    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Error posting comment");
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error posting comment:", error);
+    throw error;
+  }
+}
+
+
+
 //! ode treba dodat fetcheve za comments
 
 //! treba exportat funkcije s fetchanim podacima za users i comments i koristit ih dalje
 export { 
   getMovieList,
   getAllUsers,
-  createUser
+  createUser,
+  loginUser,
+  getUserById,
+  registerUser,
+  postComment
 };

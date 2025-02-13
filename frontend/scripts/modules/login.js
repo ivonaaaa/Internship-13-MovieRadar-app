@@ -1,7 +1,8 @@
-import { saveAuthToken } from "./auth.js";
+import { saveAuthToken,decodeToken } from "./auth.js";
 import { initAdminApp } from "./admin-app.js";
 import { initUserApp } from "./user-app.js";
-import { getAllUsers } from "../api/api.js";
+import { loginUser,getUserById } from "../api/api.js";
+
 
 document.addEventListener("DOMContentLoaded", function () {
   const loginContainer = document.getElementById("login-container");
@@ -24,27 +25,29 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     try {
-      const allUsers = await getAllUsers();
+      const data = await loginUser(email, password);
+      const token = data.token;
 
-      const user = allUsers.find(u => u.email === email && u.password === password);
-      if (user) {
-        loginContainer.style.display = "none";
-        try {
-          // Pozivamo funkcije ovisno o tome je li korisnik admin
-          if (user.is_admin) {
-            initAdminApp();
-          } else {
-            initUserApp();
-          }
-        } catch (error) {
-          console.error("Error while loading module:", error);
-        }
+      saveAuthToken(token);
+
+      loginContainer.style.display = "none";
+
+      const decoded = decodeToken(token);
+      const userId = decoded ? decoded.sub : null;
+      if (!userId) {
+        throw new Error("Failed to retrieve user ID from token.");
+      }
+
+      const user = await getUserById(userId);
+
+      // Provjera je li korisnik admin
+      if (user.isAdmin) {
+        initAdminApp();
       } else {
-        alert("Invalid username or password.");
+        initUserApp();
       }
     } catch (error) {
-      console.error("An error occurred:", error);
-      alert("An error occurred while accessing the server.");
+      alert(error.message);
     }
   });
 

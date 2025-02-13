@@ -3,7 +3,7 @@ import { getMovieList } from "../api/api.js";
 
 console.log("aaaaaa");
 export function initAdminApp() {
-  console.log("bbbbbb");
+  console.log("fffff");
 
   async function initialize() {
     console.log("cccccc");
