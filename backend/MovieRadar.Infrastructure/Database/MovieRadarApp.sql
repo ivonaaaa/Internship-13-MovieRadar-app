@@ -24,7 +24,9 @@ CREATE TABLE movies(
 ALTER TABLE movies
     ADD COLUMN added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     ADD COLUMN last_modified_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;  
-ALTER TABLE movies ALTER COLUMN release_year SET NOT NULL;       
+ALTER TABLE movies ALTER COLUMN release_year SET NOT NULL;  
+ALTER TABLE movies
+  ADD COLUMN avg_rating DECIMAL(3, 1) DEFAULT 0;     
 
 CREATE TABLE ratings(
     id SERIAL PRIMARY KEY,
@@ -67,3 +69,22 @@ CREATE TRIGGER trigger_update_last_modified_at
 BEFORE UPDATE ON movies
 FOR EACH ROW
 EXECUTE FUNCTION update_last_modified_at();  
+
+
+CREATE OR REPLACE FUNCTION update_avg_movie_rating()
+RETURNS TRIGGER AS $$
+BEGIN 
+  UPDATE movies
+  SET avg_rating = (
+    SELECT AVG(grade)
+    FROM ratings
+    WHERE movie_id = NEW.movie_id
+  )
+  WHERE id = NEW.movie_id;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_update_column_avg_rating
+AFTER INSERT ON ratings FOR EACH row
+EXECUTE FUNCTION update_avg_movie_rating();
