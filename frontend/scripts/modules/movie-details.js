@@ -38,7 +38,7 @@ const displayMovieDetails = async (movieId) => {
       </div>
     `;
     //! ode se treba implementirat mogucnost komentiranja itd ali SAMO ZA obicne korisnike
-    //!
+    //! znaci treba provjerit po tokenu valjda ili sta vec je li user admin ili ne i ako nije onda prikazat input za comment i to sve
     //!
   } catch (error) {
     console.error("Error:", error);
