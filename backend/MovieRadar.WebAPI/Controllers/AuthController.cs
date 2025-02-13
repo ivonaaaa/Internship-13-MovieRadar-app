@@ -9,12 +9,12 @@ using Microsoft.AspNetCore.Identity.Data;
 public class AuthController : ControllerBase
 {
     private readonly IUserService userService;
-    private readonly TokenService _tokenService;
+    private readonly ITokenService tokenService;
 
-    public AuthController(IUserService userService, TokenService tokenService)
+    public AuthController(IUserService userService, ITokenService tokenService)
     {
         this.userService = userService;
-        _tokenService = tokenService;
+        this.tokenService = tokenService;
     }
 
     [HttpPost("login")]
@@ -27,7 +27,7 @@ public class AuthController : ControllerBase
             return Unauthorized(new { message = "Invalid email or password!" });
         }
 
-        var token = _tokenService.GenerateToken(user.Id, user.Email);
+        var token = tokenService.GenerateToken(user.Id, user.Email);
         return Ok(new { token });
     }
 
