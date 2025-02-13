@@ -1,4 +1,3 @@
-import { saveAuthToken } from "./auth.js";
 import { initAdminApp } from "./admin-app.js";
 import { initUserApp } from "./user-app.js";
 import { getAllUsers } from "../api/api.js";
@@ -32,7 +31,6 @@ document.addEventListener("DOMContentLoaded", function () {
       if (user) {
         loginContainer.style.display = "none";
         try {
-          // Pozivamo funkcije ovisno o tome je li korisnik admin
           if (user.is_admin) {
             initAdminApp();
           } else {
