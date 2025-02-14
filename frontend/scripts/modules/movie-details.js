@@ -1,33 +1,56 @@
-//! ode treba stavit pravi import za fetchanje filmova I KOMENTARA
-import { fetchMovies, fetchComments } from "../../ivona-test/ivona-api.js";
+import { getAllUsers, getMovieList, getRatingsList } from "../api/api.js";
 
 const displayMovieDetails = async (movieId) => {
-  const movieData = (await fetchMovies()).find((m) => m.id == movieId);
-  if (!movieData) {
-    document.getElementById("movies-container").innerHTML =
-      "<p>Data of this particular movie is not found.</p>";
-    return;
-  }
+  try {
+    const movies = await getMovieList();
+    const movieData = movies.find((m) => m.id === movieId);
 
-  const comments = await fetchComments(movieId); //! ili kakogod da se nazove funkcija za fethcanje komentara
+    if (!movieData) {
+      document.getElementById("movies-container").innerHTML =
+        "<p>Movie details not found.</p>";
+      return;
+    }
 
-  document.getElementById("movies-container").innerHTML = `
-      <h2>${movieData.title} (${movieData.release_year})</h2>
+    const allRatings = await getRatingsList();
+    const movieRatings = allRatings.filter(
+      (rating) => rating.movieId === movieId
+    );
+
+    const users = await getAllUsers();
+
+    document.getElementById("movies-container").innerHTML = `
+      <h2>${movieData.title} (${movieData.releaseYear})</h2>
       <p>${movieData.summary}</p>
+      <h3>Average grade: ${averageRating(movieRatings)} / 10</h3>
       <h3>Comments</h3>
       <div id="comments-section">
         ${
-          comments.length
-            ? comments
-                .map(
-                  (c) =>
-                    `<p><strong>${c.user_id}:</strong> ${c.content} (⭐ ${c.grade})</p>`
-                )
+          movieRatings.length
+            ? movieRatings
+                .map((c) => {
+                  const user = users.find((u) => u.id === c.userId);
+                  const userName = user ? user.firstName : "Unknown user";
+                  return `<p><strong>${userName}:</strong> ${c.review} (⭐ ${c.grade})</p>`;
+                })
                 .join("")
-            : "<p>No comments yet.</p>"
+            : "<p>No available comments.</p>"
         }
       </div>
     `;
+    //! ode se treba implementirat mogucnost komentiranja itd ali SAMO ZA obicne korisnike
+    //! znaci treba provjerit po tokenu valjda ili sta vec je li user admin ili ne i ako nije onda prikazat input za comment i to sve
+    //!
+  } catch (error) {
+    console.error("Error:", error);
+    document.getElementById("movies-container").innerHTML =
+      "<p>An error ocurred while trying to fetch movie details.</p>";
+  }
+};
+
+const averageRating = (ratings) => {
+  if (ratings.length === 0) return 0;
+  const total = ratings.reduce((sum, rating) => sum + rating.grade, 0);
+  return parseFloat((total / ratings.length).toFixed(1));
 };
 
 export { displayMovieDetails };

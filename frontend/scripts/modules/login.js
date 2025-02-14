@@ -1,8 +1,7 @@
-import { saveAuthToken,decodeToken } from "./auth.js";
+import { saveAuthToken, decodeToken } from "./auth.js";
 import { initAdminApp } from "./admin-app.js";
 import { initUserApp } from "./user-app.js";
-import { loginUser,getUserById } from "../api/api.js";
-
+import { loginUser, getUserById } from "../api/api.js";
 
 document.addEventListener("DOMContentLoaded", function () {
   const loginContainer = document.getElementById("login-container");
@@ -56,9 +55,7 @@ document.addEventListener("DOMContentLoaded", function () {
     createBtn.addEventListener("click", function () {
       loginContainer.style.display = "none";
       const registerContainer = document.getElementById("register-container");
-      if (registerContainer) {
-        registerContainer.style.display = "block";
-      }
+      if (registerContainer) registerContainer.style.display = "block";
     });
   }
 });
