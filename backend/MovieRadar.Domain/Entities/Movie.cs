@@ -8,8 +8,8 @@
         public int ReleaseYear{ get; set; }
         public string Summary { get; set; }
         public float AvgRating { get; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime LastModifiedAt { get; set; }
+        public DateTime CreatedAt { get; }
+        public DateTime LastModifiedAt { get; }
         //public string Image { get; set; }
     }
 }

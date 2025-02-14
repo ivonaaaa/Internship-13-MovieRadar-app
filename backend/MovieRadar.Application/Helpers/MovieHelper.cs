@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MovieRadar.Domain.Entities;
+﻿using MovieRadar.Domain.Entities;
 
 namespace MovieRadar.Application.Helpers
 {
@@ -11,25 +6,33 @@ namespace MovieRadar.Application.Helpers
     {
         public static (bool, string) IsMovieValid(Movie newMovie)
         {
-            string message = string.Empty;
+            var unValidFields = new List<string>();
 
-            if (newMovie.Title == null)
-            {
-                message = "Title cannot be null";
-                return (false, message); 
-            }
+            var titleValidation = CheckTitle(newMovie.Title);
+            if(!titleValidation.Item1)
+                unValidFields.Add(titleValidation.Item2);
 
-            if(newMovie.Genre == null)
-            {
-                message = "Genre cannot be null";
-                return (false, message);
-            }
+            var genreValidation = CheckGenre(newMovie.Genre);
+            if (!genreValidation.Item1)
+                unValidFields.Add(genreValidation.Item2);
 
-            return (true, "User is valid");
+            var releaseYearValidation = CheckReleaseYear(newMovie.ReleaseYear);
+            if(!releaseYearValidation.Item1)
+                unValidFields.Add(releaseYearValidation.Item2);
+
+            return unValidFields.Count() > 0 ? (false, string.Join("\n", unValidFields)) : (true, "Movie is valid");
         }
-        public static (bool, string) CheckTitle(string movies)
+        public static (bool, string) CheckTitle(string movieTitle)
         {
-
+            return !string.IsNullOrWhiteSpace(movieTitle) ? (true, "Title is valid") : (false, "Title cannot be empty");
+        }
+        public static (bool, string) CheckGenre(string movieGenre)
+        {
+            return !string.IsNullOrWhiteSpace(movieGenre) ? (true, "Genre is valid") : (false, "Genre cannot be empty");
+        }
+        public static (bool, string) CheckReleaseYear(int movieReleaseYear)
+        {
+            return (movieReleaseYear > 1850 && movieReleaseYear <= DateTime.Now.Year) ? (true, "Release year is valid") : (false, "Release year is not valid");
         }
     }
 }

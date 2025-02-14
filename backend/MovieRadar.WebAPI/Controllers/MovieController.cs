@@ -63,22 +63,41 @@ namespace MovieRadar.WebAPI.Controllers
         [HttpPost]
         public async Task<ActionResult> AddMovie([FromBody] Movie newMovie)
         {
-            if(!MovieHelper.IsMovieValid(newMovie) || newMovie == null)
-                return BadRequest("Invalid movie");
-
-            var newMovieId = await movieService.Add(newMovie);
-            return CreatedAtAction(nameof(GetMovieById), new { id = newMovieId }, newMovie);
+            try 
+            {
+                var newMovieId = await movieService.Add(newMovie);
+                return CreatedAtAction(nameof(GetMovieById), new { id = newMovieId }, newMovie);
+            }
+            catch(ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error adding new movie: , {ex.Message}, inner: , {ex.InnerException}");
+            }
         }
 
         [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateMovie([FromBody] Movie updatedMovie, int id)
         {
-            if(id != updatedMovie.Id)
-                return BadRequest();
+            if (id != updatedMovie.Id) //ovo mozda bespotrebno triba vidit kako ce slat podatke
+                return BadRequest("Not matching id");
 
-            var updated = await movieService.Update(updatedMovie);
-            return updated ? NoContent() : NotFound();
+            try
+            {
+                var updated = await movieService.Update(updatedMovie);
+                return updated ? NoContent() : NotFound();
+            }
+            catch(ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, $"Error updating new movie: , {ex.Message}, inner: , {ex.InnerException}");
+            }
         }
 
         [Authorize(Roles = "Admin")]
