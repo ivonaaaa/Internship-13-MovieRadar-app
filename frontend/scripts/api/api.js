@@ -159,11 +159,18 @@ async function postComment(commentData, token) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        // Ako API očekuje Authorization header:
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(commentData),
     });
+    console.log(response.status)
+
+     if (response.status === 401) {
+      alert("Your session is expired, Please login again.");
+      removeAuthToken();  
+      throw new Error("401 Unauthorized");
+    }
+
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.message || "Error posting comment");
@@ -183,5 +190,5 @@ export {
   registerUser,
   getMovieList,
   getRatingsList,
-  postComment,
+  postComment
 };

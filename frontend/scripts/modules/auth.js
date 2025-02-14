@@ -21,12 +21,12 @@ export function setCookie(name, value, minutes) {
   }
   
   export function eraseCookie(name) {
-    document.cookie = name + "=; Max-Age=-99999999; path=/";
+    document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
   }
   
   
   export function saveAuthToken(token) {
-    setCookie("authToken", token, 30);
+    setCookie("authToken", token, 0.2);
   }
   
   export function getAuthToken() {

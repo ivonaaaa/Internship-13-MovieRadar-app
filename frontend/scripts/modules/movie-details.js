@@ -1,4 +1,5 @@
-import { getAllUsers, getMovieList, getRatingsList } from "../api/api.js";
+import { getAllUsers, getMovieList, getRatingsList, postComment, getUserById } from "../api/api.js";
+import { getAuthToken, decodeToken, removeAuthToken } from "./auth.js";
 
 const displayMovieDetails = async (movieId) => {
   try {
@@ -12,10 +13,7 @@ const displayMovieDetails = async (movieId) => {
     }
 
     const allRatings = await getRatingsList();
-    const movieRatings = allRatings.filter(
-      (rating) => rating.movieId === movieId
-    );
-
+    const movieRatings = allRatings.filter((rating) => rating.movieId === movieId);
     const users = await getAllUsers();
 
     document.getElementById("movies-container").innerHTML = `
@@ -37,13 +35,64 @@ const displayMovieDetails = async (movieId) => {
         }
       </div>
     `;
-    //! ode se treba implementirat mogucnost komentiranja itd ali SAMO ZA obicne korisnike
-    //! znaci treba provjerit po tokenu valjda ili sta vec je li user admin ili ne i ako nije onda prikazat input za comment i to sve
-    //!
-  } catch (error) {
+
+    const token = getAuthToken();
+    let userId = null;
+    let isLoggedIn = false; 
+
+    if (token) {
+      try {
+        const decoded = decodeToken(token);
+        if (decoded && decoded.sub) {
+          userId = decoded.sub;
+          isLoggedIn = true;
+        }
+      } catch (e) {
+        console.error("Token decode failed:", e);
+      }
+    }
+
+      const commentFormHtml = `
+        <div id="comment-form-container">
+          <h4>Leave a comment:</h4>
+          <textarea id="comment-content" placeholder="Your comment"></textarea>
+          <br>
+          <input id="comment-grade" type="number" placeholder="Grade (1-10)" min="1" max="10" step="0.1">
+          <br>
+          <button id="submit-comment">Submit Comment</button>
+        </div>
+      `;
+      document.getElementById("movies-container").innerHTML += commentFormHtml;
+
+      document.getElementById("submit-comment").addEventListener("click", async () => {
+        const content = document.getElementById("comment-content").value.trim();
+        const grade = parseFloat(document.getElementById("comment-grade").value);
+        if (!content || isNaN(grade)) {
+          alert("Please enter a valid comment and grade.");
+          return;
+        }
+
+        const commentData = {
+          movieId: movieId,
+          review: content,
+          grade: grade,
+          userId: userId  
+        };
+
+        try {
+          const currentToken = getAuthToken();
+          await postComment(commentData, currentToken);
+          alert("Comment submitted successfully!");
+          displayMovieDetails(movieId);
+        } catch (err) {
+          window.location.href = "./index.html";
+        }
+      });
+    }
+   catch (error) {
     console.error("Error:", error);
     document.getElementById("movies-container").innerHTML =
-      "<p>An error ocurred while trying to fetch movie details.</p>";
+      "<p>An error occurred while trying to fetch movie details.</p>";
   }
 };
 
