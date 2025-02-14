@@ -18,36 +18,36 @@ namespace MovieRadar.WebAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Rating>>> GetAllComments()
         {
-            var allComments = await ratingService.GetAll();
-            return Ok(allComments);
+            var allRatings = await ratingService.GetAll();
+            return Ok(allRatings);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Rating>> GetCommentById(int id)
         {
-            var comment = await ratingService.GetById(id);
-            if(comment == null)
+            var rating = await ratingService.GetById(id);
+            if(rating == null)
                 return NotFound();
 
-            return Ok(comment);
+            return Ok(rating);
         }
 
         [Authorize]
         [HttpPost]
-        public async Task<ActionResult> AddComment([FromBody] Rating newComment)
+        public async Task<ActionResult> AddComment([FromBody] Rating newRating)
         {
-            var id = await ratingService.Add(newComment);
-            return CreatedAtAction(nameof(GetCommentById), new { id }, newComment);
+            var id = await ratingService.Add(newRating);
+            return CreatedAtAction(nameof(GetCommentById), new { id }, newRating);
         }
 
         [Authorize]
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateComment([FromBody] Rating updatedComment, int id)
+        public async Task<IActionResult> UpdateComment([FromBody] Rating updatedRating, int id)
         {
-            if(id != updatedComment.Id)
+            if(id != updatedRating.Id)
                 return BadRequest();
 
-            var updated = await ratingService.Update(updatedComment);
+            var updated = await ratingService.Update(updatedRating);
             return updated ? NoContent() : NotFound();
         }
 

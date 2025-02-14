@@ -52,7 +52,7 @@ namespace MovieRadar.Application.Services
         public async Task<bool> Update(Movie movie)
         {
             var updateMovieValidation = MovieHelper.IsMovieValid(movie);
-            if (!updateMovieValidation.Item1 || movie == null)
+            if (!updateMovieValidation.Item1)
                 throw new ArgumentException(updateMovieValidation.Item2);
 
             try

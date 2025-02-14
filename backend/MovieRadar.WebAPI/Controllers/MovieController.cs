@@ -82,7 +82,7 @@ namespace MovieRadar.WebAPI.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateMovie([FromBody] Movie updatedMovie, int id)
         {
-            if (id != updatedMovie.Id) //ovo mozda bespotrebno triba vidit kako ce slat podatke
+            if (id != updatedMovie.Id)
                 return BadRequest("Not matching id");
 
             try
