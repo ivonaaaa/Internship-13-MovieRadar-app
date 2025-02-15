@@ -3,6 +3,7 @@ using MovieRadar.Application.Services;
 using MovieRadar.Domain.Entities;
 using MovieRadar.Application.Helpers;
 using Microsoft.AspNetCore.Identity.Data;
+using MovieRadar.Application.Interfaces;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -34,7 +35,7 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<ActionResult> Register([FromBody] User newUser)
     {
-        var userValidity = UserHelper.isUserValid(newUser);
+        var userValidity = UserHelper.IsUserValid(newUser);
 
         if (!userValidity.Item1)
         {
@@ -48,7 +49,18 @@ public class AuthController : ControllerBase
             return BadRequest(new { message = "Email is already taken!" });
         }
 
-        var id = await userService.Add(newUser);
-        return Ok();
+        try
+        {
+            var id = await userService.Add(newUser);
+            return Ok();
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Error adding new user: , {ex.Message}, inner: , {ex.InnerException}");
+        }
     }
 }

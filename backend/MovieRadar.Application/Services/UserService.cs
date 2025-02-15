@@ -1,4 +1,5 @@
-﻿using MovieRadar.Domain.Entities;
+﻿using MovieRadar.Application.Helpers;
+using MovieRadar.Domain.Entities;
 using MovieRadar.Domain.Interfaces;
 
 namespace MovieRadar.Application.Services
@@ -37,6 +38,10 @@ namespace MovieRadar.Application.Services
 
         public async Task<int> Add(User user)
         {
+            var updateUserValidation = UserHelper.IsUserValid(user);
+            if (!updateUserValidation.Item1)
+                throw new ArgumentException(updateUserValidation.Item2);
+
             try
             {
                 return await userRepository.Add(user);
@@ -49,6 +54,10 @@ namespace MovieRadar.Application.Services
 
         public async Task<bool> Update(User user)
         {
+            var updateUserValidation = UserHelper.IsUserValid(user);
+            if (!updateUserValidation.Item1)
+                throw new ArgumentException(updateUserValidation.Item2);
+
             try
             {
                 return await userRepository.Update(user);
