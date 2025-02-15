@@ -41,6 +41,10 @@ namespace MovieRadar.Application.Services
 
         public async Task<int> Add(Rating rating)
         {
+            var updateRatingValidation = await RatingHelper.IsRatingValid(rating, movieRepository);
+            if (!updateRatingValidation.Item1)
+                throw new ArgumentException(updateRatingValidation.Item2);
+
             try
             {
                 return await ratingRepository.Add(rating);
