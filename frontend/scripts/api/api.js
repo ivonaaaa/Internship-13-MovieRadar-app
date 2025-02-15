@@ -1,3 +1,5 @@
+import { getAuthToken } from "../modules/auth.js";
+
 async function getAllUsers() {
   try {
     const response = await fetch("https://localhost:50844/api/User", {
@@ -150,21 +152,15 @@ async function getMovieList({ genre, year, sort } = {}) {
   }
 }
 
-//! treba ono nesto u headers dodat, token ili sta vec
+//! je li ovo dobro, stavila sam da se salje taj token
 async function createMovie(movieData) {
+  const token = getAuthToken();
+  if (!token) {
+    throw new Error("Unauthorized: No token found.");
+  }
+
   try {
-    const response = await fetch("http://localhost:50845/api/movie", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(movieData),
-    });
-    if (!response.ok) {
-      throw new Error("Failed to create movie.");
-    }
-    return await response.json();
+    return await postMovie(movieData, token);
   } catch (error) {
     console.error("Error creating movie:", error);
     throw error;
@@ -172,22 +168,13 @@ async function createMovie(movieData) {
 }
 
 async function updateMovie(movieId, movieData) {
+  const token = getAuthToken();
+  if (!token) {
+    throw new Error("Unauthorized: No token found.");
+  }
+
   try {
-    const response = await fetch(
-      `http://localhost:50845/api/movie/${movieId}`,
-      {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(movieData),
-      }
-    );
-    if (!response.ok) {
-      throw new Error("Failed to update movie.");
-    }
-    return await response.json();
+    return await postMovie(movieData, token, movieId, "PUT");
   } catch (error) {
     console.error("Error updating movie:", error);
     throw error;
@@ -195,6 +182,13 @@ async function updateMovie(movieId, movieData) {
 }
 
 async function deleteMovie(movieId) {
+  console.log(`Deleting movie with ID: ${movieId}`);
+
+  const token = getAuthToken(); // Dohvati token
+  if (!token) {
+    throw new Error("Unauthorized: No token found.");
+  }
+
   try {
     const response = await fetch(
       `http://localhost:50845/api/movie/${movieId}`,
@@ -202,15 +196,53 @@ async function deleteMovie(movieId) {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`, // Koristi dohvaćeni token
         },
       }
     );
+
     if (!response.ok) {
-      throw new Error("Failed to delete movie.");
+      const errorMessage = await response.text();
+      throw new Error(
+        `Failed to delete movie. Server response: ${errorMessage}`
+      );
     }
+
+    console.log(`Movie with ID ${movieId} deleted successfully.`);
   } catch (error) {
     console.error("Error deleting movie:", error);
+    throw error;
+  }
+}
+
+//! ode se zapravo salje, ovo se poziva u one tri osnovne radnje
+async function postMovie(movieData, token, movieId = null, method = "POST") {
+  let url = "http://localhost:50845/api/movie";
+  if (movieId) {
+    url = `http://localhost:50845/api/movie/${movieId}`;
+  }
+
+  try {
+    const response = await fetch(url, {
+      method: method,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      mode: "cors",
+      body: method === "DELETE" ? null : JSON.stringify(movieData),
+    });
+    if (!response.ok) {
+      throw new Error(
+        `Failed to ${method === "DELETE" ? "delete" : "create/update"} movie.`
+      );
+    }
+    return await response.json();
+  } catch (error) {
+    console.error(
+      `Error ${method === "DELETE" ? "deleting" : "creating/updating"} movie:`,
+      error
+    );
     throw error;
   }
 }

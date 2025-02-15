@@ -7,10 +7,12 @@ import {
 import { displayMovieDetails } from "./movie-details.js";
 
 export function initAdminApp() {
-  //! dohvacanje tokena???
   async function initialize() {
     const moviesContainer = document.getElementById("movies-container");
-    const header = document.querySelector("h2");
+
+    const header = document.createElement("h2");
+    header.textContent = "Movies List";
+    document.body.insertBefore(header, moviesContainer);
 
     const addNewButton = document.createElement("button");
     addNewButton.textContent = "Add New";
@@ -40,6 +42,8 @@ export function initAdminApp() {
 
     document.querySelectorAll(".view-details").forEach((button) => {
       button.addEventListener("click", async (e) => {
+        e.preventDefault();
+
         const movieId = parseInt(e.target.dataset.id, 10);
         loadMovieDetails(movieId);
       });
@@ -47,18 +51,22 @@ export function initAdminApp() {
 
     document.querySelectorAll(".edit-movie").forEach((button) => {
       button.addEventListener("click", (e) => {
+        e.preventDefault();
+
         const movieId = parseInt(e.target.dataset.id, 10);
-        console.log("✏️ Edit Movie:", movieId);
         openMovieModal(movieId);
       });
     });
 
     document.querySelectorAll(".delete-movie").forEach((button) => {
       button.addEventListener("click", async (e) => {
+        e.preventDefault();
+
         const movieId = parseInt(e.target.dataset.id, 10);
+
         if (confirm("Are you sure you want to delete this movie?")) {
           try {
-            await deleteMovie(movieId, token);
+            await deleteMovie(movieId);
             location.reload();
           } catch (error) {
             alert("Failed to delete movie.");
@@ -76,17 +84,45 @@ export function initAdminApp() {
     displayMovieDetails(movieId);
   }
 
+  function ensureMovieModalExists() {
+    let modal = document.getElementById("movie-modal");
+
+    if (!modal) {
+      modal = document.createElement("div");
+      modal.id = "movie-modal";
+      modal.style.display = "none";
+      modal.innerHTML = `
+        <div class="modal-content">
+          <h2>Movie Form</h2>
+          <form id="movie-form">
+            <label for="movie-title">Title:</label>
+            <input type="text" id="movie-title" required />
+            
+            <label for="movie-year">Release Year:</label>
+            <input type="number" id="movie-year" required />
+
+            <label for="movie-summary">Summary:</label>
+            <textarea id="movie-summary" required></textarea>
+
+            <button type="submit">Save</button>
+            <button type="button" id="close-modal">Cancel</button>
+          </form>
+        </div>
+      `;
+      document.body.appendChild(modal);
+      document.getElementById("close-modal").addEventListener("click", () => {
+        modal.style.display = "none";
+      });
+    }
+    return modal;
+  }
+
   function openMovieModal(movieId = null) {
-    const modal = document.getElementById("movie-modal");
+    const modal = ensureMovieModalExists();
     const form = document.getElementById("movie-form");
     const titleInput = document.getElementById("movie-title");
     const yearInput = document.getElementById("movie-year");
     const summaryInput = document.getElementById("movie-summary");
-
-    if (!modal || !form || !titleInput || !yearInput || !summaryInput) {
-      console.error("One or more modal elements are missing.");
-      return;
-    }
 
     if (movieId) {
       const movieElement = document.querySelector(
@@ -96,7 +132,6 @@ export function initAdminApp() {
         console.error("Movie element not found.");
         return;
       }
-
       const titleElement = movieElement.querySelector("h3");
       const summaryElement = movieElement.querySelector("p");
 
@@ -126,9 +161,9 @@ export function initAdminApp() {
 
       try {
         if (movieId) {
-          await updateMovie(movieId, movieData, token);
+          await updateMovie(movieId, movieData);
         } else {
-          await createMovie(movieData, token);
+          await createMovie(movieData);
         }
         modal.style.display = "none";
         location.reload();
