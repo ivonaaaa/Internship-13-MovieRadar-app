@@ -11,6 +11,9 @@ const displayMovieDetails = async (movieId) => {
       return;
     }
 
+    const filterContainer = document.querySelector(".filter-container");
+    filterContainer.style.display = "none";
+
     const allRatings = await getRatingsList();
     const movieRatings = allRatings.filter(
       (rating) => rating.movieId === movieId

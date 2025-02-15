@@ -15,6 +15,7 @@ export function initUserApp() {
       <option value="Comedy">Comedy</option>
       <option value="Drama">Drama</option>
       <option value="Horror">Horror</option>
+      <option value="Crime">Crime</option>
     `;
 
     const yearInput = document.createElement("input");
@@ -37,7 +38,6 @@ export function initUserApp() {
     filterContainer.appendChild(yearInput);
     filterContainer.appendChild(sortSelect);
     filterContainer.appendChild(filterButton);
-
     moviesContainer.before(filterContainer);
 
     async function displayMovies(filters = {}) {
@@ -56,7 +56,7 @@ export function initUserApp() {
         movieElement.classList.add("movie-item");
 
         movieElement.innerHTML = `
-          <h3>${movie.title} (${movie.release_year})</h3>
+          <h3>${movie.title} (${movie.releaseYear})</h3>
           <p>${movie.summary}</p>
           <button data-id="${movie.id}" class="view-details">Details</button>
         `;

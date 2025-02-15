@@ -114,8 +114,26 @@ async function fetchMovies(url, options) {
   }
 }
 
-async function getMovieList() {
-  const url = "https://localhost:50844/api/movie";
+async function getMovieList({ genre, year, sort } = {}) {
+  let url = "http://localhost:50845/api/movie";
+  const queryParams = [];
+
+  if (genre) {
+    queryParams.push(`filter=genre&value=${genre.toLowerCase()}`);
+  }
+  if (year) {
+    queryParams.push(`filter=release_year&value=${year}`);
+  }
+
+  if (queryParams.length > 0) {
+    url += `?${queryParams.join("&")}`;
+  }
+
+  if (sort) {
+    const orderDirection = sort === "rating_desc" ? "desc" : "asc";
+    url = `http://localhost:50845/api/movie/order?orderDirection=${orderDirection}`;
+  }
+
   const options = {
     method: "GET",
     headers: {
@@ -124,7 +142,77 @@ async function getMovieList() {
     mode: "cors",
   };
 
-  return await fetchMovies(url, options);
+  try {
+    const data = await fetchMovies(url, options);
+    return data;
+  } catch (error) {
+    return null;
+  }
+}
+
+//! treba ono nesto u headers dodat, token ili sta vec
+async function createMovie(movieData) {
+  try {
+    const response = await fetch("http://localhost:50845/api/movie", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(movieData),
+    });
+    if (!response.ok) {
+      throw new Error("Failed to create movie.");
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error creating movie:", error);
+    throw error;
+  }
+}
+
+async function updateMovie(movieId, movieData) {
+  try {
+    const response = await fetch(
+      `http://localhost:50845/api/movie/${movieId}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(movieData),
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to update movie.");
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error updating movie:", error);
+    throw error;
+  }
+}
+
+async function deleteMovie(movieId) {
+  try {
+    const response = await fetch(
+      `http://localhost:50845/api/movie/${movieId}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    if (!response.ok) {
+      throw new Error("Failed to delete movie.");
+    }
+  } catch (error) {
+    console.error("Error deleting movie:", error);
+    throw error;
+  }
 }
 
 async function fetchRatings(url, options) {
@@ -182,6 +270,9 @@ export {
   getUserById,
   registerUser,
   getMovieList,
+  createMovie,
+  updateMovie,
+  deleteMovie,
   getRatingsList,
   postComment,
 };
