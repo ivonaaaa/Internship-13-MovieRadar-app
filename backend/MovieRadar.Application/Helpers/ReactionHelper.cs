@@ -9,10 +9,15 @@ namespace MovieRadar.Application.Helpers
             if (ratingReaction == null)
                 return (false, "Reaction is null");
 
-            if (ratingReaction.Reaction != "Like" && ratingReaction.Reaction != "Dislike")
-                return (false, "invalid reaction");
+            if (string.IsNullOrWhiteSpace(ratingReaction.Reaction))
+                return (false, "Reaction is empty or null");
 
-            return (true, "valid reaction");
+            string reaction = ratingReaction.Reaction?.ToLower()?.Trim();
+
+            if (reaction != "like" && reaction != "dislike")
+                return (false, "Invalid reaction");
+
+            return (true, "Valid reaction");
         }
     }
 }
