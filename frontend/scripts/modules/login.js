@@ -7,6 +7,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const loginContainer = document.getElementById("login-container");
   if (!loginContainer) return;
 
+  const idKey = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier";
+
   const loginButton = loginContainer.querySelector("button");
   loginButton.addEventListener("click", async function () {
     const usernameInput = loginContainer.querySelector(
@@ -32,7 +34,7 @@ document.addEventListener("DOMContentLoaded", function () {
       loginContainer.style.display = "none";
 
       const decoded = decodeToken(token);
-      const userId = decoded ? decoded.sub : null;
+      const userId = decoded ? decoded[idKey] : null;
       if (!userId) {
         throw new Error("Failed to retrieve user ID from token.");
       }

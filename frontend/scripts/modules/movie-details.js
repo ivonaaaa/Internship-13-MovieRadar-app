@@ -5,6 +5,7 @@ const displayMovieDetails = async (movieId) => {
   try {
     const movies = await getMovieList();
     const movieData = movies.find((m) => m.id === movieId);
+    const idKey = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier";
 
     if (!movieData) {
       document.getElementById("movies-container").innerHTML =
@@ -18,8 +19,8 @@ const displayMovieDetails = async (movieId) => {
     if (token) {
       try {
         const decoded = decodeToken(token);
-        if (decoded && decoded.sub) {
-          currentUserId = decoded.sub;
+        if (decoded && decoded[idKey]) {
+          currentUserId = decoded[idKey];
           isLoggedIn = true;
         }
       } catch (e) {
@@ -28,6 +29,7 @@ const displayMovieDetails = async (movieId) => {
     }
 
     const allRatings = await getRatingsList();
+    // Filtriramo recenzije za taj film
     const filteredRatings = allRatings.filter((rating) => rating.movieId === movieId);
     const users = await getAllUsers();
 
@@ -46,7 +48,16 @@ const displayMovieDetails = async (movieId) => {
           .join("")
       : "<p>No available comments.</p>";
 
-    document.getElementById("movies-container").innerHTML = `
+    // Provjeri je li korisnik već postavio recenziju
+    let userHasReview = false;
+    if (isLoggedIn) {
+      userHasReview = filteredRatings.some(
+        (rating) => Number(rating.userId) === Number(currentUserId)
+      );
+    }
+
+    // Sastavi HTML sadržaj: detalji filma i recenzije
+    let htmlContent = `
       <h2>${movieData.title} (${movieData.releaseYear})</h2>
       <p>${movieData.summary}</p>
       <h3>Average grade: ${averageRating(filteredRatings)} / 10</h3>
@@ -56,42 +67,52 @@ const displayMovieDetails = async (movieId) => {
       </div>
     `;
 
-    const commentFormHtml = `
-      <div id="comment-form-container">
-        <h4>Leave a comment:</h4>
-        <textarea id="comment-content" placeholder="Your comment"></textarea>
-        <br>
-        <input id="comment-grade" type="number" placeholder="Grade (1-10)" min="1" max="10" step="0.1">
-        <br>
-        <button id="submit-comment">Submit Comment</button>
-      </div>
-    `;
-    document.getElementById("movies-container").innerHTML += commentFormHtml;
+    // Ako je korisnik prijavljen i još nije postavio recenziju, prikaži formu
+    if (isLoggedIn && !userHasReview) {
+      htmlContent += `
+        <div id="comment-form-container">
+          <h4>Leave a comment:</h4>
+          <textarea id="comment-content" placeholder="Your comment"></textarea>
+          <br>
+          <input id="comment-grade" type="number" placeholder="Grade (1-10)" min="1" max="10" step="0.1">
+          <br>
+          <button id="submit-comment">Submit Comment</button>
+        </div>
+      `;
+    }
 
-    document.getElementById("submit-comment").addEventListener("click", async () => {
-      const content = document.getElementById("comment-content").value.trim();
-      const grade = parseFloat(document.getElementById("comment-grade").value);
-      if (!content || isNaN(grade)) {
-        alert("Molim unesite valjan komentar i ocjenu.");
-        return;
-      }
-      const commentData = {
-        movieId: movieId,
-        review: content,
-        grade: grade,
-        userId: currentUserId  
-      };
+    document.getElementById("movies-container").innerHTML = htmlContent;
 
-      try {
-        const currentToken = getAuthToken();
-        await postComment(commentData, currentToken);
-        alert("Komentar uspješno dodan!");
-        displayMovieDetails(movieId);
-      } catch (err) {
-        window.location.href = "./index.html";
-      }
-    });
+    // Ako postoji forma, dodaj event listener za slanje komentara
+    const submitCommentButton = document.getElementById("submit-comment");
+    if (submitCommentButton) {
+      submitCommentButton.addEventListener("click", async () => {
+        const content = document.getElementById("comment-content").value.trim();
+        const grade = parseFloat(document.getElementById("comment-grade").value);
+        if (!content || isNaN(grade)) {
+          alert("Molim unesite valjan komentar i ocjenu.");
+          return;
+        }
+        const commentData = {
+          movieId: movieId,
+          review: content,
+          grade: grade,
+          userId: currentUserId  
+        };
 
+        try {
+          const currentToken = getAuthToken();
+          await postComment(commentData, currentToken);
+          alert("Komentar uspješno dodan!");
+          displayMovieDetails(movieId);
+        } catch (err) {
+          console.error("Greška pri dodavanju komentara:", err);
+          alert("Greška pri dodavanju komentara.");
+        }
+      });
+    }
+
+    // Dodaj event listenere za delete gumbe
     const deleteButtons = document.querySelectorAll(".delete-comment");
     deleteButtons.forEach((button) => {
       button.addEventListener("click", async (e) => {
