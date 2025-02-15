@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MovieRadar.Application.Interfaces;
 using MovieRadar.Domain.Entities;
 using System.Security.Claims;
 
@@ -10,23 +10,23 @@ namespace MovieRadar.WebAPI.Controllers
     [Route("api/[controller]")]
     public class RatingController : ControllerBase
     {
-        private readonly IRatingService ratingService;
-        public RatingController(IRatingService ratingService)
+        private readonly IMediator mediator;
+        public RatingController(IMediator mediator)
         {
-            this.ratingService = ratingService;
+            this.mediator = mediator;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Rating>>> GetAllRatings()
         {
-            var allRatings = await ratingService.GetAll();
+            var allRatings = await mediator.Send(new GetAllRatingsQuery());
             return Ok(allRatings);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Rating>> GetRatingById(int id)
         {
-            var rating = await ratingService.GetById(id);
+            var rating = await mediator.Send(new GetRatingByIdQuery(id));
             if(rating == null)
                 return NotFound();
 
@@ -45,7 +45,7 @@ namespace MovieRadar.WebAPI.Controllers
 
             try
             {
-                var id = await ratingService.Add(newRating);
+                var id = await mediator.Send(new AddRatingCommand(newRating));
                 return CreatedAtAction(nameof(GetRatingById), new { id }, newRating);
             }
             catch (ArgumentException ex)
@@ -68,7 +68,7 @@ namespace MovieRadar.WebAPI.Controllers
             if (!int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var userId))
                 return Unauthorized();
 
-            var ratingToUpdate = await ratingService.GetById(id);
+            var ratingToUpdate = await mediator.Send(new GetRatingByIdQuery(id));
 
             if (ratingToUpdate == null)
                 return NotFound();
@@ -78,7 +78,7 @@ namespace MovieRadar.WebAPI.Controllers
 
             try
             {
-                var updated = await ratingService.Update(updatedRating);
+                var updated = await mediator.Send(new UpdateRatingCommand(updatedRating));
                 return updated ? NoContent() : NotFound();
             }
             catch (ArgumentException ex)
@@ -98,7 +98,7 @@ namespace MovieRadar.WebAPI.Controllers
             if (!int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var userId))
                 return Unauthorized();
 
-            var ratingToDelete = await ratingService.GetById(id);
+            var ratingToDelete = await mediator.Send(new GetRatingByIdQuery(id));
 
             if (ratingToDelete == null)
                 return NotFound();
@@ -106,7 +106,7 @@ namespace MovieRadar.WebAPI.Controllers
             if (userId != ratingToDelete.UserId)
                 return Forbid();
 
-            var deleted = await ratingService.DeleteById(id);
+            var deleted = await mediator.Send(new DeleteRatingCommand(id));
             return deleted ? NoContent() : NotFound();
         }
     }

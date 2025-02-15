@@ -1,9 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MovieRadar.Application.Services;
 using MovieRadar.Domain.Entities;
-using MovieRadar.Application.Helpers;
 using Microsoft.AspNetCore.Identity.Data;
-using MovieRadar.Application.Interfaces;
 
 [ApiController]
 [Route("api/[controller]")]

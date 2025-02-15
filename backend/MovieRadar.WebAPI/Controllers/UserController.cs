@@ -2,9 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using MovieRadar.Domain.Entities;
 using MovieRadar.Application.Services;
 using Microsoft.AspNetCore.Authorization;
-using MovieRadar.Application.Interfaces;
-using System.Security.Claims;
-using MovieRadar.Application.Helpers;
 
 namespace MovieRadar.WebAPI.Controllers
 {
