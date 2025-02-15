@@ -1,0 +1,53 @@
+﻿using Dapper;
+using MovieRadar.Domain.Entities;
+using MovieRadar.Domain.Interfaces;
+
+using System.Data;
+
+
+namespace MovieRadar.Infrastructure.Repositories
+{
+    public class RatingCommentsRepository : IRatingCommentsRepository
+    {
+        private readonly IDbConnection connection;
+        public RatingCommentsRepository(IDbConnection connection)
+        {
+                this.connection = connection;
+        }
+        
+        public async Task<IEnumerable<RatingsComments>> GetAll()
+        {
+            var getAllCommentsOnRatignQuery = @"SELECT id AS Id, rating_id AS RatingId, user_id AS UserId, comment AS Comment
+                                                FROM ratings_comments";
+            return await connection.QueryAsync<RatingsComments>(getAllCommentsOnRatignQuery);
+        }
+        
+        public async Task<RatingsComments?> GetById(int id)
+        {
+            var getByIdQuery = @"SELECT id AS Id, rating_id AS RatingId, user_id AS UserId, comment AS Comment
+                                 FROM ratings_comments
+                                 WHERE id = @Id";
+            return await connection.QuerySingleOrDefaultAsync<RatingsComments>(getByIdQuery, new { Id = id});
+        }
+
+        public async Task<int> Add(RatingsComments newRatingsComment)
+        {
+            var addRatingCommentQuery = @"INSERT INTO ratings_comments(rating_id, user_id, comment)
+                                          VALUES (@RatingId, @UserId, @Comment)
+                                          RETURNING id";
+            return await connection.ExecuteScalarAsync<int>(addRatingCommentQuery, newRatingsComment);
+        }
+
+        public async Task<bool> Update(RatingsComments ratingsComments)
+        {
+            var updateRatingComment = "UPDATE ratings_comments SET comment = @Comment WHERE id = @Id";
+            return await connection.ExecuteAsync(updateRatingComment, ratingsComments) > 0;
+        }
+
+        public async Task<bool> Delete(int id)
+        {
+            var deleteMovieQuery = "DELETE FROM ratings_comments WHERE id = @Id";
+            return await connection.ExecuteAsync(deleteMovieQuery, new { Id = id }) > 0;
+        }
+    }
+}

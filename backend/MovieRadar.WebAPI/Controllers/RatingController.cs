@@ -58,33 +58,5 @@ namespace MovieRadar.WebAPI.Controllers
             var deleted = await ratingService.DeleteById(id);
             return deleted ? NoContent() : NotFound();
         }
-
-        [HttpGet("/likes/{id}")]
-        public async Task<ActionResult> GetLikesDislikes(int id)
-        {
-            try
-            {
-                var numberOfLikesDislikes = await ratingService.GetLikesDislikes(id);
-                return Ok(numberOfLikesDislikes);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error getting likes: {ex.Message}, inner: {ex.InnerException}");
-            }
-        }
-
-        [HttpDelete("/likes/{id}")]
-        public async Task<ActionResult> RemoveLikeDislike(int reactionId)
-        {
-            try
-            {
-                var removed = await ratingService.RemoveLikeDislike(reactionId);
-                return removed ? NoContent() : NotFound();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error removing like/dislike: {ex.Message}, inner: {ex.InnerException}");
-            }
-        }
     }
 }

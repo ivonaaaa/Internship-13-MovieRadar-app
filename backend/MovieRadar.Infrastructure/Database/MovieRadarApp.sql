@@ -47,6 +47,7 @@ CREATE TABLE ratings_comments (
     user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     comment TEXT
 );
+
 CREATE TABLE ratings_reactions(
   id SERIAL PRIMARY KEY,
   rating_id INT NOT NULL REFERENCES ratings(id) ON DELETE CASCADE,

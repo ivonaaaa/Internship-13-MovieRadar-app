@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using MovieRadar.Application.Interfaces;
 using MovieRadar.Domain.Entities;
-using MovieRadar.Application.Helpers;
 
 namespace MovieRadar.WebAPI.Controllers
 {

@@ -52,21 +52,5 @@ namespace MovieRadar.Infrastructure.Repositories
 
             return await connection.ExecuteAsync(deleteCommentQuery, new { Id = id }) > 0;
         }
-
-        public async Task<(int, int)> GetLikesAndDislikes(int ratingId)
-        {
-            var likesAndDislikesQuery = @$"SELECT SUM(CASE WHEN reaction = 'like' THEN 1 ELSE 0 END) AS Likes,
-                                                  SUM(CASE WHEN reaction = 'dislike' THEN 1 ELSE 0 END) AS Dislikes
-                                           FROM ratings_reactions 
-                                           WHERE rating_id = @Id";
-            return await connection.QuerySingleAsync<(int, int)>(likesAndDislikesQuery, new { Id = ratingId });
-        }
-
-        public async Task<bool> RemoveLikeDislike(int reactionId)
-        {
-            var removeLikeDislikeQuery = @"DELETE FROM ratings_reactions 
-                                           WHERE id = @Id";
-            return await connection.ExecuteAsync(removeLikeDislikeQuery, new { Id = reactionId}) > 0;
-        }
     }
 }

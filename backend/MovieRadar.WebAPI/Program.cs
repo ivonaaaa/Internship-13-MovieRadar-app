@@ -36,6 +36,11 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IMovieRepository, MovieRepository>();
 builder.Services.AddScoped<IMovieService, MovieService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IRatingCommentsRepository, RatingCommentsRepository>();
+builder.Services.AddScoped<IRatingCommentService, RatingsCommentsService>();
+builder.Services.AddScoped<IRatingReactionsRepository, RatingReactionsRepository>();
+builder.Services.AddScoped<IRatingReactionsService, RatingReactionsService>();
+
 
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 

@@ -23,7 +23,7 @@ namespace MovieRadar.Application.Services
                 throw new Exception($"Error while getting all movies: {ex.Message}, inner: {ex.InnerException}");
             }
         }
-        public async Task<Movie> GetById(int id)
+        public async Task<Movie?> GetById(int id)
         {
             try
             {
