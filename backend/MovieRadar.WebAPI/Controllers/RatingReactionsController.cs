@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MovieRadar.Application.Interfaces;
 using MovieRadar.Domain.Entities;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MovieRadar.WebAPI.Controllers
 {
@@ -46,6 +47,7 @@ namespace MovieRadar.WebAPI.Controllers
             }
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult> AddReaction([FromBody] RatingsReactions newReaction)
         {
@@ -64,6 +66,7 @@ namespace MovieRadar.WebAPI.Controllers
             }
         }
 
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateReaction([FromBody] RatingsReactions updatedReaction, int id)
         {
@@ -81,6 +84,7 @@ namespace MovieRadar.WebAPI.Controllers
             }
         }
 
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteReaction(int id)
         {
