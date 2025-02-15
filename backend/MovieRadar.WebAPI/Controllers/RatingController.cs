@@ -16,14 +16,14 @@ namespace MovieRadar.WebAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Rating>>> GetAllComments()
+        public async Task<ActionResult<IEnumerable<Rating>>> GetAllRatings()
         {
             var allRatings = await ratingService.GetAll();
             return Ok(allRatings);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Rating>> GetCommentById(int id)
+        public async Task<ActionResult<Rating>> GetRatingById(int id)
         {
             var rating = await ratingService.GetById(id);
             if(rating == null)
@@ -34,26 +34,37 @@ namespace MovieRadar.WebAPI.Controllers
 
         [Authorize]
         [HttpPost]
-        public async Task<ActionResult> AddComment([FromBody] Rating newRating)
+        public async Task<ActionResult> AddRating([FromBody] Rating newRating)
         {
             var id = await ratingService.Add(newRating);
-            return CreatedAtAction(nameof(GetCommentById), new { id }, newRating);
+            return CreatedAtAction(nameof(GetRatingById), new { id }, newRating);
         }
 
         [Authorize]
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateComment([FromBody] Rating updatedRating, int id)
+        public async Task<IActionResult> UpdateRating([FromBody] Rating updatedRating, int id)
         {
             if(id != updatedRating.Id)
-                return BadRequest();
+                return BadRequest("Not matching id");
 
-            var updated = await ratingService.Update(updatedRating);
-            return updated ? NoContent() : NotFound();
+            try
+            {
+                var updated = await ratingService.Update(updatedRating);
+                return updated ? NoContent() : NotFound();
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error updating new rating: , {ex.Message}, inner: , {ex.InnerException}");
+            }
         }
 
         [Authorize]
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteComment(int id)
+        public async Task<IActionResult> DeleteRating(int id)
         {
             var deleted = await ratingService.DeleteById(id);
             return deleted ? NoContent() : NotFound();
