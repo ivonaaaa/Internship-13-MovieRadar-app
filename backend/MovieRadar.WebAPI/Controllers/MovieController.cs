@@ -27,7 +27,6 @@ namespace MovieRadar.WebAPI.Controllers
                 return (allMovies == null || !allMovies.Any()) ? NotFound() : Ok(allMovies);
             }
 
-
             if (!validFilters.Contains(filter))
                 return BadRequest($"Invalid filter: '{filter}'");
 

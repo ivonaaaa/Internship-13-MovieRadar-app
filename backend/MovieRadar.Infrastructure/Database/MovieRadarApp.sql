@@ -31,7 +31,7 @@ CREATE TABLE ratings(
     id SERIAL PRIMARY KEY,
     user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     movie_id INT NOT NULL REFERENCES movies(id) ON DELETE CASCADE,
-    review TEXT NOT NULL,
+    review TEXT,
     grade DECIMAL(3, 1) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 

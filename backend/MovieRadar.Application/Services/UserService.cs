@@ -1,4 +1,5 @@
-﻿using MovieRadar.Domain.Entities;
+﻿using MovieRadar.Application.Helpers;
+using MovieRadar.Domain.Entities;
 using MovieRadar.Domain.Interfaces;
 
 namespace MovieRadar.Application.Services
@@ -35,11 +36,19 @@ namespace MovieRadar.Application.Services
             }
         }
 
-        public async Task<int> Add(User user)
+        public async Task<int> Add(User newUser)
         {
+            var updateUserValidation = UserHelper.IsUserValid(newUser);
+            if (!updateUserValidation.Item1)
+                throw new ArgumentException(updateUserValidation.Item2);
+
+            var user = await GetByEmail(newUser.Email);
+            if (user != null)
+                throw new ArgumentException("Email is already taken!");
+
             try
             {
-                return await userRepository.Add(user);
+                return await userRepository.Add(newUser);
             }
             catch (Exception ex)
             {
@@ -49,6 +58,10 @@ namespace MovieRadar.Application.Services
 
         public async Task<bool> Update(User user)
         {
+            var updateUserValidation = UserHelper.IsUserValid(user);
+            if (!updateUserValidation.Item1)
+                throw new ArgumentException(updateUserValidation.Item2);
+
             try
             {
                 return await userRepository.Update(user);
