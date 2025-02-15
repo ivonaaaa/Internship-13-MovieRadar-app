@@ -8,6 +8,8 @@ using MovieRadar.Domain.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using MediatR;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -62,6 +64,7 @@ builder.Services
     });
 
 builder.Services.AddAuthorization();
+builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
 
 //builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 

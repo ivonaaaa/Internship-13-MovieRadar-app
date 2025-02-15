@@ -3,7 +3,7 @@ using MovieRadar.Domain.Interfaces;
 using MovieRadar.Application.Interfaces;
 using MovieRadar.Application.Helpers;
 
-namespace MovieRadar.Application.Services
+namespace MovieRadar.Application.Services.Rating
 {
     public class RatingService : IRatingService
     {
@@ -12,7 +12,7 @@ namespace MovieRadar.Application.Services
         public RatingService(IRatingRepository ratingRepository, IMovieRepository movieRepository)
         {
             this.ratingRepository = ratingRepository;
-            this.movieRepository=movieRepository;
+            this.movieRepository = movieRepository;
         }
 
         public async Task<IEnumerable<Rating>> GetAll()

@@ -1,6 +1,6 @@
-﻿using MovieRadar.Application.Helpers;
+﻿using MovieRadar.Domain.Entities;
+using MovieRadar.Application.Helpers;
 using MovieRadar.Application.Interfaces;
-using MovieRadar.Domain.Entities;
 using MovieRadar.Domain.Interfaces;
 
 namespace MovieRadar.Application.Services
@@ -39,7 +39,7 @@ namespace MovieRadar.Application.Services
             var newMovieValidation = MovieHelper.IsMovieValid(movie);
             if (!newMovieValidation.Item1)
                 throw new ArgumentException(newMovieValidation.Item2);
-         
+
             try
             {
                 return await movieRepository.Add(movie);

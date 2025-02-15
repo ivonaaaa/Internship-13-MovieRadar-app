@@ -2,7 +2,7 @@
 using MovieRadar.Domain.Entities;
 using MovieRadar.Domain.Interfaces;
 
-namespace MovieRadar.Application.Services
+namespace MovieRadar.Application.Services.User
 {
     public class UserService : IUserService
     {

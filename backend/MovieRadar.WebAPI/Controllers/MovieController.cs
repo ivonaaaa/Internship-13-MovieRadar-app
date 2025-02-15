@@ -1,8 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MovieRadar.Application.Interfaces;
 using MovieRadar.Domain.Entities;
-using MovieRadar.Application.Helpers;
 
 namespace MovieRadar.WebAPI.Controllers
 {
@@ -10,10 +9,10 @@ namespace MovieRadar.WebAPI.Controllers
     [Route("api/[controller]")]
     public class MovieController : ControllerBase
     {
-        private readonly IMovieService movieService;
-        public MovieController(IMovieService movieService)
+        private readonly IMediator mediator;
+        public MovieController(IMediator mediator)
         {
-            this.movieService = movieService;
+            this.mediator = mediator;
         }
 
         [HttpGet]
