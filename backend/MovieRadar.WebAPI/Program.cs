@@ -62,7 +62,6 @@ builder.Services
     });
 
 builder.Services.AddAuthorization();
-builder.Services.AddAuthentication().AddJwtBearer();
 
 //builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 

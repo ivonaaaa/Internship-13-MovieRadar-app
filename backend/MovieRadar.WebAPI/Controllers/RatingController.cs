@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using MovieRadar.Application.Interfaces;
 using MovieRadar.Domain.Entities;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 namespace MovieRadar.WebAPI.Controllers
