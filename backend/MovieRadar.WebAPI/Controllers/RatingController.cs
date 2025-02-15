@@ -39,10 +39,7 @@ namespace MovieRadar.WebAPI.Controllers
         public async Task<ActionResult> AddRating([FromBody] Rating newRating)
         {
             if (!int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var userId))
-            {
-                Console.WriteLine("\n\n\n" + userId);
                 return Unauthorized();
-            }
 
             if (userId != newRating.UserId)
                 return Forbid();
