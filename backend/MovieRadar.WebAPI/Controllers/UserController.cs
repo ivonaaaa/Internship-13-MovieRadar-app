@@ -2,6 +2,9 @@ using Microsoft.AspNetCore.Mvc;
 using MovieRadar.Domain.Entities;
 using MovieRadar.Application.Services;
 using Microsoft.AspNetCore.Authorization;
+using MovieRadar.Application.Interfaces;
+using System.Security.Claims;
+using MovieRadar.Application.Helpers;
 
 namespace MovieRadar.WebAPI.Controllers
 {
@@ -37,10 +40,21 @@ namespace MovieRadar.WebAPI.Controllers
         public async Task<IActionResult> UpdateUser([FromBody] User updatedUser, int id)
         {
             if (id != updatedUser.Id)
-                return BadRequest();
+                return BadRequest("Not matching user ID");
 
-            var updated = await userService.Update(updatedUser);
-            return updated ? NoContent() : NotFound();
+            try
+            {
+                var updated = await userService.Update(updatedUser);
+                return updated ? NoContent() : NotFound();
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error updating user: , {ex.Message}, inner: , {ex.InnerException}");
+            }
         }
 
         [Authorize(Roles = "Admin")]

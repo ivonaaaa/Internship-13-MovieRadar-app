@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MovieRadar.Application.Interfaces;
 using MovieRadar.Domain.Entities;
+using MovieRadar.Application.Helpers;
 
 namespace MovieRadar.WebAPI.Controllers
 {
@@ -25,7 +26,6 @@ namespace MovieRadar.WebAPI.Controllers
                 var allMovies = await movieService.GetAll();
                 return (allMovies == null || !allMovies.Any()) ? NotFound() : Ok(allMovies);
             }
-
 
             if (!validFilters.Contains(filter))
                 return BadRequest($"Invalid filter: '{filter}'");
@@ -62,19 +62,41 @@ namespace MovieRadar.WebAPI.Controllers
         [HttpPost]
         public async Task<ActionResult> AddMovie([FromBody] Movie newMovie)
         {
-            var newMovieId = await movieService.Add(newMovie);
-            return CreatedAtAction(nameof(GetMovieById), new { id = newMovieId }, newMovie);
+            try 
+            {
+                var newMovieId = await movieService.Add(newMovie);
+                return CreatedAtAction(nameof(GetMovieById), new { id = newMovieId }, newMovie);
+            }
+            catch(ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error adding new movie: , {ex.Message}, inner: , {ex.InnerException}");
+            }
         }
 
         [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateMovie([FromBody] Movie updatedMovie, int id)
         {
-            if(id != updatedMovie.Id)
-                return BadRequest();
+            if (id != updatedMovie.Id)
+                return BadRequest("Not matching id");
 
-            var updated = await movieService.Update(updatedMovie);
-            return updated ? NoContent() : NotFound();
+            try
+            {
+                var updated = await movieService.Update(updatedMovie);
+                return updated ? NoContent() : NotFound();
+            }
+            catch(ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, $"Error updating new movie: , {ex.Message}, inner: , {ex.InnerException}");
+            }
         }
 
         [Authorize(Roles = "Admin")]

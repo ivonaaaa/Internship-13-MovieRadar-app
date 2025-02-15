@@ -1,4 +1,5 @@
-﻿using MovieRadar.Application.Interfaces;
+﻿using MovieRadar.Application.Helpers;
+using MovieRadar.Application.Interfaces;
 using MovieRadar.Domain.Entities;
 using MovieRadar.Domain.Interfaces;
 
@@ -22,7 +23,7 @@ namespace MovieRadar.Application.Services
                 throw new Exception($"Error while getting all movies: {ex.Message}, inner: {ex.InnerException}");
             }
         }
-        public async Task<Movie> GetById(int id)
+        public async Task<Movie?> GetById(int id)
         {
             try
             {
@@ -35,6 +36,10 @@ namespace MovieRadar.Application.Services
         }
         public async Task<int> Add(Movie movie)
         {
+            var newMovieValidation = MovieHelper.IsMovieValid(movie);
+            if (!newMovieValidation.Item1)
+                throw new ArgumentException(newMovieValidation.Item2);
+         
             try
             {
                 return await movieRepository.Add(movie);
@@ -46,6 +51,10 @@ namespace MovieRadar.Application.Services
         }
         public async Task<bool> Update(Movie movie)
         {
+            var updateMovieValidation = MovieHelper.IsMovieValid(movie);
+            if (!updateMovieValidation.Item1)
+                throw new ArgumentException(updateMovieValidation.Item2);
+
             try
             {
                 return await movieRepository.Update(movie);

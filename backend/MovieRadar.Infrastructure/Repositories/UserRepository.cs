@@ -36,7 +36,7 @@ namespace MovieRadar.Infrastructure.Repositories
 
         public async Task<bool> Update(User user)
         {
-            var updateUserQuery = "UPDATE users SET first_name = @FirstName, last_name = @LastName, email = @Email, password = @Password WHERE id = @Id";
+            var updateUserQuery = "UPDATE users SET first_name = @FirstName, last_name = @LastName, password = @Password WHERE id = @Id";
             int rows = await _connection.ExecuteAsync(updateUserQuery, user);
 
             return rows > 0;

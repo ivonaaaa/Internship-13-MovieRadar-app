@@ -1,15 +1,18 @@
 ﻿using MovieRadar.Domain.Entities;
 using MovieRadar.Domain.Interfaces;
 using MovieRadar.Application.Interfaces;
+using MovieRadar.Application.Helpers;
 
 namespace MovieRadar.Application.Services
 {
     public class RatingService : IRatingService
     {
         private readonly IRatingRepository ratingRepository;
-        public RatingService(IRatingRepository ratingRepository)
+        private readonly IMovieRepository movieRepository;
+        public RatingService(IRatingRepository ratingRepository, IMovieRepository movieRepository)
         {
             this.ratingRepository = ratingRepository;
+            this.movieRepository=movieRepository;
         }
 
         public async Task<IEnumerable<Rating>> GetAll()
@@ -20,11 +23,11 @@ namespace MovieRadar.Application.Services
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error while getting all comments: {ex.Message}, inner: {ex.InnerException}");
+                throw new Exception($"Error while getting all ratings: {ex.Message}, inner: {ex.InnerException}");
             }
         }
 
-        public async Task<Rating> GetById(int id)
+        public async Task<Rating?> GetById(int id)
         {
             try
             {
@@ -32,31 +35,39 @@ namespace MovieRadar.Application.Services
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error getting comment by id: {ex.Message}, inner: {ex.InnerException}");
+                throw new Exception($"Error getting rating by id: {ex.Message}, inner: {ex.InnerException}");
             }
         }
 
-        public async Task<int> Add(Rating comment)
+        public async Task<int> Add(Rating rating)
         {
+            var updateRatingValidation = await RatingHelper.IsRatingValid(rating, movieRepository);
+            if (!updateRatingValidation.Item1)
+                throw new ArgumentException(updateRatingValidation.Item2);
+
             try
             {
-                return await ratingRepository.Add(comment);
+                return await ratingRepository.Add(rating);
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error adding new comment: {ex.Message}, inner: {ex.InnerException}");
+                throw new Exception($"Error adding new rating: {ex.Message}, inner: {ex.InnerException}");
             }
         }
 
-        public async Task<bool> Update(Rating comment)
+        public async Task<bool> Update(Rating rating)
         {
+            var updateRatingValidation = await RatingHelper.IsRatingValid(rating, movieRepository);
+            if (!updateRatingValidation.Item1)
+                throw new ArgumentException(updateRatingValidation.Item2);
+
             try
             {
-                return await ratingRepository.Update(comment);
+                return await ratingRepository.Update(rating);
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error updating comment: {ex.Message}, inner: {ex.InnerException}");
+                throw new Exception($"Error updating rating: {ex.Message}, inner: {ex.InnerException}");
             }
         }
 
@@ -68,7 +79,7 @@ namespace MovieRadar.Application.Services
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error deleting comment: {ex.Message}, inner: {ex.InnerException}");
+                throw new Exception($"Error deleting rating: {ex.Message}, inner: {ex.InnerException}");
             }
         }
     }

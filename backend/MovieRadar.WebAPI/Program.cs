@@ -63,10 +63,6 @@ builder.Services
 
 builder.Services.AddAuthorization();
 
-
-//builder.Services.AddAuthentication(); //za jwt dodat .AddJwtBearer();
-//builder.Services.AddAuthorization();
-
 //builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 
 var app = builder.Build();
