@@ -3,13 +3,13 @@ using Npgsql;
 using MovieRadar.Domain.Interfaces;
 using MovieRadar.Infrastructure.Repositories;
 using MovieRadar.Application.Services;
+using MovieRadar.Application.Services.Movies.Handlers;
 using MovieRadar.Application.Interfaces;
 using MovieRadar.Domain.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using MediatR;
-using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,7 +36,6 @@ builder.Services.AddScoped<IRatingService, RatingService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IMovieRepository, MovieRepository>();
-builder.Services.AddScoped<IMovieService, MovieService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
@@ -64,7 +63,7 @@ builder.Services
     });
 
 builder.Services.AddAuthorization();
-builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
+builder.Services.AddMediatR(typeof(AddMovieHandler).Assembly);
 
 //builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 

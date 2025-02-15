@@ -3,7 +3,7 @@ using MovieRadar.Domain.Interfaces;
 using MovieRadar.Application.Interfaces;
 using MovieRadar.Application.Helpers;
 
-namespace MovieRadar.Application.Services.Rating
+namespace MovieRadar.Application.Services
 {
     public class RatingService : IRatingService
     {

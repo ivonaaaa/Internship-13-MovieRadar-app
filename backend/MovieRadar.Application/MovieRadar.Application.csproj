@@ -17,4 +17,16 @@
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.4.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Services\Ratings\Commands\" />
+    <Folder Include="Services\Ratings\Handlers\" />
+    <Folder Include="Services\Ratings\Queries\" />
+    <Folder Include="Services\Token\Commands\" />
+    <Folder Include="Services\Token\Handlers\" />
+    <Folder Include="Services\Token\Queries\" />
+    <Folder Include="Services\Users\Commands\" />
+    <Folder Include="Services\Users\Handlers\" />
+    <Folder Include="Services\Users\Queries\" />
+  </ItemGroup>
+
 </Project>
