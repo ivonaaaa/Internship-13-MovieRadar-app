@@ -87,18 +87,26 @@ async function registerUser(newUser) {
       },
       body: JSON.stringify(newUser),
     });
+
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(
-        errorData.message || "An error occurred during registration."
-      );
+      const errorText = await response.text();
+      let errorData = {};
+      try {
+        errorData = errorText ? JSON.parse(errorText) : {};
+      } catch (e) {
+        errorData = {};
+      }
+      throw new Error(errorData.message || "An error occurred during registration.");
     }
-    return await response.json();
+
+    const text = await response.text();
+    return text ? JSON.parse(text) : null;
   } catch (error) {
     console.error("Error registering user:", error);
     throw error;
   }
 }
+
 
 async function fetchMovies(url, options) {
   try {
@@ -182,6 +190,32 @@ async function postComment(commentData, token) {
   }
 }
 
+async function deleteComment(commentId, token) {
+  try {
+    const response = await fetch(`http://localhost:50845/api/rating/${commentId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      const errorText = await response.text();
+      let errorData = {};
+      try {
+        errorData = errorText ? JSON.parse(errorText) : {};
+      } catch (e) {
+        errorData = {};
+      }
+      throw new Error(errorData.message || "Error deleting comment");
+    }
+    return true;
+  } catch (error) {
+    console.error("Error deleting comment:", error);
+    throw error;
+  }
+}
+
 export {
   getAllUsers,
   createUser,
@@ -190,5 +224,6 @@ export {
   registerUser,
   getMovieList,
   getRatingsList,
-  postComment
+  postComment,
+  deleteComment
 };

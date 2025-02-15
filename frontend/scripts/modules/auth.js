@@ -26,7 +26,7 @@ export function setCookie(name, value, minutes) {
   
   
   export function saveAuthToken(token) {
-    setCookie("authToken", token, 0.2);
+    setCookie("authToken", token, 30);
   }
   
   export function getAuthToken() {

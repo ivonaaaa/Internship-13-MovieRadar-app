@@ -27,17 +27,24 @@ document.addEventListener("DOMContentLoaded", function () {
         firstName,
         lastName,
         email,
-        password,
-        is_admin: false
+        password
       };
 
       await registerUser(newUser);
 
-      registerContainer.style.display = "none";
-      initUserApp();
+      alert("Registration successful, please login now");
+      window.location.href = "./index.html";
+
     } catch (error) {
       console.error("An error occurred during registration:", error);
-      alert("An error occurred while accessing the server.");
+      if (error.message.includes("The password is invalid!")) {
+        alert("Password must contain at least 1 upper letter, 1 lower letter, 1 number and 1 special character");
+      }else if(error.message.includes("The email is invalid!")){
+        alert("Enter valid email (example: user@user.com)");
+      }
+      else{
+        alert("An error occurred while accessing the server.");
+      }
     }
   });
 });
