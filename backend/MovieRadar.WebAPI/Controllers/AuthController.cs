@@ -35,20 +35,6 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<ActionResult> Register([FromBody] User newUser)
     {
-        var userValidity = UserHelper.IsUserValid(newUser);
-
-        if (!userValidity.Item1)
-        {
-            return BadRequest(new { message = userValidity.Item2 });
-        }
-
-        var user = await userService.GetByEmail(newUser.Email);
-
-        if (user != null)
-        {
-            return BadRequest(new { message = "Email is already taken!" });
-        }
-
         try
         {
             var id = await userService.Add(newUser);

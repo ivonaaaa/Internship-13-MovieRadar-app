@@ -36,15 +36,19 @@ namespace MovieRadar.Application.Services
             }
         }
 
-        public async Task<int> Add(User user)
+        public async Task<int> Add(User newUser)
         {
-            var updateUserValidation = UserHelper.IsUserValid(user);
+            var updateUserValidation = UserHelper.IsUserValid(newUser);
             if (!updateUserValidation.Item1)
                 throw new ArgumentException(updateUserValidation.Item2);
 
+            var user = await GetByEmail(newUser.Email);
+            if (user != null)
+                throw new ArgumentException("Email is already taken!");
+
             try
             {
-                return await userRepository.Add(user);
+                return await userRepository.Add(newUser);
             }
             catch (Exception ex)
             {
