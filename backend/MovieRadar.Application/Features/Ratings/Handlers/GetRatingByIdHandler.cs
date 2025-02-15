@@ -2,7 +2,7 @@
 using MovieRadar.Domain.Entities;
 using MovieRadar.Domain.Interfaces;
 
-namespace RatingRadar.Application.Services.Ratings.Handlers
+namespace MovieRadar.Application.Features.Ratings.Handlers
 {
     public class GetRatingByIdHandler : IRequestHandler<GetRatingByIdQuery, Rating?>
     {

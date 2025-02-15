@@ -2,20 +2,20 @@
 using MovieRadar.Application.Helpers;
 using MovieRadar.Domain.Interfaces;
 
-namespace RatingRadar.Application.Services.Ratings.Handlers
+namespace MovieRadar.Application.Features.Ratings.Handlers
 {
-    public class UpdateRatingHandler : IRequestHandler<UpdateRatingCommand, bool>
+    public class AddRatingHandler : IRequestHandler<AddRatingCommand, int>
     {
         private readonly IRatingRepository ratingRepository;
         private readonly IMovieRepository movieRepository;
 
-        public UpdateRatingHandler(IRatingRepository ratingRepository, IMovieRepository movieRepository)
+        public AddRatingHandler(IRatingRepository ratingRepository, IMovieRepository movieRepository)
         {
             this.ratingRepository = ratingRepository;
             this.movieRepository = movieRepository;
         }
 
-        public async Task<bool> Handle(UpdateRatingCommand request, CancellationToken cancellationToken)
+        public async Task<int> Handle(AddRatingCommand request, CancellationToken cancellationToken)
         {
             var updateRatingValidation = await RatingHelper.IsRatingValid(request.rating, movieRepository);
             if (!updateRatingValidation.Item1)
@@ -23,11 +23,11 @@ namespace RatingRadar.Application.Services.Ratings.Handlers
 
             try
             {
-                return await ratingRepository.Update(request.rating);
+                return await ratingRepository.Add(request.rating);
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error updating rating: {ex.Message}, inner: {ex.InnerException}");
+                throw new Exception($"Error adding new rating: {ex.Message}, inner: {ex.InnerException}");
             }
         }
     }

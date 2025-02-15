@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using MovieRadar.Domain.Interfaces;
 
-namespace RatingRadar.Application.Services.Ratings.Handlers
+namespace MovieRadar.Application.Features.Users.Handlers
 {
     public class DeleteUserHandler : IRequestHandler<DeleteUserCommand, bool>
     {

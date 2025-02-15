@@ -3,13 +3,13 @@ using Npgsql;
 using MovieRadar.Domain.Interfaces;
 using MovieRadar.Infrastructure.Repositories;
 using MovieRadar.Application.Services;
-using MovieRadar.Application.Services.Movies.Handlers;
 using MovieRadar.Domain.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using MediatR;
 using MovieRadar.Application.Services.Token;
+using MovieRadar.Application.Features.Movies.Handlers;
 
 var builder = WebApplication.CreateBuilder(args);
 

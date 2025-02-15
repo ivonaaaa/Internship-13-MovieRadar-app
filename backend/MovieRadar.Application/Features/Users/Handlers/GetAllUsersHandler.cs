@@ -2,7 +2,7 @@
 using MovieRadar.Domain.Entities;
 using MovieRadar.Domain.Interfaces;
 
-namespace UserRadar.Application.Services.Users.Handlers
+namespace MovieRadar.Application.Features.Users.Handlers
 {
     public class GetAllUsersHandler : IRequestHandler<GetAllUsersQuery, IEnumerable<User>>
     {

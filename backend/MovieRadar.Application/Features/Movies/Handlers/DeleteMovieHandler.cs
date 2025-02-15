@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using MovieRadar.Domain.Interfaces;
 
-namespace MovieRadar.Application.Services.Movies.Handlers
+namespace MovieRadar.Application.Features.Movies.Handlers
 {
     public class DeleteMovieHandler : IRequestHandler<DeleteMovieCommand, bool>
     {

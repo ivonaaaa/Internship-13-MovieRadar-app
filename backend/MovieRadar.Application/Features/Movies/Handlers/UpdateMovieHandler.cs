@@ -2,7 +2,7 @@
 using MovieRadar.Application.Helpers;
 using MovieRadar.Domain.Interfaces;
 
-namespace MovieRadar.Application.Services.Movies.Handlers
+namespace MovieRadar.Application.Features.Movies.Handlers
 {
     public class UpdateMovieHandler : IRequestHandler<UpdateMovieCommand, bool>
     {
