@@ -1,9 +1,13 @@
 import { getMovieList } from "../api/api.js";
 import { displayMovieDetails } from "./movie-details.js";
+import { createLogoutButton } from "./logout.js";
 
 export function initUserApp() {
   async function initialize() {
     const moviesContainer = document.getElementById("movies-container");
+
+    const logoutButton = createLogoutButton();
+    document.body.prepend(logoutButton);
 
     const filterContainer = document.createElement("div");
     filterContainer.classList.add("filter-container");
