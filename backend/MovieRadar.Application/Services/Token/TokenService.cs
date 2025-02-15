@@ -5,7 +5,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using MovieRadar.Domain.Entities;
 
-namespace MovieRadar.Application.Services
+namespace MovieRadar.Application.Services.Token
 {
     public class TokenService : ITokenService
     {

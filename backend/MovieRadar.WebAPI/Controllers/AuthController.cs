@@ -2,24 +2,25 @@ using Microsoft.AspNetCore.Mvc;
 using MovieRadar.Application.Services;
 using MovieRadar.Domain.Entities;
 using Microsoft.AspNetCore.Identity.Data;
+using MediatR;
 
 [ApiController]
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
-    private readonly IUserService userService;
+    private IMediator mediator;
     private readonly ITokenService tokenService;
 
-    public AuthController(IUserService userService, ITokenService tokenService)
+    public AuthController(IMediator mediator, ITokenService tokenService)
     {
-        this.userService = userService;
+        this.mediator = mediator;
         this.tokenService = tokenService;
     }
 
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        var user = await userService.GetByEmail(request.Email);
+        var user = await mediator.Send(new GetUserByEmailQuery(request.Email));
 
         if (user == null || user.Password != request.Password)
         {
@@ -35,7 +36,7 @@ public class AuthController : ControllerBase
     {
         try
         {
-            var id = await userService.Add(newUser);
+            var id = await mediator.Send(new AddUserCommand(newUser));
             return Ok();
         }
         catch (ArgumentException ex)
