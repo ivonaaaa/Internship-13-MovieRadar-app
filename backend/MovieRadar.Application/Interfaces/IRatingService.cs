@@ -5,5 +5,7 @@ namespace MovieRadar.Application.Interfaces
 {
     public interface IRatingService : IService<Rating>
     {
+        Task<(int, int)> GetLikesDislikes(int ratingId);
+        Task<bool> RemoveLikeDislike(int reactionId);
     }
 }

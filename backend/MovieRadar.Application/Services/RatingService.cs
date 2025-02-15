@@ -71,5 +71,30 @@ namespace MovieRadar.Application.Services
                 throw new Exception($"Error deleting comment: {ex.Message}, inner: {ex.InnerException}");
             }
         }
+
+        public async Task<(int, int)> GetLikesDislikes(int ratingId)
+        {
+            try
+            {
+                return await ratingRepository.GetLikesAndDislikes(ratingId);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error getting likes: {ex.Message}, inner: {ex.InnerException}");
+            }
+        }
+
+        public async Task<bool> RemoveLikeDislike(int reactionId)
+        {
+            try
+            {
+                return await ratingRepository.RemoveLikeDislike(reactionId);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error removing like/dislike: {ex.Message}, inner: {ex.InnerException}");
+
+            }
+        }
     }
 }

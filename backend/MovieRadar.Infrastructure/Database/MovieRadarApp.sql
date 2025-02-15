@@ -39,17 +39,18 @@ CREATE TABLE ratings(
     CONSTRAINT unique_user_movie UNIQUE(user_id, movie_id)
 );
 
+CREATE TYPE reaction_type AS ENUM('like', 'dislike');
 
 CREATE TABLE ratings_comments (
     id SERIAL PRIMARY KEY, 
     rating_id INT NOT NULL REFERENCES ratings(id) ON DELETE CASCADE,
-    movie_id INT NOT NULL REFERENCES movies(id) ON DELETE CASCADE,
+    user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     comment TEXT
 );
 CREATE TABLE ratings_reactions(
-  rating_id INT PRIMARY KEY NOT NULL REFERENCES ratings(id) ON DELETE CASCADE,
-  likes INT DEFAULT 0,
-  dislikes INT DEFAULT 0
+  id SERIAL PRIMARY KEY,
+  rating_id INT NOT NULL REFERENCES ratings(id) ON DELETE CASCADE,
+  reaction reaction_type
 );
 
 
