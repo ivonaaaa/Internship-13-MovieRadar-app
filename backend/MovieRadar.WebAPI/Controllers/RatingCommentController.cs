@@ -1,20 +1,20 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using MovieRadar.Application.Interfaces;
 using MovieRadar.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using MediatR;
 
 namespace MovieRadar.WebAPI.Controllers
 {
 
     [ApiController]
     [Route("api/[controller]")]
-    public class RatingCommentsController : ControllerBase
+    public class RatingCommentController : ControllerBase
     {
-        private readonly IRatingCommentService ratingCommentService;
-        public RatingCommentsController(IRatingCommentService ratingCommentService)
+        private readonly IMediator mediator;
+        public RatingCommentController(IMediator mediator)
         {
-            this.ratingCommentService = ratingCommentService;
+            this.mediator = mediator;
         }
 
         [HttpGet]
@@ -22,7 +22,7 @@ namespace MovieRadar.WebAPI.Controllers
         {
             try
             {
-                var allRatingComments = await ratingCommentService.GetAll();
+                var allRatingComments = await mediator.Send(new GetAllRatingCommentsQuery());
                 return Ok(allRatingComments);
             }
             catch (Exception ex) 
@@ -34,7 +34,7 @@ namespace MovieRadar.WebAPI.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<RatingComment>> GetRatingCommentById(int id)
         {
-            var ratingComment = await ratingCommentService.GetById(id);
+            var ratingComment = await mediator.Send(new GetRatingCommentByIdQuery(id));
             if (ratingComment == null)
                 return NotFound();
 
@@ -47,7 +47,7 @@ namespace MovieRadar.WebAPI.Controllers
         {
             try
             {
-                var newRatingCommentId = await ratingCommentService.Add(newRatingsComments);
+                var newRatingCommentId = await mediator.Send(new AddRatingCommentCommand(newRatingsComments));
                 return CreatedAtAction(nameof(GetRatingCommentById), new { id = newRatingCommentId }, newRatingsComments);
             }
             catch (ArgumentException ex)
@@ -70,12 +70,17 @@ namespace MovieRadar.WebAPI.Controllers
             if (!int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var userId))
                 return Unauthorized();
 
-            if (userId != ratingsComments.UserId)
+            var ratingCommentToUpdate = await mediator.Send(new GetRatingCommentByIdQuery(id));
+
+            if (ratingCommentToUpdate== null)
+                return NotFound();
+
+            if (userId != ratingCommentToUpdate.UserId)
                 return Forbid();
 
             try
             {
-                var updated = await ratingCommentService.Update(ratingsComments);
+                var updated = await mediator.Send(new UpdateRatingCommentCommand(ratingsComments));
                 return updated ? NoContent() : NotFound();
             }
             catch (ArgumentException ex)
@@ -95,7 +100,7 @@ namespace MovieRadar.WebAPI.Controllers
             if (!int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var userId))
                 return Unauthorized();
 
-            var ratingCommentToDelete = await ratingCommentService.GetById(id);
+            var ratingCommentToDelete = await mediator.Send(new GetRatingCommentByIdQuery(id));
 
             if(ratingCommentToDelete == null)
                 return NotFound();
@@ -105,12 +110,12 @@ namespace MovieRadar.WebAPI.Controllers
             
             try
             {
-                var deleted = await ratingCommentService.DeleteById(id);
+                var deleted = await mediator.Send(new DeleteRatingCommentCommand(id));
                 return deleted ? NoContent() : NotFound();
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Error deleting   rating comment: , {ex.Message}, inner: , {ex.InnerException}");
+                return StatusCode(500, $"Error deleting rating comment: , {ex.Message}, inner: , {ex.InnerException}");
             }
         }
     }

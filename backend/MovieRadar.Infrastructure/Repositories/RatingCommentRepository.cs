@@ -4,13 +4,12 @@ using MovieRadar.Domain.Interfaces;
 
 using System.Data;
 
-
 namespace MovieRadar.Infrastructure.Repositories
 {
-    public class RatingCommentsRepository : IRatingCommentsRepository
+    public class RatingCommentRepository : IRatingCommentRepository
     {
         private readonly IDbConnection connection;
-        public RatingCommentsRepository(IDbConnection connection)
+        public RatingCommentRepository(IDbConnection connection)
         {
                 this.connection = connection;
         }
@@ -48,6 +47,14 @@ namespace MovieRadar.Infrastructure.Repositories
         {
             var deleteMovieQuery = "DELETE FROM ratings_comments WHERE id = @Id";
             return await connection.ExecuteAsync(deleteMovieQuery, new { Id = id }) > 0;
+        }
+
+        public async Task<IEnumerable<RatingComment>> GetAllByRatingId(int id)
+        {
+            var allReactionsByRatingId = @"SELECT id AS Id, rating_id AS RatingId, user_id AS UserId, comment AS Comment
+                                           FROM ratings_comments
+                                           WHERE rating_id = @Id";
+            return await connection.QueryAsync<RatingComment>(allReactionsByRatingId, new { Id = id });
         }
     }
 }

@@ -9,11 +9,11 @@ namespace MovieRadar.WebAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class RatingReactionsController : ControllerBase
+    public class RatingReactionController : ControllerBase
     {
         private readonly IMediator mediator;
         
-        public RatingReactionsController(IMediator mediator)
+        public RatingReactionController(IMediator mediator)
         {
             this.mediator = mediator;
         }
@@ -78,7 +78,12 @@ namespace MovieRadar.WebAPI.Controllers
             if (!int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var userId))
                 return Unauthorized();
 
-            if (userId != updatedReaction.UserId)
+            var reactionToUpdate = await mediator.Send(new GetRatingReactionByIdQuery(id));
+
+            if (reactionToUpdate == null)
+                return NotFound();
+
+            if (userId != reactionToUpdate.UserId)
                 return Forbid();
 
             try
@@ -118,18 +123,13 @@ namespace MovieRadar.WebAPI.Controllers
             }
         }
 
-        [HttpGet("ratingId/{id}")]
+        [HttpGet]
         public async Task<IActionResult> GetAllByRatingId(int id)
         {
             try
             {
-                Console.WriteLine("aaaaaa" + id);
                 var reactionsByRatingId = await mediator.Send(new GetRatingReactionsByRatingIdQuery(id));
-                
-                if(reactionsByRatingId == null || !reactionsByRatingId.Any())
-                    return NotFound();
-                
-                return Ok(reactionsByRatingId);
+                return (reactionsByRatingId == null || !reactionsByRatingId.Any()) ? NotFound() : Ok(reactionsByRatingId);
             }
             catch (Exception ex)
             {

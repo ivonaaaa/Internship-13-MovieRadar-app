@@ -1,4 +1,4 @@
-﻿namespace MovieRadar.Application.Services
+﻿namespace MovieRadar.Application.Interfaces
 {
     public interface ITokenService
     {

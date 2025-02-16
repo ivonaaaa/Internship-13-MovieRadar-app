@@ -2,7 +2,7 @@
 using Npgsql;
 using MovieRadar.Domain.Interfaces;
 using MovieRadar.Infrastructure.Repositories;
-using MovieRadar.Application.Services;
+using MovieRadar.Application.Interfaces;
 using MovieRadar.Domain.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -10,21 +10,14 @@ using System.Text;
 using MediatR;
 using MovieRadar.Application.Services.Token;
 using MovieRadar.Application.Features.Movies.Handlers;
-using MovieRadar.Application.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
-
-//builder.Services.AddEndpointsApiExplorer();
-//builder.Services.AddSwaggerGen(c =>
-//{
-//    c.SwaggerDoc("v1", new OpenApiInfo { Title = "MovieRadar API", Version = "v1" });
-//});
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: "CorsPolicy", policyBuilder =>
     {
-        policyBuilder.AllowAnyMethod().AllowAnyHeader().WithOrigins("http://localhost:5500", "http://127.0.0.1:5500"); /*.AllowAnyOrigin(); */ //ili .WithOrigins("http://localhost:5000"); ili koji je vec na FE port
+        policyBuilder.AllowAnyMethod().AllowAnyHeader().WithOrigins("http://localhost:5500", "http://127.0.0.1:5500");
     });
 });
 
@@ -35,10 +28,9 @@ builder.Services.AddScoped<IDbConnection>(_ => new NpgsqlConnection(builder.Conf
 builder.Services.AddScoped<IRatingRepository, RatingRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IMovieRepository, MovieRepository>();
-builder.Services.AddScoped<ITokenService, TokenService>();
-builder.Services.AddScoped<IRatingCommentsRepository, RatingCommentsRepository>();
+builder.Services.AddScoped<IRatingCommentRepository, RatingCommentRepository>();
 builder.Services.AddScoped<IRatingReactionRepository, RatingReactionRepository>();
-builder.Services.AddScoped<IRatingCommentService, RatingsCommentsService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 
@@ -67,15 +59,7 @@ builder.Services
 builder.Services.AddAuthorization();
 builder.Services.AddMediatR(typeof(AddMovieHandler).Assembly);
 
-//builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
-
 var app = builder.Build();
-
-//if (app.Environment.IsDevelopment())
-//{
-//    app.UseSwagger();
-//    app.UseSwaggerUI();
-//}
 
 app.UseCors("CorsPolicy");
 
