@@ -20,7 +20,7 @@ namespace MovieRadar.Application.Helpers
 
         public static async Task<bool> IsRatingReactionUnique(RatingReaction ratingReaction, IRatingReactionRepository ratingReactionsRepository)
         {
-            var existingReactions = await ratingReactionsRepository.GetAllByRatingId(ratingReaction.RatingId);
+            var existingReactions = await ratingReactionsRepository.GetFiltered("rating_id", ratingReaction.RatingId.ToString());
             return !existingReactions.Any(r => r.UserId == ratingReaction.UserId);
         }
     }

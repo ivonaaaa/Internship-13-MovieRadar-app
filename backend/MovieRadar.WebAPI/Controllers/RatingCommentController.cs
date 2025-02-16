@@ -20,7 +20,7 @@ namespace MovieRadar.WebAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<RatingComment>>> GetAllRatingComments([FromQuery] string? filter, [FromQuery] string? value)
         {
-            var validFilters = new HashSet<string> { "movie_id" };
+            var validFilters = new HashSet<string> { "rating_id" };
 
             if (string.IsNullOrEmpty(filter) && string.IsNullOrEmpty(value))
             {

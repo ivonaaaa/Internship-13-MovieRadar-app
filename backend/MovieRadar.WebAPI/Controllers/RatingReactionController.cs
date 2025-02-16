@@ -20,15 +20,30 @@ namespace MovieRadar.WebAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<RatingReaction>>> GetAllReactions([FromQuery] string? filter, [FromQuery] string? value)
         {
-            try
+            var validFilters = new HashSet<string> { "rating_id" };
+
+            if (string.IsNullOrEmpty(filter) && string.IsNullOrEmpty(value))
             {
-                var allReactions = await mediator.Send(new GetAllRatingReactionsQuery());
-                return Ok(allReactions);
+                try
+                {
+                    var allReactions = await mediator.Send(new GetAllRatingReactionsQuery());
+                    return Ok(allReactions);
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(500, $"Error getting all reactions: , {ex.Message}, inner: , {ex.InnerException}");
+                }
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error getting all reactions: , {ex.Message}, inner: , {ex.InnerException}");
-            }
+
+            if (!validFilters.Contains(filter))
+                return BadRequest($"Invalid filter: '{filter}'");
+
+            if (string.IsNullOrWhiteSpace(value))
+                return BadRequest("Value cannot be empty");
+
+            var filteredReactions = await mediator.Send(new GetFilteredRatingReactionsQuery(filter, value));
+
+            return (filteredReactions == null || !filteredReactions.Any()) ? NotFound() : Ok(filteredReactions);
         }
          
         [HttpGet("{id}")]
@@ -115,20 +130,6 @@ namespace MovieRadar.WebAPI.Controllers
             {
                 var deleted = await mediator.Send(new DeleteRatingReactionCommand(id));
                 return deleted ? Ok() : NotFound();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error deleting reaction: , {ex.Message}, inner: , {ex.InnerException}");
-            }
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> GetAllByRatingId(int id)
-        {
-            try
-            {
-                var reactionsByRatingId = await mediator.Send(new GetFilteredRatingReactionsQuery(id));
-                return (reactionsByRatingId == null || !reactionsByRatingId.Any()) ? NotFound() : Ok(reactionsByRatingId);
             }
             catch (Exception ex)
             {
