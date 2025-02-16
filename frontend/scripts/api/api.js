@@ -426,6 +426,55 @@ async function deleteReaction(reactionId, token) {
   }
 }
 
+// Dohvaća recenzije s endpointa api/ratingComments.
+// Ako želiš filtrirati (npr. po movieId), možeš proslijediti filter i value.
+async function getRatingComments(filter, value) {
+  let url = "http://localhost:50845/api/ratingComments";
+  if (filter && value) {
+    url += `?filter=${filter}&value=${value}`;
+  }
+  const options = {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+    mode: "cors",
+  };
+
+  try {
+    const response = await fetch(url, options);
+    if (!response.ok) {
+      throw new Error(`Neuspješno dohvaćanje recenzija: ${response.statusText}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Greška pri dohvaćanju recenzija:", error);
+    return [];
+  }
+}
+
+// Šalje novu recenziju na endpoint api/ratingComments.
+async function postRatingComment(ratingCommentData, token) {
+  try {
+    const response = await fetch("http://localhost:50845/api/ratingComments", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(ratingCommentData),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Greška pri slanju recenzije.");
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Greška pri slanju recenzije:", error);
+    throw error;
+  }
+}
+
+
 
 export {
   getAllUsers,
@@ -442,5 +491,7 @@ export {
   deleteComment,
   getAllReactions,
   postReaction,
-  deleteReaction
+  deleteReaction,
+  getRatingComments,
+  postRatingComment
 };
