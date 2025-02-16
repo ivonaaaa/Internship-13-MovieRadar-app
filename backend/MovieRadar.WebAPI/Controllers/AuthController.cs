@@ -28,7 +28,7 @@ public class AuthController : ControllerBase
         }
 
         var token = tokenService.GenerateToken(user.Id, user.Email, user.IsAdmin);
-        return Ok(new { token });
+        return Ok(new { token, user.IsAdmin });
     }
 
     [HttpPost("register")]
