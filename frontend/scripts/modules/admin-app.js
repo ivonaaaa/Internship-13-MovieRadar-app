@@ -153,7 +153,7 @@ export function initAdminApp() {
           </form>
         </div>
       `;
-      document.body.appendChild(modal);
+      document.body.prepend(modal);
       document.getElementById("close-modal").addEventListener("click", () => {
         modal.style.display = "none";
       });
