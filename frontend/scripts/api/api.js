@@ -92,26 +92,42 @@ async function registerUser(newUser) {
       body: JSON.stringify(newUser),
     });
 
-    const responseMessage = await response.text();
-
-    if (!response.ok) {
-      let errorMessage = "Error during registration";
-
+    let responseData;
+    const contentType = response.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
+      responseData = await response.json();
+    } else {
+      const textResponse = await response.text();
       try {
-        const errorData = JSON.parse(responseMessage);
-
-        if (errorData.message) errorMessage = errorData.message;
+        responseData = JSON.parse(textResponse);
       } catch {
-        errorMessage = responseMessage || errorMessage;
+        responseData = { message: textResponse };
       }
-      throw new Error(
-        errorData.message || "An error occurred during registration."
-      );
     }
 
-    return responseMessage ? JSON.parse(responseMessage) : null;
+    if (!response.ok) {
+      if (responseData.errors) {
+        const errorMessages = [];
+        for (const key in responseData.errors) {
+          if (Array.isArray(responseData.errors[key])) {
+            errorMessages.push(...responseData.errors[key]);
+          } else {
+            errorMessages.push(responseData.errors[key]);
+          }
+        }
+        throw new Error(errorMessages.join("\n"));
+      } else if (responseData.message) {
+        throw new Error(responseData.message);
+      } else if (typeof responseData === "string") {
+        throw new Error(responseData);
+      } else {
+        throw new Error(`Registration failed with status ${response.status}`);
+      }
+    }
+
+    return responseData;
   } catch (error) {
-    throw new Error(error.message);
+    throw error;
   }
 }
 
