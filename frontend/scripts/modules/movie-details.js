@@ -75,6 +75,8 @@ const displayMovieDetails = async (movieId) => {
             }
             if (isLoggedIn && !isAdmin) {
               commentHtml += `<button class="reply-button" data-comment-id="${c.id}">Reply</button> `;
+              commentHtml += ` <button class="like-button" data-rating-id="${c.id}"> <i class="fas fa-thumbs-up"></i></button>
+                               <button class="dislike-button" data-rating-id="${c.id}"> <i class="fas fa-thumbs-down fa-flip-horizontal"></i></button>`;
             }
             else if(!isAdmin) {
               commentHtml += ` <button class="like-button" data-rating-id="${c.id}"> <i class="fas fa-thumbs-up"></i></button>
