@@ -1,4 +1,3 @@
-
 export function setCookie(name, value, minutes) {
     let expires = "";
     if (minutes) {
