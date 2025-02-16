@@ -5,6 +5,15 @@ import { getAuthToken } from "./auth.js";
 
 export function initAdminApp() {
   async function initialize() {
+    const listUsersButton = document.createElement("button");
+    listUsersButton.id = "users-btn";
+    listUsersButton.innerText = "Users list";
+    listUsersButton.addEventListener("click", () => {
+      // Preusmjeri na users.html
+      window.location.href = "users.html";
+    });
+    document.body.prepend(listUsersButton);
+    
     const moviesContainer = document.getElementById("movies-container");
 
     const logoutButton = createLogoutButton();

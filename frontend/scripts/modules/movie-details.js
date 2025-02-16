@@ -4,6 +4,12 @@ import { getIsAdmin } from "./authState.js";
 
 const displayMovieDetails = async (movieId) => {
   try {
+
+    const usersBtn = document.getElementById("users-btn");
+    if (usersBtn) {
+      usersBtn.style.display = "none";
+    }
+
     const movies = await getMovieList();
     const movieData = movies.find((m) => m.id === movieId);
     const idKey = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier";
