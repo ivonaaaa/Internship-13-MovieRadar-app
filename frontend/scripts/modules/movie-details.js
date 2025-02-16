@@ -133,19 +133,19 @@ const displayMovieDetails = async (movieId) => {
     }
 
     let htmlContent = `
-      <h2>${movieData.title} (${movieData.releaseYear})</h2>
-      ${
-        movieData.imageLink
-          ? `<img src="${movieData.imageLink}" alt="${movieData.title}" class="movie-detail-image" />`
-          : ""
-      }
-      <p>${movieData.summary}</p>
-      <h3>Average grade: ${averageRating(filteredRatings)} / 10</h3>
-      <h3>Reviews</h3>
-      <div id="comments-section">
-        ${commentsHtml}
-      </div>
-    `;
+  <div class="movie-detail">
+    ${
+      movieData.imageLink
+        ? `<img src="${movieData.imageLink}" alt="${movieData.title}" class="movie-detail-image" />`
+        : ""
+    }
+    <h2>${movieData.title} (${movieData.releaseYear})</h2>
+    <p>${movieData.summary}</p>
+    <h3>Average grade: ${averageRating(filteredRatings)} / 10</h3>
+    <h3>Reviews</h3>
+    <div id="comments-section">${commentsHtml}</div>
+  </div>
+`;
 
     if (isLoggedIn && !userHasReview && !isAdmin) {
       htmlContent += `
@@ -159,7 +159,7 @@ const displayMovieDetails = async (movieId) => {
         </div>
       `;
     }
-    htmlContent += `<br><button id="back-button">Back</button>`;
+    htmlContent += `<br><button id="back-button" class="back-button">Back</button>`;
 
     document.getElementById("movies-container").innerHTML = htmlContent;
 
