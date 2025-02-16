@@ -6,7 +6,6 @@ import { initAdminApp } from "./admin-app.js";
 
 const displayMovieDetails = async (movieId) => {
   try {
-
     const usersBtn = document.getElementById("users-btn");
     if (usersBtn) {
       usersBtn.style.display = "none";
@@ -14,7 +13,8 @@ const displayMovieDetails = async (movieId) => {
 
     const movies = await getMovieList();
     const movieData = movies.find((m) => m.id === movieId);
-    const idKey = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier";
+    const idKey =
+      "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier";
 
     if (!movieData) {
       document.getElementById("movies-container").innerHTML =
@@ -85,7 +85,6 @@ const displayMovieDetails = async (movieId) => {
           .join("")
       : "<p>No available reviews.</p>";
 
-    
     let userHasReview = false;
     if (isLoggedIn) {
       userHasReview = filteredRatings.some(
@@ -93,7 +92,6 @@ const displayMovieDetails = async (movieId) => {
       );
     }
 
-   
     let htmlContent = `
       <h2>${movieData.title} (${movieData.releaseYear})</h2>
       <p>${movieData.summary}</p>
@@ -124,29 +122,30 @@ const displayMovieDetails = async (movieId) => {
     backButton.addEventListener("click", async () => {
       window.location.hash = "";
       const moviesContainer = document.getElementById("movies-container");
-    
+
       const isAdmin = getIsAdmin();
-    
+
       if (isAdmin) {
-        moviesContainer.innerHTML = ""; 
-        initAdminApp(); 
+        moviesContainer.innerHTML = "";
+        initAdminApp();
       } else {
-        moviesContainer.innerHTML = ""; 
-        initUserApp(); 
+        moviesContainer.innerHTML = "";
+        initUserApp();
       }
-    
+
       const usersBtn = document.getElementById("users-btn");
       if (usersBtn) {
         usersBtn.style.display = isAdmin ? "block" : "none";
       }
     });
 
-   
     const submitCommentButton = document.getElementById("submit-comment");
     if (submitCommentButton) {
       submitCommentButton.addEventListener("click", async () => {
         const content = document.getElementById("comment-content").value.trim();
-        const grade = parseFloat(document.getElementById("comment-grade").value);
+        const grade = parseFloat(
+          document.getElementById("comment-grade").value
+        );
         if (!content || isNaN(grade)) {
           alert("Please enter valid comment and grade.");
           return;
@@ -155,7 +154,7 @@ const displayMovieDetails = async (movieId) => {
           movieId: movieId,
           review: content,
           grade: grade,
-          userId: currentUserId  
+          userId: currentUserId,
         };
 
         try {
@@ -195,7 +194,9 @@ const displayMovieDetails = async (movieId) => {
           try {
             const allReactions = await getAllReactions();
             const existingReaction = allReactions.find(
-              (r) => r.ratingId === ratingId && Number(r.userId) === Number(currentUserId)
+              (r) =>
+                r.ratingId === ratingId &&
+                Number(r.userId) === Number(currentUserId)
             );
             if (existingReaction) {
               if (existingReaction.reaction === "like") {
@@ -210,7 +211,7 @@ const displayMovieDetails = async (movieId) => {
             const reactionData = {
               ratingId: ratingId,
               Reaction: "like",
-              userId: currentUserId
+              userId: currentUserId,
             };
             await postReaction(reactionData, currentToken);
             alert("Like added!");
@@ -222,6 +223,43 @@ const displayMovieDetails = async (movieId) => {
         });
       });
 
+      const dislikeButtons = document.querySelectorAll(".dislike-button");
+      dislikeButtons.forEach((button) => {
+        button.addEventListener("click", async (e) => {
+          const ratingId = Number(e.target.dataset.ratingId);
+          const currentToken = getAuthToken();
+          try {
+            const allReactions = await getAllReactions();
+            const existingReaction = allReactions.find(
+              (r) =>
+                r.ratingId === ratingId &&
+                Number(r.userId) === Number(currentUserId)
+            );
+            if (existingReaction) {
+              if (existingReaction.reaction === "dislike") {
+                await deleteReaction(existingReaction.id, currentToken);
+                alert("Dislike removed!");
+                displayMovieDetails(movieId);
+                return;
+              } else {
+                await deleteReaction(existingReaction.id, currentToken);
+              }
+            }
+            const reactionData = {
+              ratingId: ratingId,
+              Reaction: "dislike",
+              userId: currentUserId,
+            };
+            await postReaction(reactionData, currentToken);
+            alert("Dislike added!");
+            displayMovieDetails(movieId);
+          } catch (err) {
+            console.error("Error adding reaction:", err);
+            alert("Error adding reaction.");
+          }
+        });
+      });
+    }
         const dislikeButtons = document.querySelectorAll(".dislike-button");
         dislikeButtons.forEach((button) => {
           button.addEventListener("click", async (e) => {
@@ -256,7 +294,7 @@ const displayMovieDetails = async (movieId) => {
             }
           });
         });
-      }
+      
 
       const replyButtons = document.querySelectorAll(".reply-button");
       replyButtons.forEach((button) => {
@@ -331,5 +369,21 @@ const averageRating = (ratings) => {
   const total = ratings.reduce((sum, rating) => sum + rating.grade, 0);
   return parseFloat((total / ratings.length).toFixed(1));
 };
+
+window.addEventListener("hashchange", () => {
+  if (!window.location.hash.startsWith("#film-")) {
+    const moviesContainer = document.getElementById("movies-container");
+
+    const isAdmin = getIsAdmin();
+
+    if (isAdmin) {
+      moviesContainer.innerHTML = "";
+      initAdminApp();
+    } else {
+      moviesContainer.innerHTML = "";
+      initUserApp();
+    }
+  }
+});
 
 export { displayMovieDetails };
