@@ -1,11 +1,12 @@
 import { getAuthToken } from "../modules/auth.js";
 
-async function getAllUsers() {
+async function getAllUsers(token) {
   try {
-    const response = await fetch("https://localhost:50844/api/User", {
+    const response = await fetch("http://localhost:50845/api/User", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
     });
     if (!response.ok) {
@@ -20,7 +21,7 @@ async function getAllUsers() {
 
 async function createUser(newUser) {
   try {
-    const response = await fetch("https://localhost:50844/api/User", {
+    const response = await fetch("http://localhost:50845/api/User", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -388,7 +389,7 @@ async function deleteComment(commentId, token) {
 
 async function getAllReactions() {
   try {
-    const response = await fetch("http://localhost:50845/api/ratingReactions", {
+    const response = await fetch("http://localhost:50845/api/ratingReaction", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -406,7 +407,7 @@ async function getAllReactions() {
 
 async function postReaction(reactionData, token) {
   try {
-    const response = await fetch("http://localhost:50845/api/ratingReactions", {
+    const response = await fetch("http://localhost:50845/api/ratingReaction", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -428,16 +429,13 @@ async function postReaction(reactionData, token) {
 
 async function deleteReaction(reactionId, token) {
   try {
-    const response = await fetch(
-      `https://localhost:50844/api/ratingReactions/${reactionId}`,
-      {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    const response = await fetch(`https://localhost:50844/api/ratingReaction/${reactionId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
     if (!response.ok) {
       const errorText = await response.text();
       throw new Error(errorText || "Error deleting reaction");
@@ -448,6 +446,56 @@ async function deleteReaction(reactionId, token) {
     throw error;
   }
 }
+
+// Dohvaća recenzije s endpointa api/ratingComments.
+// Ako želiš filtrirati (npr. po movieId), možeš proslijediti filter i value.
+async function getRatingComments(filter, value) {
+  let url = "http://localhost:50845/api/ratingComment";
+  if (filter && value) {
+    url += `?filter=${filter}&value=${value}`;
+  }
+  const options = {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+    mode: "cors",
+  };
+
+  try {
+    const response = await fetch(url, options);
+    if (!response.ok) {
+      throw new Error(`Neuspješno dohvaćanje recenzija: ${response.statusText}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Greška pri dohvaćanju recenzija:", error);
+    return [];
+  }
+}
+
+// Šalje novu recenziju na endpoint api/ratingComments.
+async function postRatingComment(ratingCommentData, token) {
+  try {
+    const response = await fetch("http://localhost:50845/api/ratingComment", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(ratingCommentData),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Greška pri slanju recenzije.");
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Greška pri slanju recenzije:", error);
+    throw error;
+  }
+}
+
+
 
 export {
   getAllUsers,
@@ -465,4 +513,6 @@ export {
   getAllReactions,
   postReaction,
   deleteReaction,
+  getRatingComments,
+  postRatingComment
 };
