@@ -10,6 +10,6 @@
         public float AvgRating { get; }
         public DateTime CreatedAt { get; }
         public DateTime LastModifiedAt { get; }
-        //public string Image { get; set; }
+        public string ImageLink { get; set; }
     }
 }
