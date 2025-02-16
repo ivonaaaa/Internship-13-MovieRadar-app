@@ -172,8 +172,22 @@ async function createMovie(movieData) {
   try {
     return await postMovie(movieData, token);
   } catch (error) {
-    console.error("Error creating movie:", error);
-    throw error;
+    if (error.response) {
+      const errorMessage = await error.response.text();
+      try {
+        const errorData = JSON.parse(errorMessage);
+        if (errorData.errors) {
+          const messages = Object.values(errorData.errors).flat().join("\n");
+          throw new Error(messages);
+        } else {
+          throw new Error(
+            errorData.message || "An error occurred while creating the movie"
+          );
+        }
+      } catch {
+        throw new Error("Error while parsing errors");
+      }
+    } else throw new Error("Server error");
   }
 }
 
