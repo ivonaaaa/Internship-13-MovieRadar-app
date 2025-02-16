@@ -60,7 +60,7 @@ export function initUserApp() {
         movieElement.classList.add("movie-item");
 
         movieElement.innerHTML = `
-          <h3>${movie.title} (${movie.release_year})</h3>
+          <h3>${movie.title} (${movie.releaseYear})</h3>
           <p>${movie.summary}</p>
           <button data-id="${movie.id}" class="view-details">Details</button>
         `;

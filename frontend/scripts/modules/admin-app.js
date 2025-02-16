@@ -1,6 +1,7 @@
 import { getMovieList } from "../api/api.js";
 import { displayMovieDetails } from "./movie-details.js";
 import { createLogoutButton } from "./logout.js";
+import { getAuthToken } from "./auth.js";
 
 export function initAdminApp() {
   async function initialize() {
@@ -20,7 +21,7 @@ export function initAdminApp() {
       movieElement.classList.add("movie-item");
 
       movieElement.innerHTML = `
-        <h3>${movie.title} (${movie.release_year})</h3>
+        <h3>${movie.title} (${movie.releaseYear})</h3>
         <p>${movie.summary}</p>
         <button data-id="${movie.id}" class="view-details">Details</button>
       `;
@@ -31,7 +32,6 @@ export function initAdminApp() {
     document.querySelectorAll(".view-details").forEach((button) => {
       button.addEventListener("click", async (e) => {
         const movieId = parseInt(e.target.dataset.id, 10);
-
         loadMovieDetails(movieId);
       });
     });
@@ -46,7 +46,6 @@ export function initAdminApp() {
 
     displayMovieDetails(movieId);
   }
-
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", initialize);
   } else {

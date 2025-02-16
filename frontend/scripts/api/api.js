@@ -135,6 +135,7 @@ async function getMovieList() {
   return await fetchMovies(url, options);
 }
 
+
 async function fetchRatings(url, options) {
   try {
     const response = await fetch(url, options);
@@ -225,5 +226,5 @@ export {
   getMovieList,
   getRatingsList,
   postComment,
-  deleteComment
+  deleteComment,
 };
