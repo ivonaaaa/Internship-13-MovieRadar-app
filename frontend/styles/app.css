@@ -58,3 +58,8 @@
   background-color: #0056b3;
   transform: scale(1.05);
 }
+
+#movie-form {
+  width: 500px;
+  margin-bottom: 100px;
+}

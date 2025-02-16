@@ -6,7 +6,6 @@ import {
 } from "../api/api.js";
 import { displayMovieDetails } from "./movie-details.js";
 import { createLogoutButton } from "./logout.js";
-import { getAuthToken } from "./auth.js";
 
 const genres = ["action", "crime", "horror", "comedy", "drama"];
 const cloudName = "dyt7wsphu";
@@ -274,14 +273,4 @@ export function initAdminApp() {
   }
 
   initialize();
-}
-
-function ErrorMessages(errorData) {
-  if (errorData.errors) {
-    const messages = Object.values(errorData.errors).flat().join("\n");
-
-    alert(`Validation errors: \n${messages}`);
-  } else {
-    alert(`Error: ${errorData.message || "An unexpected error occurred."}`);
-  }
 }
