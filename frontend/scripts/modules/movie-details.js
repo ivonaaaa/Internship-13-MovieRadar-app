@@ -46,8 +46,6 @@ const displayMovieDetails = async (movieId) => {
     const movieData = movies.find((m) => m.id === movieId);
     const idKey =
       "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier";
-    const idKey =
-      "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier";
 
     if (!movieData) {
       document.getElementById("movies-container").innerHTML =
@@ -76,7 +74,10 @@ const displayMovieDetails = async (movieId) => {
     const filteredRatings = allRatings.filter(
       (rating) => rating.movieId === movieId
     );
-    const users = await getAllUsers();
+
+    const ratingComments = await getRatingComments();
+    const currToken = getAuthToken();
+    const users = await getAllUsers(currToken);
 
     const commentsHtml = filteredRatings.length
       ? filteredRatings

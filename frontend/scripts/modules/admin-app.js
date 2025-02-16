@@ -266,18 +266,9 @@ export function initAdminApp() {
         modal.style.display = "none";
         await renderMoviesList();
       } catch (error) {
-        console.error("Error saving movie:", error);
-
-        if (error.response) {
-          try {
-            const errorText = await error.response.text();
-            const errorData = JSON.parse(errorText);
-
-            ErrorMessages(errorData);
-          } catch (e) {
-            alert("Error parsing server response errors");
-          }
-        } else alert("Server error");
+        alert(
+          `Failed to ${movieId ? "update" : "create"} movie: ${error.message}`
+        );
       }
     };
   }
