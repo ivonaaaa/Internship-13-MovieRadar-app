@@ -33,15 +33,14 @@ export function initAdminApp() {
       document.body.insertBefore(header, moviesContainer);
     }
 
-   
-let addNewButton = document.querySelector(".add-new");
-if (!addNewButton) {
-  addNewButton = document.createElement("button");
-  addNewButton.textContent = "Add New";
-  addNewButton.classList.add("add-new");
-  addNewButton.addEventListener("click", () => openMovieModal());
-  header.insertAdjacentElement("afterend", addNewButton);
-}
+    let addNewButton = document.querySelector(".add-new");
+    if (!addNewButton) {
+      addNewButton = document.createElement("button");
+      addNewButton.textContent = "Add New";
+      addNewButton.classList.add("add-new");
+      addNewButton.addEventListener("click", () => openMovieModal());
+      header.insertAdjacentElement("afterend", addNewButton);
+    }
 
     let movies = await getMovieList();
     if (!movies || movies.length === 0) {
@@ -199,7 +198,17 @@ if (!addNewButton) {
         modal.style.display = "none";
       } catch (error) {
         console.error("Error saving movie:", error);
-        alert("Error saving movie.");
+
+        if (error.response) {
+          try {
+            const errorText = await error.response.text();
+            const errorData = JSON.parse(errorText);
+
+            ErrorMessages(errorData);
+          } catch (e) {
+            alert("Error parsing server response errors");
+          }
+        } else alert("Server error");
       }
     };
   }
@@ -208,5 +217,15 @@ if (!addNewButton) {
     document.addEventListener("DOMContentLoaded", initialize);
   } else {
     initialize();
+  }
+}
+
+function ErrorMessages(errorData) {
+  if (errorData.errors) {
+    const messages = Object.values(errorData.errors).flat().join("\n");
+
+    alert(`Validation errors: \n${messages}`);
+  } else {
+    alert(`Error: ${errorData.message || "An unexpected error occurred."}`);
   }
 }
