@@ -1,3 +1,5 @@
+import { getAuthToken } from "../modules/auth.js";
+
 async function getAllUsers() {
   try {
     const response = await fetch("https://localhost:50844/api/User", {
@@ -114,8 +116,26 @@ async function fetchMovies(url, options) {
   }
 }
 
-async function getMovieList() {
-  const url = "https://localhost:50844/api/movie";
+async function getMovieList({ genre, year, sort } = {}) {
+  let url = "http://localhost:50845/api/movie";
+  const queryParams = [];
+
+  if (genre) {
+    queryParams.push(`filter=genre&value=${genre.toLowerCase()}`);
+  }
+  if (year) {
+    queryParams.push(`filter=release_year&value=${year}`);
+  }
+
+  if (queryParams.length > 0) {
+    url += `?${queryParams.join("&")}`;
+  }
+
+  if (sort) {
+    const orderDirection = sort === "rating_desc" ? "desc" : "asc";
+    url = `http://localhost:50845/api/movie/order?orderDirection=${orderDirection}`;
+  }
+
   const options = {
     method: "GET",
     headers: {
@@ -124,7 +144,137 @@ async function getMovieList() {
     mode: "cors",
   };
 
-  return await fetchMovies(url, options);
+  try {
+    const data = await fetchMovies(url, options);
+    return data;
+  } catch (error) {
+    return null;
+  }
+}
+
+async function createMovie(movieData) {
+  const token = getAuthToken();
+  if (!token) {
+    throw new Error("Unauthorized: No token found.");
+  }
+
+  try {
+    return await postMovie(movieData, token);
+  } catch (error) {
+    console.error("Error creating movie:", error);
+    throw error;
+  }
+}
+
+async function updateMovie(movieId, movieData) {
+  const token = getAuthToken();
+  if (!token) {
+    throw new Error("Unauthorized: No token found.");
+  }
+
+  try {
+    return await postMovie(movieData, token, movieId, "PUT");
+  } catch (error) {
+    console.error("Error updating movie:", error);
+    throw error;
+  }
+}
+
+async function deleteMovie(movieId) {
+  console.log(`Deleting movie with ID: ${movieId}`);
+
+  const token = getAuthToken();
+  if (!token) {
+    throw new Error("Unauthorized: No token found.");
+  }
+
+  try {
+    const response = await fetch(
+      `http://localhost:50845/api/movie/${movieId}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      const errorMessage = await response.text();
+      throw new Error(
+        `Failed to delete movie. Server response: ${errorMessage}`
+      );
+    }
+
+    console.log(`Movie with ID ${movieId} deleted successfully.`);
+  } catch (error) {
+    console.error("Error deleting movie:", error);
+    throw error;
+  }
+}
+
+async function postMovie(movieData, token, movieId = null, method = "POST") {
+  let url = "http://localhost:50845/api/movie";
+  if (movieId) {
+    url = `http://localhost:50845/api/movie/${movieId}`;
+  }
+
+  console.log("Original movieData:", movieData);
+
+  const enrichedMovieData = {
+    id: movieId || movieData.id,
+    title: movieData.title,
+    summary: movieData.summary,
+    genre: movieData.genre,
+    releaseYear: movieData.releaseYear,
+    avg_rating: movieData.avg_rating ?? 0,
+    created_at: movieData.created_at || new Date().toISOString(),
+    last_modified_at: new Date().toISOString(),
+  };
+
+  console.log("Enriched movieData before sending:", enrichedMovieData);
+  console.log("Release Year before sending:", enrichedMovieData.release_year);
+
+  console.log("API Request URL:", url);
+  console.log("Request Method:", method);
+  console.log("Authorization Token:", token);
+
+  try {
+    const response = await fetch(url, {
+      method: method,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(enrichedMovieData),
+    });
+
+    console.log("Server Response Status:", response.status);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Server Error Response:", errorText);
+      throw new Error(
+        `Failed to ${
+          method === "DELETE" ? "delete" : "create/update"
+        } movie. Server response: ${errorText}`
+      );
+    }
+
+    if (response.status === 204) {
+      console.log("Update successful (204 No Content)");
+      return enrichedMovieData;
+    }
+
+    const responseData = await response.json();
+    console.log("Server Response Data:", responseData);
+
+    return responseData;
+  } catch (error) {
+    console.error(`Error in ${method} movie request:`, error);
+    throw error;
+  }
 }
 
 async function fetchRatings(url, options) {
@@ -159,7 +309,6 @@ async function postComment(commentData, token) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        // Ako API očekuje Authorization header:
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(commentData),
@@ -182,6 +331,9 @@ export {
   getUserById,
   registerUser,
   getMovieList,
+  createMovie,
+  updateMovie,
+  deleteMovie,
   getRatingsList,
   postComment,
 };
