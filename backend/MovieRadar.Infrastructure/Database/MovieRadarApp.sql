@@ -54,7 +54,7 @@ CREATE TABLE ratings_reactions(
   id SERIAL PRIMARY KEY,
   rating_id INT NOT NULL REFERENCES ratings(id) ON DELETE CASCADE,
   user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  reaction reaction_type
+  reaction reaction_type,
 
   CONSTRAINT unique_user_reaction_per_rating UNIQUE(rating_id, user_id)
 );
@@ -84,8 +84,6 @@ BEGIN
       WHERE movie_id = NEW.movie_id
     )
     WHERE id = NEW.movie_id;
-  END IF;
-
   ELSIF (TG_OP = 'DELETE') THEN
     UPDATE movies
     SET avg_rating = (
