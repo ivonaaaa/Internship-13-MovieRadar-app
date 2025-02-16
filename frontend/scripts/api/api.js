@@ -89,18 +89,26 @@ async function registerUser(newUser) {
       },
       body: JSON.stringify(newUser),
     });
+
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(
-        errorData.message || "An error occurred during registration."
-      );
+      const errorText = await response.text();
+      let errorData = {};
+      try {
+        errorData = errorText ? JSON.parse(errorText) : {};
+      } catch (e) {
+        errorData = {};
+      }
+      throw new Error(errorData.message || "An error occurred during registration.");
     }
-    return await response.json();
+
+    const text = await response.text();
+    return text ? JSON.parse(text) : null;
   } catch (error) {
     console.error("Error registering user:", error);
     throw error;
   }
 }
+
 
 async function fetchMovies(url, options) {
   try {
@@ -313,6 +321,14 @@ async function postComment(commentData, token) {
       },
       body: JSON.stringify(commentData),
     });
+    console.log(response.status)
+
+     if (response.status === 401) {
+      alert("Your session is expired, Please login again.");
+      removeAuthToken();  
+      throw new Error("401 Unauthorized");
+    }
+
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.message || "Error posting comment");
@@ -323,6 +339,93 @@ async function postComment(commentData, token) {
     throw error;
   }
 }
+
+async function deleteComment(commentId, token) {
+  try {
+    const response = await fetch(`http://localhost:50845/api/rating/${commentId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      const errorText = await response.text();
+      let errorData = {};
+      try {
+        errorData = errorText ? JSON.parse(errorText) : {};
+      } catch (e) {
+        errorData = {};
+      }
+      throw new Error(errorData.message || "Error deleting comment");
+    }
+    return true;
+  } catch (error) {
+    console.error("Error deleting comment:", error);
+    throw error;
+  }
+}
+
+async function getAllReactions() {
+  try {
+    const response = await fetch("http://localhost:50845/api/ratingReactions", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+    if (!response.ok) {
+      throw new Error(`Greška pri dohvaćanju reakcija: ${response.statusText}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Greška pri dohvaćanju reakcija:", error);
+    return [];
+  }
+}
+
+async function postReaction(reactionData, token) {
+  try {
+    const response = await fetch("http://localhost:50845/api/ratingReactions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(reactionData),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText || "Error posting reaction");
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error posting reaction:", error);
+    throw error;
+  }
+}
+
+async function deleteReaction(reactionId, token) {
+  try {
+    const response = await fetch(`https://localhost:50844/api/ratingReactions/${reactionId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText || "Error deleting reaction");
+    }
+    return true;
+  } catch (error) {
+    console.error("Error deleting reaction:", error);
+    throw error;
+  }
+}
+
 
 export {
   getAllUsers,
@@ -336,4 +439,8 @@ export {
   deleteMovie,
   getRatingsList,
   postComment,
+  deleteComment,
+  getAllReactions,
+  postReaction,
+  deleteReaction
 };
