@@ -6,6 +6,14 @@ export function initUserApp() {
   async function initialize() {
     const moviesContainer = document.getElementById("movies-container");
 
+    let header = document.getElementById("movies-header");
+    if (!header) {
+      header = document.createElement("h2");
+      header.id = "movies-header";
+      header.textContent = "Movies List";
+      document.body.insertBefore(header, moviesContainer);
+    }
+
     const existingFilterContainer = document.querySelector(".filter-container");
     if (existingFilterContainer) {
       existingFilterContainer.remove();
