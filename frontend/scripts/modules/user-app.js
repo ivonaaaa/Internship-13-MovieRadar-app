@@ -6,6 +6,11 @@ export function initUserApp() {
   async function initialize() {
     const moviesContainer = document.getElementById("movies-container");
 
+    const existingFilterContainer = document.querySelector(".filter-container");
+    if (existingFilterContainer) {
+      existingFilterContainer.remove();
+    }
+
     const logoutButton = createLogoutButton();
     document.body.prepend(logoutButton);
 

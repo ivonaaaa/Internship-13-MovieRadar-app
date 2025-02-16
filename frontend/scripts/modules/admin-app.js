@@ -12,6 +12,8 @@ const genres = ["action", "crime", "horror", "comedy", "drama"];
 
 export function initAdminApp() {
   async function initialize() {
+    const logoutButton = createLogoutButton();
+    document.body.prepend(logoutButton);
     const listUsersButton = document.createElement("button");
     listUsersButton.id = "users-btn";
     listUsersButton.innerText = "Users list";
@@ -20,18 +22,26 @@ export function initAdminApp() {
       window.location.href = "users.html";
     });
     document.body.prepend(listUsersButton);
-    
+
     const moviesContainer = document.getElementById("movies-container");
 
-    const header = document.createElement("h2");
-    header.textContent = "Movies List";
-    document.body.insertBefore(header, moviesContainer);
+    let header = document.getElementById("movies-header");
+    if (!header) {
+      header = document.createElement("h2");
+      header.id = "movies-header";
+      header.textContent = "Movies List";
+      document.body.insertBefore(header, moviesContainer);
+    }
 
-    const addNewButton = document.createElement("button");
-    addNewButton.textContent = "Add New";
-    addNewButton.classList.add("add-new");
-    addNewButton.addEventListener("click", () => openMovieModal());
-    header.insertAdjacentElement("afterend", addNewButton);
+   
+let addNewButton = document.querySelector(".add-new");
+if (!addNewButton) {
+  addNewButton = document.createElement("button");
+  addNewButton.textContent = "Add New";
+  addNewButton.classList.add("add-new");
+  addNewButton.addEventListener("click", () => openMovieModal());
+  header.insertAdjacentElement("afterend", addNewButton);
+}
 
     let movies = await getMovieList();
     if (!movies || movies.length === 0) {

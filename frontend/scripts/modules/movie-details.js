@@ -1,6 +1,8 @@
 import { getAllUsers, getMovieList, getRatingsList, postComment, deleteComment,postReaction,deleteReaction,getAllReactions } from "../api/api.js";
 import { getAuthToken, decodeToken } from "./auth.js";
 import { getIsAdmin } from "./authState.js";
+import { initUserApp } from "./user-app.js";
+import { initAdminApp } from "./admin-app.js";
 
 const displayMovieDetails = async (movieId) => {
   try {
@@ -90,8 +92,30 @@ const displayMovieDetails = async (movieId) => {
         </div>
       `;
     }
+    htmlContent += `<br><button id="back-button">Back</button>`;
 
     document.getElementById("movies-container").innerHTML = htmlContent;
+
+    const backButton = document.getElementById("back-button");
+    backButton.addEventListener("click", async () => {
+      window.location.hash = "";
+      const moviesContainer = document.getElementById("movies-container");
+    
+      const isAdmin = getIsAdmin();
+    
+      if (isAdmin) {
+        moviesContainer.innerHTML = ""; 
+        initAdminApp(); 
+      } else {
+        moviesContainer.innerHTML = ""; 
+        initUserApp(); 
+      }
+    
+      const usersBtn = document.getElementById("users-btn");
+      if (usersBtn) {
+        usersBtn.style.display = isAdmin ? "block" : "none";
+      }
+    });
 
    
     const submitCommentButton = document.getElementById("submit-comment");
