@@ -1,5 +1,5 @@
 import { getAllUsers, getMovieList, getRatingsList, postComment, getUserById, deleteComment } from "../api/api.js";
-import { getAuthToken, decodeToken, removeAuthToken } from "./auth.js";
+import { getAuthToken, decodeToken } from "./auth.js";
 
 const displayMovieDetails = async (movieId) => {
   try {

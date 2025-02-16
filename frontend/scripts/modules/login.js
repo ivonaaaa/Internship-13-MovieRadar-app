@@ -1,13 +1,11 @@
 import { saveAuthToken, decodeToken } from "./auth.js";
 import { initAdminApp } from "./admin-app.js";
 import { initUserApp } from "./user-app.js";
-import { loginUser, getUserById } from "../api/api.js";
+import { loginUser } from "../api/api.js";
 
 document.addEventListener("DOMContentLoaded", function () {
   const loginContainer = document.getElementById("login-container");
   if (!loginContainer) return;
-
-  const idKey = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier";
 
   const loginButton = loginContainer.querySelector("button");
   loginButton.addEventListener("click", async function () {
@@ -27,22 +25,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
     try {
       const data = await loginUser(email, password);
-      const token = data.token;
+      const {token,isAdmin} = data;
 
       saveAuthToken(token);
 
       loginContainer.style.display = "none";
 
-      const decoded = decodeToken(token);
-      const userId = decoded ? decoded[idKey] : null;
-      if (!userId) {
-        throw new Error("Failed to retrieve user ID from token.");
-      }
-
-      const user = await getUserById(userId);
-
       // Provjera je li korisnik admin
-      if (user.isAdmin) {
+      if (isAdmin) {
         initAdminApp();
       } else {
         initUserApp();
