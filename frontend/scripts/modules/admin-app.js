@@ -9,21 +9,28 @@ import { createLogoutButton } from "./logout.js";
 import { getAuthToken } from "./auth.js";
 
 const genres = ["action", "crime", "horror", "comedy", "drama"];
+const cloudName = "dyt7wsphu";
+const uploadPreset = "movie_uploads";
 
 export function initAdminApp() {
   async function initialize() {
     const logoutButton = createLogoutButton();
     document.body.prepend(logoutButton);
+
     const listUsersButton = document.createElement("button");
     listUsersButton.id = "users-btn";
     listUsersButton.innerText = "Users list";
     listUsersButton.addEventListener("click", () => {
-      // Preusmjeri na users.html
       window.location.href = "users.html";
     });
     document.body.prepend(listUsersButton);
 
+    await renderMoviesList();
+  }
+
+  async function renderMoviesList() {
     const moviesContainer = document.getElementById("movies-container");
+    moviesContainer.innerHTML = "";
 
     let header = document.getElementById("movies-header");
     if (!header) {
@@ -47,12 +54,16 @@ export function initAdminApp() {
       moviesContainer.innerHTML = "<p>No movies available.</p>";
       return;
     }
+
     movies.forEach((movie) => {
       const movieElement = document.createElement("div");
       movieElement.classList.add("movie-item");
 
       movieElement.innerHTML = `
         <h3>${movie.title} (${movie.releaseYear})</h3>
+        <img src="${movie.imageLink || "placeholder.jpg"}" alt="${
+        movie.title
+      }" class="movie-cover" />
         <p>${movie.summary}</p>
         <button data-id="${movie.id}" class="view-details">Details</button>
         <button data-id="${movie.id}" class="edit-movie">Edit</button>
@@ -62,6 +73,10 @@ export function initAdminApp() {
       moviesContainer.appendChild(movieElement);
     });
 
+    attachEventListeners();
+  }
+
+  function attachEventListeners() {
     document.querySelectorAll(".view-details").forEach((button) => {
       button.addEventListener("click", async (e) => {
         e.preventDefault();
@@ -85,7 +100,7 @@ export function initAdminApp() {
         if (confirm("Are you sure you want to delete this movie?")) {
           try {
             await deleteMovie(movieId);
-            location.reload();
+            await renderMoviesList();
           } catch (error) {
             alert("Failed to delete movie.");
           }
@@ -113,6 +128,7 @@ export function initAdminApp() {
         <div class="modal-content">
           <h2>Movie Form</h2>
           <form id="movie-form">
+            <input type="hidden" id="movie-id" value="" />
             <label for="movie-title">Title:</label>
             <input type="text" id="movie-title" required />
             
@@ -129,6 +145,10 @@ export function initAdminApp() {
                 .join("")}
             </select>
 
+            <label for="movie-cover">Cover Image:</label>
+            <input type="file" id="movie-cover" accept="image/*" />
+            <img id="preview-image" src="" alt="Image Preview" style="display: none; max-width: 100px; margin-top: 10px;"/>
+
             <button type="submit">Save</button>
             <button type="button" id="close-modal">Cancel</button>
           </form>
@@ -138,86 +158,122 @@ export function initAdminApp() {
       document.getElementById("close-modal").addEventListener("click", () => {
         modal.style.display = "none";
       });
+
+      document
+        .getElementById("movie-cover")
+        .addEventListener("change", (event) => {
+          const file = event.target.files[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+              document.getElementById("preview-image").src = e.target.result;
+              document.getElementById("preview-image").style.display = "block";
+            };
+            reader.readAsDataURL(file);
+          }
+        });
     }
     return modal;
   }
 
-  function openMovieModal(movieId = null) {
+  async function uploadImageToCloudinary(file) {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("upload_preset", uploadPreset);
+
+    const response = await fetch(
+      `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Image upload failed");
+    }
+
+    const data = await response.json();
+    console.log("Cloudinary response:", data);
+    return data.secure_url;
+  }
+
+  async function openMovieModal(movieId = null) {
     const modal = ensureMovieModalExists();
     const form = document.getElementById("movie-form");
-    const titleInput = document.getElementById("movie-title");
-    const yearInput = document.getElementById("movie-year");
-    const summaryInput = document.getElementById("movie-summary");
-    const genreSelect = document.getElementById("movie-genre");
-
     form.reset();
+
+    const movieIdField = document.getElementById("movie-id");
+    movieIdField.value = movieId || "";
+
+    if (movieId) {
+      try {
+        const movies = await getMovieList();
+        const movie = movies.find((m) => m.id === movieId);
+
+        if (movie) {
+          form["movie-title"].value = movie.title;
+          form["movie-year"].value = movie.releaseYear;
+          form["movie-summary"].value = movie.summary;
+          form["movie-genre"].value = movie.genre;
+
+          if (movie.imageLink) {
+            document.getElementById("preview-image").src = movie.imageLink;
+            document.getElementById("preview-image").style.display = "block";
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch movie details:", error);
+      }
+    }
 
     modal.style.display = "block";
 
     form.onsubmit = async (e) => {
       e.preventDefault();
+
+      const fileInput = document.getElementById("movie-cover");
+      let coverImageUrl = "";
+
+      if (fileInput.files.length > 0) {
+        try {
+          coverImageUrl = await uploadImageToCloudinary(fileInput.files[0]);
+        } catch (error) {
+          alert("Failed to upload image.");
+          return;
+        }
+      } else if (movieId) {
+        const previewImg = document.getElementById("preview-image");
+        coverImageUrl =
+          previewImg.style.display !== "none" ? previewImg.src : "";
+      }
+
       const movieData = {
-        title: titleInput.value,
-        releaseYear: parseInt(yearInput.value, 10),
-        summary: summaryInput.value,
-        genre: genreSelect.value,
+        title: form["movie-title"].value,
+        releaseYear: parseInt(form["movie-year"].value, 10),
+        summary: form["movie-summary"].value,
+        genre: form["movie-genre"].value,
+        imageLink: coverImageUrl,
       };
 
       try {
-        let resultMovie;
         if (movieId) {
-          resultMovie = await updateMovie(movieId, movieData);
-
-          const movieElement = document.querySelector(
-            `[data-id='${movieId}']`
-          ).parentElement;
-          if (movieElement) {
-            movieElement.querySelector(
-              "h3"
-            ).textContent = `${resultMovie.title} (${resultMovie.releaseYear})`;
-            movieElement.querySelector("p").textContent = resultMovie.summary;
-          }
+          await updateMovie(movieId, movieData);
         } else {
-          resultMovie = await createMovie(movieData);
-
-          const moviesContainer = document.getElementById("movies-container");
-          const movieElement = document.createElement("div");
-          movieElement.classList.add("movie-item");
-
-          movieElement.innerHTML = `
-            <h3>${resultMovie.title} (${resultMovie.releaseYear})</h3>
-            <p>${resultMovie.summary}</p>
-            <button data-id="${resultMovie.id}" class="view-details">Details</button>
-            <button data-id="${resultMovie.id}" class="edit-movie">Edit</button>
-            <button data-id="${resultMovie.id}" class="delete-movie">Delete</button>
-          `;
-
-          moviesContainer.appendChild(movieElement);
+          await createMovie(movieData);
         }
 
         modal.style.display = "none";
+        await renderMoviesList();
       } catch (error) {
-        console.error("Error saving movie:", error);
-
-        if (error.response) {
-          try {
-            const errorText = await error.response.text();
-            const errorData = JSON.parse(errorText);
-
-            ErrorMessages(errorData);
-          } catch (e) {
-            alert("Error parsing server response errors");
-          }
-        } else alert("Server error");
+        alert(
+          `Failed to ${movieId ? "update" : "create"} movie: ${error.message}`
+        );
       }
     };
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initialize);
-  } else {
-    initialize();
-  }
+  initialize();
 }
 
 function ErrorMessages(errorData) {

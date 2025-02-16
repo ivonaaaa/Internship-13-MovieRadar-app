@@ -92,25 +92,42 @@ async function registerUser(newUser) {
       body: JSON.stringify(newUser),
     });
 
-    const responseMessage = await response.text();
-
-    if (!response.ok) {
-      let errorMessage = "Error during registration";
-
+    let responseData;
+    const contentType = response.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
+      responseData = await response.json();
+    } else {
+      const textResponse = await response.text();
       try {
-        const errorData = JSON.parse(responseMessage);
-
-        if (errorData.message) errorMessage = errorData.message;
+        responseData = JSON.parse(textResponse);
       } catch {
-        errorMessage = responseMessage || errorMessage;
+        responseData = { message: textResponse };
       }
-
-      throw new Error(errorMessage);
     }
 
-    return responseMessage ? JSON.parse(responseMessage) : null;
+    if (!response.ok) {
+      if (responseData.errors) {
+        const errorMessages = [];
+        for (const key in responseData.errors) {
+          if (Array.isArray(responseData.errors[key])) {
+            errorMessages.push(...responseData.errors[key]);
+          } else {
+            errorMessages.push(responseData.errors[key]);
+          }
+        }
+        throw new Error(errorMessages.join("\n"));
+      } else if (responseData.message) {
+        throw new Error(responseData.message);
+      } else if (typeof responseData === "string") {
+        throw new Error(responseData);
+      } else {
+        throw new Error(`Registration failed with status ${response.status}`);
+      }
+    }
+
+    return responseData;
   } catch (error) {
-    throw new Error(error.message);
+    throw error;
   }
 }
 
@@ -158,6 +175,7 @@ async function getMovieList({ genre, year, sort } = {}) {
 
   try {
     const data = await fetchMovies(url, options);
+    console.log("Data from fetchMovies:", data);
     return data;
   } catch (error) {
     return null;
@@ -257,6 +275,7 @@ async function postMovie(movieData, token, movieId = null, method = "POST") {
     avg_rating: movieData.avg_rating ?? 0,
     created_at: movieData.created_at || new Date().toISOString(),
     last_modified_at: new Date().toISOString(),
+    imageLink: movieData.imageLink || "",
   };
 
   console.log("Enriched movieData before sending:", enrichedMovieData);
@@ -429,13 +448,16 @@ async function postReaction(reactionData, token) {
 
 async function deleteReaction(reactionId, token) {
   try {
-    const response = await fetch(`https://localhost:50844/api/ratingReaction/${reactionId}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await fetch(
+      `https://localhost:50844/api/ratingReaction/${reactionId}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     if (!response.ok) {
       const errorText = await response.text();
       throw new Error(errorText || "Error deleting reaction");
@@ -463,7 +485,9 @@ async function getRatingComments(filter, value) {
   try {
     const response = await fetch(url, options);
     if (!response.ok) {
-      throw new Error(`Neuspješno dohvaćanje recenzija: ${response.statusText}`);
+      throw new Error(
+        `Neuspješno dohvaćanje recenzija: ${response.statusText}`
+      );
     }
     return await response.json();
   } catch (error) {
@@ -495,8 +519,6 @@ async function postRatingComment(ratingCommentData, token) {
   }
 }
 
-
-
 export {
   getAllUsers,
   createUser,
@@ -514,5 +536,5 @@ export {
   postReaction,
   deleteReaction,
   getRatingComments,
-  postRatingComment
+  postRatingComment,
 };
