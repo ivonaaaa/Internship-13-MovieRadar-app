@@ -3,6 +3,7 @@ using MovieRadar.Application.Services;
 using MovieRadar.Domain.Entities;
 using Microsoft.AspNetCore.Identity.Data;
 using MediatR;
+using MovieRadar.Application.Features.Users.Commands;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -21,12 +22,14 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
         var user = await mediator.Send(new GetUserByEmailQuery(request.Email));
-
-        if (user == null || user.Password != request.Password)
-        {
+        if (user == null)
             return Unauthorized(new { message = "Invalid email or password!" });
-        }
 
+        var isValidAuthData = await mediator.Send(new CheckUserAuthDataCommand(request.Email, request.Password));
+
+        if (!isValidAuthData)
+            return Unauthorized(new { message = "Invalid email or password!" });
+        
         var token = tokenService.GenerateToken(user.Id, user.Email, user.IsAdmin);
         return Ok(new { token, user.IsAdmin });
     }
