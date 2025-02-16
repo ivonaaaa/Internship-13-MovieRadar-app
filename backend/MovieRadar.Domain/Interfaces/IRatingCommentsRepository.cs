@@ -3,7 +3,7 @@
 
 namespace MovieRadar.Domain.Interfaces
 {
-    public interface IRatingCommentsRepository : IRepository<RatingsComments>
+    public interface IRatingCommentsRepository : IRepository<RatingComment>
     {
     }
 }

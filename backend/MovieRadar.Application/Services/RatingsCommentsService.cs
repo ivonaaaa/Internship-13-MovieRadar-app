@@ -11,7 +11,7 @@ namespace MovieRadar.Application.Services
         {
             this.ratingCommentsRepository = ratingCommentsRepository;
         }
-        public async Task<IEnumerable<RatingsComments>> GetAll()
+        public async Task<IEnumerable<RatingComment>> GetAll()
         {
             try
             {
@@ -22,7 +22,7 @@ namespace MovieRadar.Application.Services
                 throw new Exception($"Error while getting all movies: {ex.Message}, inner: {ex.InnerException}");
             }
         }
-        public async Task<RatingsComments> GetById(int id)
+        public async Task<RatingComment> GetById(int id)
         {
             try
             {
@@ -33,7 +33,7 @@ namespace MovieRadar.Application.Services
                 throw new Exception($"Error getting movie by id: {ex.Message}, inner: {ex.InnerException}");
             }
         }
-        public async Task<int> Add(RatingsComments ratingsComments)
+        public async Task<int> Add(RatingComment ratingsComments)
         {
             try
             {
@@ -44,7 +44,7 @@ namespace MovieRadar.Application.Services
                 throw new Exception($"Error adding new movie: {ex.Message}, inner: {ex.InnerException}");
             }
         }
-        public async Task<bool> Update(RatingsComments ratingsComments)
+        public async Task<bool> Update(RatingComment ratingsComments)
         {
 
             try

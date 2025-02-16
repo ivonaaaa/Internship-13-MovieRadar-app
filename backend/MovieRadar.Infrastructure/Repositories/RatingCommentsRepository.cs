@@ -15,22 +15,22 @@ namespace MovieRadar.Infrastructure.Repositories
                 this.connection = connection;
         }
         
-        public async Task<IEnumerable<RatingsComments>> GetAll()
+        public async Task<IEnumerable<RatingComment>> GetAll()
         {
             var getAllCommentsOnRatignQuery = @"SELECT id AS Id, rating_id AS RatingId, user_id AS UserId, comment AS Comment
                                                 FROM ratings_comments";
-            return await connection.QueryAsync<RatingsComments>(getAllCommentsOnRatignQuery);
+            return await connection.QueryAsync<RatingComment>(getAllCommentsOnRatignQuery);
         }
         
-        public async Task<RatingsComments?> GetById(int id)
+        public async Task<RatingComment?> GetById(int id)
         {
             var getByIdQuery = @"SELECT id AS Id, rating_id AS RatingId, user_id AS UserId, comment AS Comment
                                  FROM ratings_comments
                                  WHERE id = @Id";
-            return await connection.QuerySingleOrDefaultAsync<RatingsComments>(getByIdQuery, new { Id = id});
+            return await connection.QuerySingleOrDefaultAsync<RatingComment>(getByIdQuery, new { Id = id});
         }
 
-        public async Task<int> Add(RatingsComments newRatingsComment)
+        public async Task<int> Add(RatingComment newRatingsComment)
         {
             var addRatingCommentQuery = @"INSERT INTO ratings_comments(rating_id, user_id, comment)
                                           VALUES (@RatingId, @UserId, @Comment)
@@ -38,7 +38,7 @@ namespace MovieRadar.Infrastructure.Repositories
             return await connection.ExecuteScalarAsync<int>(addRatingCommentQuery, newRatingsComment);
         }
 
-        public async Task<bool> Update(RatingsComments ratingsComments)
+        public async Task<bool> Update(RatingComment ratingsComments)
         {
             var updateRatingComment = "UPDATE ratings_comments SET comment = @Comment WHERE id = @Id";
             return await connection.ExecuteAsync(updateRatingComment, ratingsComments) > 0;

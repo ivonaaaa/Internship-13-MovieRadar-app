@@ -18,7 +18,7 @@ namespace MovieRadar.WebAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<RatingsComments>>> GetAllRatingComments()
+        public async Task<ActionResult<IEnumerable<RatingComment>>> GetAllRatingComments()
         {
             try
             {
@@ -32,7 +32,7 @@ namespace MovieRadar.WebAPI.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<RatingsComments>> GetRatingCommentById(int id)
+        public async Task<ActionResult<RatingComment>> GetRatingCommentById(int id)
         {
             var ratingComment = await ratingCommentService.GetById(id);
             if (ratingComment == null)
@@ -43,7 +43,7 @@ namespace MovieRadar.WebAPI.Controllers
 
         [Authorize]
         [HttpPost]
-        public async Task<ActionResult> AddRatingComment([FromBody] RatingsComments newRatingsComments)
+        public async Task<ActionResult> AddRatingComment([FromBody] RatingComment newRatingsComments)
         {
             try
             {
@@ -62,7 +62,7 @@ namespace MovieRadar.WebAPI.Controllers
 
         [Authorize]
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateRatingComment([FromBody] RatingsComments ratingsComments, int id)
+        public async Task<IActionResult> UpdateRatingComment([FromBody] RatingComment ratingsComments, int id)
         {
             if (id != ratingsComments.Id)
                 return BadRequest("Not matching id");

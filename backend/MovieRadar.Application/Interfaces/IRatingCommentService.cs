@@ -4,7 +4,7 @@ using MovieRadar.Domain.Entities;
 
 namespace MovieRadar.Application.Interfaces
 {
-    public interface IRatingCommentService : IService<RatingsComments>
+    public interface IRatingCommentService : IService<RatingComment>
     {
     }
 }

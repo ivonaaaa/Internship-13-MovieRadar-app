@@ -3,6 +3,7 @@ using MovieRadar.Application.Interfaces;
 using MovieRadar.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using MediatR;
 
 namespace MovieRadar.WebAPI.Controllers
 {
@@ -10,19 +11,19 @@ namespace MovieRadar.WebAPI.Controllers
     [Route("api/[controller]")]
     public class RatingReactionsController : ControllerBase
     {
-        private readonly IRatingReactionsService ratingReactionsService;
+        private readonly IMediator mediator;
         
-        public RatingReactionsController(IRatingReactionsService ratingReactionsService)
+        public RatingReactionsController(IMediator mediator)
         {
-            this.ratingReactionsService = ratingReactionsService;
+            this.mediator = mediator;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<RatingsReactions>>> GetAllReactions()
+        public async Task<ActionResult<IEnumerable<RatingReaction>>> GetAllReactions()
         {
             try
             {
-                var allReactions = await ratingReactionsService.GetAll();
+                var allReactions = await mediator.Send(new GetAllRatingReactionsQuery());
                 return Ok(allReactions);
             }
             catch (Exception ex)
@@ -32,11 +33,11 @@ namespace MovieRadar.WebAPI.Controllers
         }
          
         [HttpGet("{id}")]
-        public async Task<ActionResult<RatingsReactions>> GetById(int id)
+        public async Task<ActionResult<RatingReaction>> GetById(int id)
         {
             try
             {
-                var reaction = await ratingReactionsService.GetById(id);
+                var reaction = await mediator.Send(new GetRatingReactionByIdQuery(id));
                 if (reaction == null)
                     return NotFound();
 
@@ -50,11 +51,11 @@ namespace MovieRadar.WebAPI.Controllers
 
         [Authorize]
         [HttpPost]
-        public async Task<ActionResult> AddReaction([FromBody] RatingsReactions newReaction)
+        public async Task<ActionResult> AddReaction([FromBody] RatingReaction newReaction)
         {
             try
             {
-                var newMovieId = await ratingReactionsService.Add(newReaction);
+                var newMovieId = await mediator.Send(new AddRatingReactionCommand(newReaction));
                 return CreatedAtAction(nameof(GetById), new { id = newMovieId }, newReaction);
             }
             catch (ArgumentException ex)
@@ -69,7 +70,7 @@ namespace MovieRadar.WebAPI.Controllers
 
         [Authorize]
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateReaction([FromBody] RatingsReactions updatedReaction, int id)
+        public async Task<IActionResult> UpdateReaction([FromBody] RatingReaction updatedReaction, int id)
         {
             if(id != updatedReaction.Id)
                 return BadRequest("Not matching id");
@@ -82,7 +83,7 @@ namespace MovieRadar.WebAPI.Controllers
 
             try
             {
-                var updated = await ratingReactionsService.Update(updatedReaction);
+                var updated = await mediator.Send(new UpdateRatingReactionCommand(updatedReaction));
                 return updated ? NoContent() : NotFound();
             }
             catch (Exception ex)
@@ -98,7 +99,7 @@ namespace MovieRadar.WebAPI.Controllers
             if (!int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var userId))
                 return Unauthorized();
 
-            var reactionToDelete = await ratingReactionsService.GetById(id);
+            var reactionToDelete = await mediator.Send(new GetRatingReactionByIdQuery(id));
 
             if(reactionToDelete == null)
                 return NotFound();
@@ -108,7 +109,7 @@ namespace MovieRadar.WebAPI.Controllers
 
             try
             {
-                var deleted = await ratingReactionsService.DeleteById(id);
+                var deleted = await mediator.Send(new DeleteRatingReactionCommand(id));
                 return deleted ? Ok() : NotFound();
             }
             catch (Exception ex)
@@ -123,7 +124,7 @@ namespace MovieRadar.WebAPI.Controllers
             try
             {
                 Console.WriteLine("aaaaaa" + id);
-                var reactionsByRatingId = await ratingReactionsService.GetAllReactionsByRatingId(id);
+                var reactionsByRatingId = await mediator.Send(new GetRatingReactionsByRatingIdQuery(id));
                 
                 if(reactionsByRatingId == null || !reactionsByRatingId.Any())
                     return NotFound();

@@ -2,7 +2,7 @@
 
 namespace MovieRadar.Domain.Entities
 {
-    public class RatingsComments
+    public class RatingComment
     {
         public int Id { get; set;  }
         public int RatingId { get; set; }
