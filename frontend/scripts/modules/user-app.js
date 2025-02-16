@@ -1,7 +1,6 @@
 import { getMovieList } from "../api/api.js";
 import { displayMovieDetails } from "./movie-details.js";
 import { createLogoutButton } from "./logout.js";
-
 export function initUserApp() {
   async function initialize() {
     const moviesContainer = document.getElementById("movies-container");
@@ -43,10 +42,15 @@ export function initUserApp() {
     const filterButton = document.createElement("button");
     filterButton.textContent = "Filter Movies";
 
+    const sortAlphabeticallyButton = document.createElement("button");
+    sortAlphabeticallyButton.textContent = "Sort A-Z";
+
     filterContainer.appendChild(genreSelect);
     filterContainer.appendChild(yearInput);
     filterContainer.appendChild(sortSelect);
     filterContainer.appendChild(filterButton);
+    filterContainer.appendChild(sortAlphabeticallyButton);
+
     moviesContainer.before(filterContainer);
 
     async function displayMovies(filters = {}) {
@@ -81,6 +85,19 @@ export function initUserApp() {
       });
     }
 
+    function sortMoviesAlphabetically() {
+      const movieItems = Array.from(document.querySelectorAll(".movie-item"));
+
+      const sortedMovies = movieItems.sort((a, b) => {
+        const titleA = a.querySelector("h3").textContent.toLowerCase();
+        const titleB = b.querySelector("h3").textContent.toLowerCase();
+        return titleA.localeCompare(titleB);
+      });
+
+      moviesContainer.innerHTML = "";
+      sortedMovies.forEach((movie) => moviesContainer.appendChild(movie));
+    }
+
     filterButton.addEventListener("click", () => {
       const genre = genreSelect.value;
       const year = yearInput.value ? parseInt(yearInput.value, 10) : null;
@@ -88,6 +105,11 @@ export function initUserApp() {
 
       displayMovies({ genre, year, sort });
     });
+
+    sortAlphabeticallyButton.addEventListener(
+      "click",
+      sortMoviesAlphabetically
+    );
 
     displayMovies();
   }
