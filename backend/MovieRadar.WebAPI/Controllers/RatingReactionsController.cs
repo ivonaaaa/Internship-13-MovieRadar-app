@@ -98,8 +98,7 @@ namespace MovieRadar.WebAPI.Controllers
             if (!int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var userId))
                 return Unauthorized();
 
-            if (userId != id)
-                return Forbid();
+            
 
             try
             {
