@@ -19,9 +19,6 @@ namespace MovieRadar.Infrastructure
             try
             {
                 return new NpgsqlConnection(connectionString);
-                //var connection = new NpgsqlConnection(connectionString);
-                //connection.Open();
-                //return connection;
             }
             catch (Exception ex)
             {
