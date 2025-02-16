@@ -6,6 +6,8 @@ import {
 } from "../api/api.js";
 import { displayMovieDetails } from "./movie-details.js";
 
+const genres = ["action", "crime", "horror", "comedy", "drama"];
+
 export function initAdminApp() {
   async function initialize() {
     const moviesContainer = document.getElementById("movies-container");
@@ -31,6 +33,7 @@ export function initAdminApp() {
 
       movieElement.innerHTML = `
         <h3>${movie.title} (${movie.release_year})</h3>
+        <p><strong>Genre:</strong> ${movie.genre}</p>
         <p>${movie.summary}</p>
         <button data-id="${movie.id}" class="view-details">Details</button>
         <button data-id="${movie.id}" class="edit-movie">Edit</button>
@@ -43,7 +46,6 @@ export function initAdminApp() {
     document.querySelectorAll(".view-details").forEach((button) => {
       button.addEventListener("click", async (e) => {
         e.preventDefault();
-
         const movieId = parseInt(e.target.dataset.id, 10);
         loadMovieDetails(movieId);
       });
@@ -52,7 +54,6 @@ export function initAdminApp() {
     document.querySelectorAll(".edit-movie").forEach((button) => {
       button.addEventListener("click", (e) => {
         e.preventDefault();
-
         const movieId = parseInt(e.target.dataset.id, 10);
         openMovieModal(movieId);
       });
@@ -61,9 +62,7 @@ export function initAdminApp() {
     document.querySelectorAll(".delete-movie").forEach((button) => {
       button.addEventListener("click", async (e) => {
         e.preventDefault();
-
         const movieId = parseInt(e.target.dataset.id, 10);
-
         if (confirm("Are you sure you want to delete this movie?")) {
           try {
             await deleteMovie(movieId);
@@ -104,6 +103,13 @@ export function initAdminApp() {
             <label for="movie-summary">Summary:</label>
             <textarea id="movie-summary" required></textarea>
 
+            <label for="movie-genre">Genre:</label>
+            <select id="movie-genre" required>
+              ${genres
+                .map((genre) => `<option value="${genre}">${genre}</option>`)
+                .join("")}
+            </select>
+
             <button type="submit">Save</button>
             <button type="button" id="close-modal">Cancel</button>
           </form>
@@ -123,31 +129,9 @@ export function initAdminApp() {
     const titleInput = document.getElementById("movie-title");
     const yearInput = document.getElementById("movie-year");
     const summaryInput = document.getElementById("movie-summary");
+    const genreSelect = document.getElementById("movie-genre");
 
-    if (movieId) {
-      const movieElement = document.querySelector(
-        `[data-id='${movieId}']`
-      )?.parentNode;
-      if (!movieElement) {
-        console.error("Movie element not found.");
-        return;
-      }
-      const titleElement = movieElement.querySelector("h3");
-      const summaryElement = movieElement.querySelector("p");
-
-      if (titleElement) {
-        titleInput.value = titleElement.textContent.split(" (")[0];
-      }
-      if (summaryElement) {
-        summaryInput.value = summaryElement.textContent;
-      }
-      const yearMatch = titleElement?.textContent.match(/\d{4}/);
-      if (yearMatch) {
-        yearInput.value = yearMatch[0];
-      }
-    } else {
-      form.reset();
-    }
+    form.reset();
 
     modal.style.display = "block";
 
@@ -157,16 +141,35 @@ export function initAdminApp() {
         title: titleInput.value,
         release_year: parseInt(yearInput.value, 10),
         summary: summaryInput.value,
+        genre: genreSelect.value,
       };
 
       try {
+        let newMovie;
         if (movieId) {
-          await updateMovie(movieId, movieData);
+          newMovie = await updateMovie(movieId, movieData);
         } else {
-          await createMovie(movieData);
+          newMovie = await createMovie(movieData);
         }
+
+        // Dodajemo film odmah u DOM bez ponovnog učitavanja stranice
+        const moviesContainer = document.getElementById("movies-container");
+        const movieElement = document.createElement("div");
+        movieElement.classList.add("movie-item");
+
+        movieElement.innerHTML = `
+          <h3>${newMovie.title} (${newMovie.release_year})</h3>
+          <p><strong>Genre:</strong> ${newMovie.genre}</p>
+          <p>${newMovie.summary}</p>
+          <button data-id="${newMovie.id}" class="view-details">Details</button>
+          <button data-id="${newMovie.id}" class="edit-movie">Edit</button>
+          <button data-id="${newMovie.id}" class="delete-movie">Delete</button>
+        `;
+
+        moviesContainer.appendChild(movieElement);
+
+        // Sakrijemo modal nakon uspješnog dodavanja
         modal.style.display = "none";
-        location.reload();
       } catch (error) {
         alert("Error saving movie.");
       }

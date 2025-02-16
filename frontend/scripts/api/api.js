@@ -215,12 +215,27 @@ async function deleteMovie(movieId) {
   }
 }
 
-//! ode se zapravo salje, ovo se poziva u one tri osnovne radnje
 async function postMovie(movieData, token, movieId = null, method = "POST") {
   let url = "http://localhost:50845/api/movie";
   if (movieId) {
     url = `http://localhost:50845/api/movie/${movieId}`;
   }
+
+  const enrichedMovieData = {
+    id: movieId || movieData.id,
+    title: movieData.title,
+    summary: movieData.summary,
+    genre: movieData.genre,
+    release_year: movieData.release_year,
+    avg_rating: movieData.avg_rating ?? 0,
+    created_at: movieData.created_at || new Date().toISOString(),
+    last_modified_at: new Date().toISOString(),
+  };
+
+  console.log("API Request URL:", url);
+  console.log("Request Method:", method);
+  console.log("Movie Data to Send:", enrichedMovieData);
+  console.log("Authorization Token:", token);
 
   try {
     const response = await fetch(url, {
@@ -229,20 +244,33 @@ async function postMovie(movieData, token, movieId = null, method = "POST") {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      mode: "cors",
-      body: method === "DELETE" ? null : JSON.stringify(movieData),
+      body: JSON.stringify(enrichedMovieData),
     });
+
+    console.log("Server Response Status:", response.status);
+
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Server Error Response:", errorText);
       throw new Error(
-        `Failed to ${method === "DELETE" ? "delete" : "create/update"} movie.`
+        `Failed to ${
+          method === "DELETE" ? "delete" : "create/update"
+        } movie. Server response: ${errorText}`
       );
     }
-    return await response.json();
+
+    //! ove poruke popravit ne znam
+    if (response.status === 204) {
+      console.log("Update successful (204 No Content)");
+      return null;
+    }
+
+    const responseData = await response.json();
+    console.log("Server Response Data:", responseData);
+
+    return responseData;
   } catch (error) {
-    console.error(
-      `Error ${method === "DELETE" ? "deleting" : "creating/updating"} movie:`,
-      error
-    );
+    console.error(`Error in ${method} movie request:`, error);
     throw error;
   }
 }
