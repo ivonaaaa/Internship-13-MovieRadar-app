@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using MovieRadar.Domain.Entities;
 
 namespace MovieRadar.Application.Features.Users.Commands
 {

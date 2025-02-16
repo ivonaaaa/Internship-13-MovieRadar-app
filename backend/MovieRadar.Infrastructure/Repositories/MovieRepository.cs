@@ -35,14 +35,14 @@ namespace MovieRadar.Infrastructure.Repositories
         public async Task<int> Add(Movie newMovie)
         {
             var addMovieQuery = @"INSERT INTO movies(title, summary, release_year, genre, image_link) 
-                                    VALUES (@Title, @Summary, @ReleaseYear, @Genre, @ImageLink)
+                                    VALUES (@Title, @Summary, @ReleaseYear, CAST(@Genre AS movie_genre), @ImageLink)
                                     RETURNING id AS Id";
             return await connection.ExecuteScalarAsync<int>(addMovieQuery, newMovie);
         }
 
         public async Task<bool> Update(Movie newMovie)
         {
-            var updateMovieQuery = @"UPDATE movies SET title = @Title, summary = @Summary, release_year = @ReleaseYear, genre = @Genre, image_link = @ImageLink 
+            var updateMovieQuery = @"UPDATE movies SET title = @Title, summary = @Summary, release_year = @ReleaseYear, genre = CAST(@Genre AS movie_genre), image_link = @ImageLink 
                                      WHERE id = @Id";
             return await connection.ExecuteAsync(updateMovieQuery, newMovie) > 0;
         }
