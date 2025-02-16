@@ -1,11 +1,12 @@
 import { getAuthToken } from "../modules/auth.js";
 
-async function getAllUsers() {
+async function getAllUsers(token) {
   try {
-    const response = await fetch("https://localhost:50844/api/User", {
+    const response = await fetch("http://localhost:50845/api/User", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
     });
     if (!response.ok) {
@@ -20,7 +21,7 @@ async function getAllUsers() {
 
 async function createUser(newUser) {
   try {
-    const response = await fetch("https://localhost:50844/api/User", {
+    const response = await fetch("http://localhost:50845/api/User", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -368,7 +369,7 @@ async function deleteComment(commentId, token) {
 
 async function getAllReactions() {
   try {
-    const response = await fetch("http://localhost:50845/api/ratingReactions", {
+    const response = await fetch("http://localhost:50845/api/ratingReaction", {
       method: "GET",
       headers: {
         "Content-Type": "application/json"
@@ -386,7 +387,7 @@ async function getAllReactions() {
 
 async function postReaction(reactionData, token) {
   try {
-    const response = await fetch("http://localhost:50845/api/ratingReactions", {
+    const response = await fetch("http://localhost:50845/api/ratingReaction", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -408,7 +409,7 @@ async function postReaction(reactionData, token) {
 
 async function deleteReaction(reactionId, token) {
   try {
-    const response = await fetch(`https://localhost:50844/api/ratingReactions/${reactionId}`, {
+    const response = await fetch(`https://localhost:50844/api/ratingReaction/${reactionId}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -429,7 +430,7 @@ async function deleteReaction(reactionId, token) {
 // Dohvaća recenzije s endpointa api/ratingComments.
 // Ako želiš filtrirati (npr. po movieId), možeš proslijediti filter i value.
 async function getRatingComments(filter, value) {
-  let url = "http://localhost:50845/api/ratingComments";
+  let url = "http://localhost:50845/api/ratingComment";
   if (filter && value) {
     url += `?filter=${filter}&value=${value}`;
   }
@@ -454,7 +455,7 @@ async function getRatingComments(filter, value) {
 // Šalje novu recenziju na endpoint api/ratingComments.
 async function postRatingComment(ratingCommentData, token) {
   try {
-    const response = await fetch("http://localhost:50845/api/ratingComments", {
+    const response = await fetch("http://localhost:50845/api/ratingComment", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

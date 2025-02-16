@@ -43,8 +43,8 @@ const displayMovieDetails = async (movieId) => {
     const filteredRatings = allRatings.filter((rating) => rating.movieId === movieId);
   
     const ratingComments = await getRatingComments();
-
-    const users = await getAllUsers();
+    const currToken = getAuthToken()
+    const users = await getAllUsers(currToken);
 
     const commentsHtml = filteredRatings.length
       ? filteredRatings
@@ -78,10 +78,7 @@ const displayMovieDetails = async (movieId) => {
               commentHtml += ` <button class="like-button" data-rating-id="${c.id}"> <i class="fas fa-thumbs-up"></i></button>
                                <button class="dislike-button" data-rating-id="${c.id}"> <i class="fas fa-thumbs-down fa-flip-horizontal"></i></button>`;
             }
-            else if(!isAdmin) {
-              commentHtml += ` <button class="like-button" data-rating-id="${c.id}"> <i class="fas fa-thumbs-up"></i></button>
-                               <button class="dislike-button" data-rating-id="${c.id}"> <i class="fas fa-thumbs-down fa-flip-horizontal"></i></button>`;
-            }
+      
             commentHtml += `</p></div>`;
             return commentHtml;
           })
