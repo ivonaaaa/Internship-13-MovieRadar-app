@@ -11,7 +11,7 @@ import {
   getAllReactions,
 } from "../api/api.js";
 import { getAuthToken, decodeToken } from "./auth.js";
-import { getIsAdmin } from "./authState.js";
+import { getIsAdmin } from "./auth.js";
 import { initUserApp } from "./user-app.js";
 import { initAdminApp } from "./admin-app.js";
 
@@ -404,13 +404,9 @@ window.addEventListener("hashchange", () => {
 
     const isAdmin = getIsAdmin();
 
-    if (isAdmin) {
-      moviesContainer.innerHTML = "";
-      initAdminApp();
-    } else {
-      moviesContainer.innerHTML = "";
-      initUserApp();
-    }
+    moviesContainer.innerHTML = "";
+
+    isAdmin ? initAdminApp() : initUserApp();
   }
 });
 
