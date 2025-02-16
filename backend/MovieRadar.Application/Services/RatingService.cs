@@ -4,7 +4,7 @@ using MovieRadar.Application.Interfaces;
 
 namespace MovieRadar.Application.Services
 {
-    public class RatingService : IRatingService
+    public class RatingService 
     {
         private readonly IRatingRepository ratingRepository;
         public RatingService(IRatingRepository ratingRepository)

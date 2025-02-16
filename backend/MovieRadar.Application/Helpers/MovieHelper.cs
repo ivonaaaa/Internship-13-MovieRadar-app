@@ -1,4 +1,5 @@
 ﻿using MovieRadar.Domain.Entities;
+using MovieRadar.Domain.Interfaces;
 
 namespace MovieRadar.Application.Helpers
 {
@@ -6,21 +7,24 @@ namespace MovieRadar.Application.Helpers
     {
         public static (bool, string) IsMovieValid(Movie newMovie)
         {
-            var unValidFields = new List<string>();
+            if (newMovie == null)
+                return (false, "The movie is null!");
+
+            var invalidFields = new List<string>();
 
             var titleValidation = CheckTitle(newMovie.Title);
             if(!titleValidation.Item1)
-                unValidFields.Add(titleValidation.Item2);
+                invalidFields.Add(titleValidation.Item2);
 
             var genreValidation = CheckGenre(newMovie.Genre);
             if (!genreValidation.Item1)
-                unValidFields.Add(genreValidation.Item2);
+                invalidFields.Add(genreValidation.Item2);
 
             var releaseYearValidation = CheckReleaseYear(newMovie.ReleaseYear);
             if(!releaseYearValidation.Item1)
-                unValidFields.Add(releaseYearValidation.Item2);
+                invalidFields.Add(releaseYearValidation.Item2);
 
-            return unValidFields.Count() > 0 ? (false, string.Join("\n", unValidFields)) : (true, "Movie is valid");
+            return invalidFields.Count() > 0 ? (false, string.Join("\n", invalidFields)) : (true, "Movie is valid");
         }
         public static (bool, string) CheckTitle(string movieTitle)
         {
@@ -33,6 +37,10 @@ namespace MovieRadar.Application.Helpers
         public static (bool, string) CheckReleaseYear(int movieReleaseYear)
         {
             return (movieReleaseYear > 1850 && movieReleaseYear <= DateTime.Now.Year) ? (true, "Release year is valid") : (false, "Release year is not valid");
+        }
+        public static async Task<(bool, string)> CheckMovieId(int movieId, IMovieRepository movieRepository)
+        {
+            return await movieRepository.GetById(movieId) != null ? (true, "The movie ID is valid") : (false, "The movie ID does not exist");
         }
     }
 }

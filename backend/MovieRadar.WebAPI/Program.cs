@@ -3,11 +3,14 @@ using Npgsql;
 using MovieRadar.Domain.Interfaces;
 using MovieRadar.Infrastructure.Repositories;
 using MovieRadar.Application.Services;
-using MovieRadar.Application.Interfaces;
 using MovieRadar.Domain.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using MediatR;
+using MovieRadar.Application.Services.Token;
+using MovieRadar.Application.Features.Movies.Handlers;
+using MovieRadar.Application.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,15 +33,12 @@ builder.Services.AddControllers();
 builder.Services.AddScoped<IDbConnection>(_ => new NpgsqlConnection(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<IRatingRepository, RatingRepository>();
-builder.Services.AddScoped<IRatingService, RatingService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IMovieRepository, MovieRepository>();
-builder.Services.AddScoped<IMovieService, MovieService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IRatingCommentsRepository, RatingCommentsRepository>();
-builder.Services.AddScoped<IRatingCommentService, RatingsCommentsService>();
 builder.Services.AddScoped<IRatingReactionsRepository, RatingReactionsRepository>();
+builder.Services.AddScoped<IRatingCommentService, RatingsCommentsService>();
 builder.Services.AddScoped<IRatingReactionsService, RatingReactionsService>();
 
 
@@ -67,9 +67,7 @@ builder.Services
     });
 
 builder.Services.AddAuthorization();
-
-
-//builder.Services.AddAuthentication(); //za jwt dodat .AddJwtBearer();
+builder.Services.AddMediatR(typeof(AddMovieHandler).Assembly);
 
 //builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 

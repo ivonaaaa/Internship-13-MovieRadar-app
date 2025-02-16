@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MovieRadar.Domain.Entities;
-using MovieRadar.Application.Services;
 using Microsoft.AspNetCore.Authorization;
+using MediatR;
 
 namespace MovieRadar.WebAPI.Controllers
 {
@@ -9,23 +9,26 @@ namespace MovieRadar.WebAPI.Controllers
     [Route("api/[controller]")]
     public class UserController : ControllerBase
     {
-        private readonly IUserService userService;
-        public UserController(IUserService userService)
+        private readonly IMediator mediator;
+
+        public UserController(IMediator mediator)
         {
-            this.userService = userService;
+            this.mediator = mediator;
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetAllUsers()
         {
-            var allUsers = await userService.GetAll();
+            var allUsers = await mediator.Send(new GetAllUsersQuery());
             return Ok(allUsers);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUserById(int id)
         {
-            var user = await userService.GetById(id);
+            var user = await mediator.Send(new GetUserByIdQuery(id));
             if (user == null)
                 return NotFound();
 
@@ -37,17 +40,28 @@ namespace MovieRadar.WebAPI.Controllers
         public async Task<IActionResult> UpdateUser([FromBody] User updatedUser, int id)
         {
             if (id != updatedUser.Id)
-                return BadRequest();
+                return BadRequest("Not matching user ID");
 
-            var updated = await userService.Update(updatedUser);
-            return updated ? NoContent() : NotFound();
+            try
+            {
+                var updated = await mediator.Send(new UpdateUserCommand(updatedUser));
+                return updated ? NoContent() : NotFound();
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error updating user: , {ex.Message}, inner: , {ex.InnerException}");
+            }
         }
 
         [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
-            var deleted = await userService.DeleteById(id);
+            var deleted = await mediator.Send(new DeleteUserCommand(id));
             return deleted ? NoContent() : NotFound();
         }
     }

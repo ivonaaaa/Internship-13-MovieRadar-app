@@ -5,7 +5,7 @@ using MovieRadar.Domain.Interfaces;
 
 namespace MovieRadar.Application.Services
 {
-    public class MovieService : IMovieService
+    public class MovieService 
     {
         private readonly IMovieRepository movieRepository;
         public MovieService(IMovieRepository movieRepository)

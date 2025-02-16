@@ -5,7 +5,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using MovieRadar.Domain.Entities;
 
-namespace MovieRadar.Application.Services
+namespace MovieRadar.Application.Services.Token
 {
     public class TokenService : ITokenService
     {
@@ -16,12 +16,12 @@ namespace MovieRadar.Application.Services
             _jwtSettings = jwtSettings.Value;
         }
 
-        public string GenerateToken(int userId, string username, bool isAdmin)
+        public string GenerateToken(int userId, string email, bool isAdmin)
         {
             var claims = new[]
             {
-            new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
-            new Claim(JwtRegisteredClaimNames.UniqueName, username),
+            new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
+            new Claim(JwtRegisteredClaimNames.UniqueName, email),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new Claim(ClaimTypes.Role, isAdmin ? "Admin" : "User")
         };
