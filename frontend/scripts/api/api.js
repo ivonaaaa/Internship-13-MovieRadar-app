@@ -49,16 +49,17 @@ async function loginUser(email, password) {
     });
 
     if (!response.ok) {
-      if (response.status === 401) {
-        throw new Error("Invalid email address or password.");
-      } else {
-        throw new Error("An error occurred during login.");
-      }
+      const errorMessage = await response.text();
+      throw new Error(
+        response.status === 401
+          ? "Invalid email or password"
+          : errorMessage || "Login failed"
+      );
     }
 
     return await response.json();
   } catch (error) {
-    console.error("Error logging in user:", error);
+    console.error("Login error:", error.message);
     throw error;
   }
 }
@@ -91,25 +92,27 @@ async function registerUser(newUser) {
       body: JSON.stringify(newUser),
     });
 
+    const responseMessage = await response.text();
+
     if (!response.ok) {
-      const errorText = await response.text();
-      let errorData = {};
+      let errorMessage = "Error during registration";
+
       try {
-        errorData = errorText ? JSON.parse(errorText) : {};
-      } catch (e) {
-        errorData = {};
+        const errorData = JSON.parse(responseMessage);
+
+        if (errorData.message) errorMessage = errorData.message;
+      } catch {
+        errorMessage = responseMessage || errorMessage;
       }
-      throw new Error(errorData.message || "An error occurred during registration.");
+
+      throw new Error(errorMessage);
     }
 
-    const text = await response.text();
-    return text ? JSON.parse(text) : null;
+    return responseMessage ? JSON.parse(responseMessage) : null;
   } catch (error) {
-    console.error("Error registering user:", error);
-    throw error;
+    throw new Error(error.message);
   }
 }
-
 
 async function fetchMovies(url, options) {
   try {
@@ -170,8 +173,22 @@ async function createMovie(movieData) {
   try {
     return await postMovie(movieData, token);
   } catch (error) {
-    console.error("Error creating movie:", error);
-    throw error;
+    if (error.response) {
+      const errorMessage = await error.response.text();
+      try {
+        const errorData = JSON.parse(errorMessage);
+        if (errorData.errors) {
+          const messages = Object.values(errorData.errors).flat().join("\n");
+          throw new Error(messages);
+        } else {
+          throw new Error(
+            errorData.message || "An error occurred while creating the movie"
+          );
+        }
+      } catch {
+        throw new Error("Error while parsing errors");
+      }
+    } else throw new Error("Server error");
   }
 }
 
@@ -322,11 +339,11 @@ async function postComment(commentData, token) {
       },
       body: JSON.stringify(commentData),
     });
-    console.log(response.status)
+    console.log(response.status);
 
-     if (response.status === 401) {
+    if (response.status === 401) {
       alert("Your session is expired, Please login again.");
-      removeAuthToken();  
+      removeAuthToken();
       throw new Error("401 Unauthorized");
     }
 
@@ -343,13 +360,16 @@ async function postComment(commentData, token) {
 
 async function deleteComment(commentId, token) {
   try {
-    const response = await fetch(`http://localhost:50845/api/rating/${commentId}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await fetch(
+      `http://localhost:50845/api/rating/${commentId}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     if (!response.ok) {
       const errorText = await response.text();
       let errorData = {};
@@ -372,8 +392,8 @@ async function getAllReactions() {
     const response = await fetch("http://localhost:50845/api/ratingReaction", {
       method: "GET",
       headers: {
-        "Content-Type": "application/json"
-      }
+        "Content-Type": "application/json",
+      },
     });
     if (!response.ok) {
       throw new Error(`Greška pri dohvaćanju reakcija: ${response.statusText}`);
