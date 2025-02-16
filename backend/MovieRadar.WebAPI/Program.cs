@@ -10,6 +10,7 @@ using System.Text;
 using MediatR;
 using MovieRadar.Application.Services.Token;
 using MovieRadar.Application.Features.Movies.Handlers;
+using MovieRadar.Application.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +36,11 @@ builder.Services.AddScoped<IRatingRepository, RatingRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IMovieRepository, MovieRepository>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IRatingCommentsRepository, RatingCommentsRepository>();
+builder.Services.AddScoped<IRatingReactionsRepository, RatingReactionsRepository>();
+builder.Services.AddScoped<IRatingCommentService, RatingsCommentsService>();
+builder.Services.AddScoped<IRatingReactionsService, RatingReactionsService>();
+
 
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 
