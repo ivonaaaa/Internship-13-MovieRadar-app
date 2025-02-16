@@ -1,11 +1,23 @@
-import { saveAuthToken, decodeToken } from "./auth.js";
+import { saveAuthToken, decodeToken, getAuthToken } from "./auth.js";
 import { initAdminApp } from "./admin-app.js";
 import { initUserApp } from "./user-app.js";
 import { loginUser } from "../api/api.js";
 import { setIsAdmin } from "./authState.js";
+import { getIsAdmin } from "./auth.js";
+import { saveIsAdmin } from "./auth.js";
 
 document.addEventListener("DOMContentLoaded", function () {
   const loginContainer = document.getElementById("login-container");
+
+  const token = getAuthToken();
+  const isAdmin = getIsAdmin();
+
+  if (token) {
+    loginContainer.style.display = "none";
+    isAdmin ? initAdminApp() : initUserApp();
+    return;
+  }
+
   if (!loginContainer) return;
 
   const loginButton = loginContainer.querySelector("button");
@@ -35,10 +47,10 @@ document.addEventListener("DOMContentLoaded", function () {
       saveAuthToken(token);
 
       setIsAdmin(isAdmin);
+      saveIsAdmin(isAdmin);
 
       loginContainer.style.display = "none";
 
-      // Provjera je li korisnik admin
       isAdmin ? initAdminApp() : initUserApp();
     } catch (error) {
       alert(error.message);
