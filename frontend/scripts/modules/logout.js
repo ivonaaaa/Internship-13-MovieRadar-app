@@ -1,9 +1,10 @@
-
-import { removeAuthToken } from "./auth.js"; 
+import { removeAuthToken } from "./auth.js";
+import { removeIsAdmin } from "./auth.js";
 
 function logoutUser() {
-  removeAuthToken(); 
-  window.location.href = "./index.html"; 
+  removeAuthToken();
+  removeIsAdmin();
+  window.location.href = "./index.html";
 }
 
 export function createLogoutButton() {
@@ -16,11 +17,11 @@ export function createLogoutButton() {
   logoutButton.style.padding = "5px 10px";
   logoutButton.style.fontSize = "12px";
   logoutButton.style.zIndex = "1000";
-  logoutButton.style.display = "inline-block";  
-  logoutButton.style.width = "auto";             
+  logoutButton.style.display = "inline-block";
+  logoutButton.style.width = "auto";
   logoutButton.style.cursor = "pointer";
 
-  logoutButton.classList.add("logout-button"); 
+  logoutButton.classList.add("logout-button");
   logoutButton.addEventListener("click", logoutUser);
   return logoutButton;
 }

@@ -27,12 +27,24 @@ export function saveAuthToken(token) {
   setCookie("authToken", token, 30);
 }
 
+export function saveIsAdmin(isAdmin) {
+  setCookie("isAdmin", isAdmin, 30);
+}
+
 export function getAuthToken() {
   return getCookie("authToken");
 }
 
+export function getIsAdmin() {
+  return getCookie("isAdmin");
+}
+
 export function removeAuthToken() {
   eraseCookie("authToken");
+}
+
+export function removeIsAdmin() {
+  eraseCookie("isAdmin");
 }
 
 export function decodeToken(token) {
@@ -45,4 +57,3 @@ export function decodeToken(token) {
     return null;
   }
 }
-  
