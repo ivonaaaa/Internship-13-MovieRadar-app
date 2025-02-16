@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using MovieRadar.Application.Interfaces;
 using MovieRadar.Domain.Entities;
 
 namespace MovieRadar.Application.Services.Token

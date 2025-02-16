@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using MovieRadar.Application.Services;
+using MovieRadar.Application.Interfaces;
 using MovieRadar.Domain.Entities;
 using Microsoft.AspNetCore.Identity.Data;
 using MediatR;
