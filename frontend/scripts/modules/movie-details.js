@@ -260,40 +260,6 @@ const displayMovieDetails = async (movieId) => {
         });
       });
     }
-        const dislikeButtons = document.querySelectorAll(".dislike-button");
-        dislikeButtons.forEach((button) => {
-          button.addEventListener("click", async (e) => {
-            const ratingId = Number(e.target.dataset.ratingId);
-            const currentToken = getAuthToken();
-            try {
-              const allReactions = await getAllReactions();
-              const existingReaction = allReactions.find(
-                (r) => r.ratingId === ratingId && Number(r.userId) === Number(currentUserId)
-              );
-              if (existingReaction) {
-                if (existingReaction.reaction === "dislike") {
-                  await deleteReaction(existingReaction.id, currentToken);
-                  alert("Dislike removed!");
-                  displayMovieDetails(movieId);
-                  return;
-                } else {
-                  await deleteReaction(existingReaction.id, currentToken);
-                }
-              }
-              const reactionData = {
-                ratingId: ratingId,
-                Reaction: "dislike",
-                userId: currentUserId
-              };
-              await postReaction(reactionData, currentToken);
-              alert("Dislike added!");
-              displayMovieDetails(movieId);
-            } catch (err) {
-              console.error("Error adding reaction:", err);
-              alert("Error adding reaction.");
-            }
-          });
-        });
       
 
       const replyButtons = document.querySelectorAll(".reply-button");
