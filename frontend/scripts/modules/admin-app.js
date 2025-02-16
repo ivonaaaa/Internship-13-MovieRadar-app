@@ -9,6 +9,8 @@ import { createLogoutButton } from "./logout.js";
 import { getAuthToken } from "./auth.js";
 
 const genres = ["action", "crime", "horror", "comedy", "drama"];
+const cloudName = "dyt7wsphu"; // Zamijeni sa svojim Cloudinary cloud_name
+const uploadPreset = "movie_uploads"; // Unsigned preset
 
 export function initAdminApp() {
   async function initialize() {
@@ -166,13 +168,12 @@ export function initAdminApp() {
   async function uploadImageToCloudinary(file) {
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("upload_preset", "ml_default");
+    formData.append("upload_preset", uploadPreset);
 
-    //! provvjera
-    console.log([...formData]);
+    console.log([...formData]); // Debugging log
 
     const response = await fetch(
-      "https://api.cloudinary.com/v1_1/dyt7wsphu/image/upload",
+      `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
       {
         method: "POST",
         body: formData,

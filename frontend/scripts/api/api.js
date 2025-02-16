@@ -98,7 +98,9 @@ async function registerUser(newUser) {
       } catch (e) {
         errorData = {};
       }
-      throw new Error(errorData.message || "An error occurred during registration.");
+      throw new Error(
+        errorData.message || "An error occurred during registration."
+      );
     }
 
     const text = await response.text();
@@ -108,7 +110,6 @@ async function registerUser(newUser) {
     throw error;
   }
 }
-
 
 async function fetchMovies(url, options) {
   try {
@@ -239,6 +240,7 @@ async function postMovie(movieData, token, movieId = null, method = "POST") {
     avg_rating: movieData.avg_rating ?? 0,
     created_at: movieData.created_at || new Date().toISOString(),
     last_modified_at: new Date().toISOString(),
+    imageLink: movieData.imageLink || "",
   };
 
   console.log("Enriched movieData before sending:", enrichedMovieData);
@@ -321,11 +323,11 @@ async function postComment(commentData, token) {
       },
       body: JSON.stringify(commentData),
     });
-    console.log(response.status)
+    console.log(response.status);
 
-     if (response.status === 401) {
+    if (response.status === 401) {
       alert("Your session is expired, Please login again.");
-      removeAuthToken();  
+      removeAuthToken();
       throw new Error("401 Unauthorized");
     }
 
@@ -342,13 +344,16 @@ async function postComment(commentData, token) {
 
 async function deleteComment(commentId, token) {
   try {
-    const response = await fetch(`http://localhost:50845/api/rating/${commentId}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await fetch(
+      `http://localhost:50845/api/rating/${commentId}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     if (!response.ok) {
       const errorText = await response.text();
       let errorData = {};
@@ -371,8 +376,8 @@ async function getAllReactions() {
     const response = await fetch("http://localhost:50845/api/ratingReactions", {
       method: "GET",
       headers: {
-        "Content-Type": "application/json"
-      }
+        "Content-Type": "application/json",
+      },
     });
     if (!response.ok) {
       throw new Error(`Greška pri dohvaćanju reakcija: ${response.statusText}`);
@@ -408,13 +413,16 @@ async function postReaction(reactionData, token) {
 
 async function deleteReaction(reactionId, token) {
   try {
-    const response = await fetch(`https://localhost:50844/api/ratingReactions/${reactionId}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    const response = await fetch(
+      `https://localhost:50844/api/ratingReactions/${reactionId}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
     if (!response.ok) {
       const errorText = await response.text();
       throw new Error(errorText || "Error deleting reaction");
@@ -425,7 +433,6 @@ async function deleteReaction(reactionId, token) {
     throw error;
   }
 }
-
 
 export {
   getAllUsers,
@@ -442,5 +449,5 @@ export {
   deleteComment,
   getAllReactions,
   postReaction,
-  deleteReaction
+  deleteReaction,
 };
