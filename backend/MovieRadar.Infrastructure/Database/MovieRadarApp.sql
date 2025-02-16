@@ -12,15 +12,17 @@ ALTER TABLE users
   ADD CONSTRAINT check_last_name CHECK (last_name IS NULL OR last_name ~ '^[A-Za-z]+$'),
   ADD CONSTRAINT check_email CHECK (email ~ '^[a-zA-Z]+@[a-zA-Z]{2,}\.[a-zA-Z]{2,}$');
 
+CREATE TYPE movie_genre AS ENUM ('drama', 'horror', 'action', 'comedy', 'crime');
 CREATE TABLE movies(
     id SERIAL PRIMARY KEY,
     title TEXT NOT NULL UNIQUE,
     summary TEXT,
-    genre TEXT NOT NULL,
+    genre movie_genre NOT NULL,
     release_year INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     last_modified_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    avg_rating DECIMAL(3, 1) DEFAULT NULL
+    avg_rating DECIMAL(3, 1) DEFAULT NULL,
+    image_link TEXT 
 
     CONSTRAINT release_year_check CHECK (release_year <= EXTRACT(YEAR FROM CURRENT_DATE))
 );

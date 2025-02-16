@@ -17,20 +17,32 @@ namespace MovieRadar.WebAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Rating>>> GetAllRatings()
+        public async Task<ActionResult<IEnumerable<Rating>>> GetAllRatings([FromQuery] string? filter, [FromQuery] string? value)
         {
-            var allRatings = await mediator.Send(new GetAllRatingsQuery());
-            return Ok(allRatings);
+            var validFilters = new HashSet<string> { "movie_id" };
+
+            if (string.IsNullOrEmpty(filter) && string.IsNullOrEmpty(value))
+            {
+                var allRatings = await mediator.Send(new GetAllRatingsQuery());
+                return (allRatings == null || !allRatings.Any()) ? NotFound() : Ok(allRatings);
+            }
+
+            if (!validFilters.Contains(filter))
+                return BadRequest($"Invalid filter: '{filter}'");
+
+            if (string.IsNullOrWhiteSpace(value))
+                return BadRequest("Value cannot be empty");
+
+            var filteredRatings = await mediator.Send(new GetFilteredRatingsQuery(filter, value));
+
+            return (filteredRatings == null || !filteredRatings.Any()) ? NotFound() : Ok(filteredRatings);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Rating>> GetRatingById(int id)
         {
             var rating = await mediator.Send(new GetRatingByIdQuery(id));
-            if(rating == null)
-                return NotFound();
-
-            return Ok(rating);
+            return rating == null ? NotFound() : Ok(rating);
         }
 
         [Authorize]

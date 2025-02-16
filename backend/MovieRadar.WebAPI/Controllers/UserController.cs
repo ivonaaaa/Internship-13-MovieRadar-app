@@ -16,7 +16,7 @@ namespace MovieRadar.WebAPI.Controllers
             this.mediator = mediator;
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetAllUsers()
         {
@@ -24,7 +24,7 @@ namespace MovieRadar.WebAPI.Controllers
             return Ok(allUsers);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<User>> GetUserById(int id)
         {

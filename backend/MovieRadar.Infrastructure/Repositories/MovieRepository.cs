@@ -17,7 +17,7 @@ namespace MovieRadar.Infrastructure.Repositories
         {
             var getAllQuery = @"SELECT id AS Id, title AS Title, summary AS Summary, 
                                        release_year AS ReleaseYear, genre AS Genre, avg_rating AS AvgRating,
-                                        created_at AS CreatedAt, last_modified_at AS LastModifiedAt
+                                       image_link AS ImageLink, created_at AS CreatedAt, last_modified_at AS LastModifiedAt
                                 FROM movies ";
             return await connection.QueryAsync<Movie>(getAllQuery);
         }
@@ -25,8 +25,8 @@ namespace MovieRadar.Infrastructure.Repositories
         public async Task<Movie?> GetById(int id)
         {
             var getByIdQuery = @"SELECT id AS Id, title AS Title, summary AS Summary, 
-                                       release_year AS ReleaseYear, genre AS Genre, avg_rating AS AvgRating,
-                                       created_at AS CreatedAt, last_modified_at AS LastModifiedAt
+                                       release_year AS ReleaseYear, genre AS Genre, avg_rating AS AvgRating, 
+                                       image_link AS ImageLink, created_at AS CreatedAt, last_modified_at AS LastModifiedAt
                                  FROM movies
                                  WHERE id = @Id";
             return await connection.QuerySingleOrDefaultAsync<Movie>(getByIdQuery, new { Id = id });
@@ -34,15 +34,15 @@ namespace MovieRadar.Infrastructure.Repositories
 
         public async Task<int> Add(Movie newMovie)
         {
-            var addMovieQuery = @"INSERT INTO movies(title, summary, release_year, genre) 
-                                    VALUES (@Title, @Summary, @ReleaseYear, @Genre)
+            var addMovieQuery = @"INSERT INTO movies(title, summary, release_year, genre, image_link) 
+                                    VALUES (@Title, @Summary, @ReleaseYear, CAST(@Genre AS movie_genre), @ImageLink)
                                     RETURNING id AS Id";
             return await connection.ExecuteScalarAsync<int>(addMovieQuery, newMovie);
         }
 
         public async Task<bool> Update(Movie newMovie)
         {
-            var updateMovieQuery = @"UPDATE movies SET title = @Title, summary = @Summary, release_year = @ReleaseYear, genre = @Genre 
+            var updateMovieQuery = @"UPDATE movies SET title = @Title, summary = @Summary, release_year = @ReleaseYear, genre = CAST(@Genre AS movie_genre), image_link = @ImageLink 
                                      WHERE id = @Id";
             return await connection.ExecuteAsync(updateMovieQuery, newMovie) > 0;
         }
@@ -53,18 +53,19 @@ namespace MovieRadar.Infrastructure.Repositories
             return await connection.ExecuteAsync(deleteMovieQuery, new { Id = id }) > 0;
         }
 
-        public async Task<IEnumerable<Movie>> GetFilteredMovies(string filter, string parameter)
+        public async Task<IEnumerable<Movie>> GetFiltered(string filter, string value)
         {
             var getFilteredMoviesQuery = $@"SELECT id AS Id, title AS Title, summary AS Summary, release_year AS ReleaseYear, genre AS Genre, 
-                                                   avg_rating AS AvgRating, created_at AS CreatedAt, last_modified_at AS LastModifiedAt
+                                                   avg_rating AS AvgRating, created_at AS CreatedAt, image_link AS ImageLink, last_modified_at AS LastModifiedAt
                                             FROM movies 
-                                            WHERE {filter} = '{parameter}'";
+                                            WHERE {filter} = '{value}'";
             return await connection.QueryAsync<Movie>(getFilteredMoviesQuery);
         }
 
         public async Task<IEnumerable<Movie>> OrderByRating(string orderDirection)
         {
-            var orderQuery = @$"SELECT id AS Id, title AS Title, summary AS Summary, release_year AS ReleaseYear, genre AS Genre, avg_rating AS AvgRating, created_at AS CreatedAt, last_modified_at AS LastModifiedAt
+            var orderQuery = @$"SELECT id AS Id, title AS Title, summary AS Summary, release_year AS ReleaseYear, genre AS Genre, avg_rating AS AvgRating, 
+                                image_link AS ImageLink, created_at AS CreatedAt, last_modified_at AS LastModifiedAt
                                 FROM movies
                                 ORDER BY avg_rating {orderDirection}";
             return await connection.QueryAsync<Movie>(orderQuery);

@@ -16,13 +16,13 @@ namespace MovieRadar.Infrastructure.Repositories
 
         public async Task<IEnumerable<User>> GetAll()
         {
-            var getQuery = "SELECT id AS Id, first_name AS FirstName, last_name AS LastName, email AS Email, password AS Password, is_admin AS IsAdmin FROM users";
+            var getQuery = "SELECT id AS Id, first_name AS FirstName, last_name AS LastName, email AS Email, is_admin AS IsAdmin FROM users";
             return await _connection.QueryAsync<User>(getQuery);
         }
 
         public async Task<User?> GetById(int id)
         {
-            var getByIdQuery = @"SELECT id AS Id, first_name AS FirstName, last_name AS LastName, email AS Email, password AS Password,
+            var getByIdQuery = @"SELECT id AS Id, first_name AS FirstName, last_name AS LastName, email AS Email,
                 is_admin AS IsAdmin FROM users WHERE id = @Id";
             return await _connection.QuerySingleOrDefaultAsync<User>(getByIdQuery, new { Id = id });
         }
@@ -52,9 +52,18 @@ namespace MovieRadar.Infrastructure.Repositories
 
         public async Task<User?> GetByEmail(string email)
         {
-            string query = @"SELECT id AS Id, first_name AS FirstName, last_name AS LastName, email AS Email, password AS Password, 
+            string query = @"SELECT id AS Id, first_name AS FirstName, last_name AS LastName, email AS Email, 
                    is_admin AS IsAdmin FROM users WHERE email = @Email";
             return await _connection.QueryFirstOrDefaultAsync<User>(query, new { Email = email });
+        }
+
+        public async Task<bool> CheckAuthData(string email, string password)
+        {
+            string checkAuthDataQuery  = @$"SELECT EXISTS( SELECT 1 
+                                           FROM users
+                                           WHERE email = @Email AND password = @Password)";
+            return await _connection.ExecuteScalarAsync<bool>(checkAuthDataQuery, new { Email = email, Password = password });
+            
         }
     }
 }

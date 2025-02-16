@@ -1,5 +1,6 @@
 ﻿using MovieRadar.Domain.Entities;
 using MovieRadar.Domain.Interfaces;
+using MovieRadar.Application.Enums;
 
 namespace MovieRadar.Application.Helpers
 {
@@ -32,7 +33,9 @@ namespace MovieRadar.Application.Helpers
         }
         public static (bool, string) CheckGenre(string movieGenre)
         {
-            return !string.IsNullOrWhiteSpace(movieGenre) ? (true, "Genre is valid") : (false, "Genre cannot be empty");
+            bool isValidGenre = Enum.TryParse<MovieGenre>(movieGenre, true, out var genreEnum);
+
+            return isValidGenre ? (true, "valid genre") : (false, "Invalid genre");
         }
         public static (bool, string) CheckReleaseYear(int movieReleaseYear)
         {

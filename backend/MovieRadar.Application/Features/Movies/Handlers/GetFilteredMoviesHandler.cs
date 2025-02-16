@@ -17,7 +17,7 @@ namespace MovieRadar.Application.Features.Movies.Handlers
         {
             try
             {
-                return await movieRepository.GetFilteredMovies(request.filter, request.parameter);
+                return await movieRepository.GetFiltered(request.filter, request.parameter);
             }
             catch (Exception ex)
             {
