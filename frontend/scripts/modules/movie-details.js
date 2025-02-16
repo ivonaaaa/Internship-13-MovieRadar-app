@@ -2,6 +2,8 @@ import {
   getAllUsers,
   getMovieList,
   getRatingsList,
+  getRatingComments,
+  postRatingComment,
   postComment,
   deleteComment,
   postReaction,
@@ -44,6 +46,8 @@ const displayMovieDetails = async (movieId) => {
     const movieData = movies.find((m) => m.id === movieId);
     const idKey =
       "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier";
+    const idKey =
+      "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier";
 
     if (!movieData) {
       document.getElementById("movies-container").innerHTML =
@@ -79,18 +83,42 @@ const displayMovieDetails = async (movieId) => {
           .map((c) => {
             const user = users.find((u) => u.id === c.userId);
             const userName = user ? user.firstName : "Unknown user";
-            let commentHtml = `<p><strong>${userName}:</strong> ${c.review} (⭐ ${c.grade})`;
+            let commentHtml = `<div class="comment" data-comment-id="${c.id}">`;
+            commentHtml += `<p><strong>${userName}:</strong> ${c.review} (⭐ ${c.grade})`;
+
+            const replies = ratingComments.filter(
+              (comment) => comment.ratingId === c.id
+            );
+
+            if (replies.length) {
+              commentHtml += `<div class="replies">
+              <h4>Replies:</h4>`;
+              replies.forEach((reply) => {
+                const replyUser = users.find((u) => u.id === reply.userId);
+                const replyUserName = replyUser
+                  ? replyUser.firstName
+                  : "Unknown user";
+                commentHtml += `<div class="reply">
+                  <p><strong>${replyUserName}:</strong> ${reply.comment}</p>
+                </div>`;
+              });
+              commentHtml += `</div>`;
+            }
+
             if (
               isLoggedIn &&
               Number(c.userId) === Number(currentUserId) &&
               !isAdmin
             ) {
               commentHtml += ` <button class="delete-comment" data-comment-id="${c.id}">Delete</button>`;
-            } else if (!isAdmin) {
+            }
+            if (isLoggedIn && !isAdmin) {
+              commentHtml += `<button class="reply-button" data-comment-id="${c.id}">Reply</button> `;
               commentHtml += ` <button class="like-button" data-rating-id="${c.id}"> <i class="fas fa-thumbs-up"></i></button>
                                <button class="dislike-button" data-rating-id="${c.id}"> <i class="fas fa-thumbs-down fa-flip-horizontal"></i></button>`;
             }
-            commentHtml += `</p>`;
+
+            commentHtml += `</p></div>`;
             return commentHtml;
           })
           .join("")
@@ -156,7 +184,11 @@ const displayMovieDetails = async (movieId) => {
       if (isAdmin) {
         moviesContainer.innerHTML = "";
         initAdminApp();
+        moviesContainer.innerHTML = "";
+        initAdminApp();
       } else {
+        moviesContainer.innerHTML = "";
+        initUserApp();
         moviesContainer.innerHTML = "";
         initUserApp();
       }
@@ -287,6 +319,75 @@ const displayMovieDetails = async (movieId) => {
         });
       });
     }
+
+    const replyButtons = document.querySelectorAll(".reply-button");
+    replyButtons.forEach((button) => {
+      button.addEventListener("click", (e) => {
+        const commentId = Number(button.dataset.commentId);
+        console.log(commentId);
+        const rating = filteredRatings.find((r) => r.id === commentId);
+        const ratingId = rating ? rating.id : null;
+
+        const commentDiv = e.target.closest(".comment");
+        if (!commentDiv) {
+          console.error("Nije pronađen roditeljski .comment element.");
+          return;
+        }
+
+        let replyForm = commentDiv.querySelector(".reply-form");
+        if (!replyForm) {
+          replyForm = document.createElement("div");
+          replyForm.classList.add("reply-form");
+
+          replyForm.innerHTML = `
+              <input type="text" class="reply-content" placeholder="Leave your reply here" />
+              <button class="submit-reply">Submit Reply</button>
+              <button class="cancel-reply">Cancel</button>
+            `;
+          commentDiv.appendChild(replyForm);
+
+          replyForm
+            .querySelector(".cancel-reply")
+            .addEventListener("click", () => {
+              replyForm.remove();
+            });
+
+          replyForm
+            .querySelector(".submit-reply")
+            .addEventListener("click", async () => {
+              const content = replyForm
+                .querySelector(".reply-content")
+                .value.trim();
+              if (!content) {
+                alert("Please enter a comment.");
+                return;
+              }
+              const currentToken = getAuthToken();
+
+              const replyData = {
+                ratingId: ratingId,
+                comment: content,
+                userId: currentUserId,
+              };
+              try {
+                console.log(
+                  "Reply data being sent:",
+                  JSON.stringify(replyData)
+                );
+                await postRatingComment(replyData, currentToken);
+                alert("Reply added successfully!");
+                displayMovieDetails(movieId);
+              } catch (err) {
+                console.error("Error while adding reply:", err);
+                alert("Error while adding reply");
+              }
+            });
+        } else {
+          replyForm.style.display =
+            replyForm.style.display === "none" ? "block" : "none";
+        }
+      });
+    });
   } catch (error) {
     console.error("Error:", error);
     document.getElementById("movies-container").innerHTML =
@@ -299,5 +400,21 @@ const averageRating = (ratings) => {
   const total = ratings.reduce((sum, rating) => sum + rating.grade, 0);
   return parseFloat((total / ratings.length).toFixed(1));
 };
+
+window.addEventListener("hashchange", () => {
+  if (!window.location.hash.startsWith("#film-")) {
+    const moviesContainer = document.getElementById("movies-container");
+
+    const isAdmin = getIsAdmin();
+
+    if (isAdmin) {
+      moviesContainer.innerHTML = "";
+      initAdminApp();
+    } else {
+      moviesContainer.innerHTML = "";
+      initUserApp();
+    }
+  }
+});
 
 export { displayMovieDetails };

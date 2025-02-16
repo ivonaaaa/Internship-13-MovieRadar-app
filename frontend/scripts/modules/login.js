@@ -26,7 +26,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     try {
       const data = await loginUser(email, password);
-      const {token,isAdmin} = data;
+
+      if (!data || !data.token || typeof data.isAdmin === "undefined")
+        throw new Error("Invalid response from server.");
+
+      const { token, isAdmin } = data;
 
       saveAuthToken(token);
 
@@ -35,11 +39,7 @@ document.addEventListener("DOMContentLoaded", function () {
       loginContainer.style.display = "none";
 
       // Provjera je li korisnik admin
-      if (isAdmin) {
-        initAdminApp();
-      } else {
-        initUserApp();
-      }
+      isAdmin ? initAdminApp() : initUserApp();
     } catch (error) {
       alert(error.message);
     }

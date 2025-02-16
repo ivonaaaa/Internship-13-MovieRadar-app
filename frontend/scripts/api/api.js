@@ -1,11 +1,12 @@
 import { getAuthToken } from "../modules/auth.js";
 
-async function getAllUsers() {
+async function getAllUsers(token) {
   try {
-    const response = await fetch("https://localhost:50844/api/User", {
+    const response = await fetch("http://localhost:50845/api/User", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       },
     });
     if (!response.ok) {
@@ -20,7 +21,7 @@ async function getAllUsers() {
 
 async function createUser(newUser) {
   try {
-    const response = await fetch("https://localhost:50844/api/User", {
+    const response = await fetch("http://localhost:50845/api/User", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -48,16 +49,17 @@ async function loginUser(email, password) {
     });
 
     if (!response.ok) {
-      if (response.status === 401) {
-        throw new Error("Invalid email address or password.");
-      } else {
-        throw new Error("An error occurred during login.");
-      }
+      const errorMessage = await response.text();
+      throw new Error(
+        response.status === 401
+          ? "Invalid email or password"
+          : errorMessage || "Login failed"
+      );
     }
 
     return await response.json();
   } catch (error) {
-    console.error("Error logging in user:", error);
+    console.error("Login error:", error.message);
     throw error;
   }
 }
@@ -90,24 +92,26 @@ async function registerUser(newUser) {
       body: JSON.stringify(newUser),
     });
 
+    const responseMessage = await response.text();
+
     if (!response.ok) {
-      const errorText = await response.text();
-      let errorData = {};
+      let errorMessage = "Error during registration";
+
       try {
-        errorData = errorText ? JSON.parse(errorText) : {};
-      } catch (e) {
-        errorData = {};
+        const errorData = JSON.parse(responseMessage);
+
+        if (errorData.message) errorMessage = errorData.message;
+      } catch {
+        errorMessage = responseMessage || errorMessage;
       }
       throw new Error(
         errorData.message || "An error occurred during registration."
       );
     }
 
-    const text = await response.text();
-    return text ? JSON.parse(text) : null;
+    return responseMessage ? JSON.parse(responseMessage) : null;
   } catch (error) {
-    console.error("Error registering user:", error);
-    throw error;
+    throw new Error(error.message);
   }
 }
 
@@ -171,8 +175,22 @@ async function createMovie(movieData) {
   try {
     return await postMovie(movieData, token);
   } catch (error) {
-    console.error("Error creating movie:", error);
-    throw error;
+    if (error.response) {
+      const errorMessage = await error.response.text();
+      try {
+        const errorData = JSON.parse(errorMessage);
+        if (errorData.errors) {
+          const messages = Object.values(errorData.errors).flat().join("\n");
+          throw new Error(messages);
+        } else {
+          throw new Error(
+            errorData.message || "An error occurred while creating the movie"
+          );
+        }
+      } catch {
+        throw new Error("Error while parsing errors");
+      }
+    } else throw new Error("Server error");
   }
 }
 
@@ -374,7 +392,7 @@ async function deleteComment(commentId, token) {
 
 async function getAllReactions() {
   try {
-    const response = await fetch("http://localhost:50845/api/ratingReactions", {
+    const response = await fetch("http://localhost:50845/api/ratingReaction", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -392,7 +410,7 @@ async function getAllReactions() {
 
 async function postReaction(reactionData, token) {
   try {
-    const response = await fetch("http://localhost:50845/api/ratingReactions", {
+    const response = await fetch("http://localhost:50845/api/ratingReaction", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -415,7 +433,7 @@ async function postReaction(reactionData, token) {
 async function deleteReaction(reactionId, token) {
   try {
     const response = await fetch(
-      `https://localhost:50844/api/ratingReactions/${reactionId}`,
+      `https://localhost:50844/api/ratingReaction/${reactionId}`,
       {
         method: "DELETE",
         headers: {
@@ -431,6 +449,56 @@ async function deleteReaction(reactionId, token) {
     return true;
   } catch (error) {
     console.error("Error deleting reaction:", error);
+    throw error;
+  }
+}
+
+// Dohvaća recenzije s endpointa api/ratingComments.
+// Ako želiš filtrirati (npr. po movieId), možeš proslijediti filter i value.
+async function getRatingComments(filter, value) {
+  let url = "http://localhost:50845/api/ratingComment";
+  if (filter && value) {
+    url += `?filter=${filter}&value=${value}`;
+  }
+  const options = {
+    method: "GET",
+    headers: { "Content-Type": "application/json" },
+    mode: "cors",
+  };
+
+  try {
+    const response = await fetch(url, options);
+    if (!response.ok) {
+      throw new Error(
+        `Neuspješno dohvaćanje recenzija: ${response.statusText}`
+      );
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Greška pri dohvaćanju recenzija:", error);
+    return [];
+  }
+}
+
+// Šalje novu recenziju na endpoint api/ratingComments.
+async function postRatingComment(ratingCommentData, token) {
+  try {
+    const response = await fetch("http://localhost:50845/api/ratingComment", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(ratingCommentData),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Greška pri slanju recenzije.");
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Greška pri slanju recenzije:", error);
     throw error;
   }
 }
@@ -451,4 +519,6 @@ export {
   getAllReactions,
   postReaction,
   deleteReaction,
+  getRatingComments,
+  postRatingComment,
 };

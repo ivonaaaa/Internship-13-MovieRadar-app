@@ -266,12 +266,31 @@ export function initAdminApp() {
         modal.style.display = "none";
         await renderMoviesList();
       } catch (error) {
-        alert(
-          `Failed to ${movieId ? "update" : "create"} movie: ${error.message}`
-        );
+        console.error("Error saving movie:", error);
+
+        if (error.response) {
+          try {
+            const errorText = await error.response.text();
+            const errorData = JSON.parse(errorText);
+
+            ErrorMessages(errorData);
+          } catch (e) {
+            alert("Error parsing server response errors");
+          }
+        } else alert("Server error");
       }
     };
   }
 
   initialize();
+}
+
+function ErrorMessages(errorData) {
+  if (errorData.errors) {
+    const messages = Object.values(errorData.errors).flat().join("\n");
+
+    alert(`Validation errors: \n${messages}`);
+  } else {
+    alert(`Error: ${errorData.message || "An unexpected error occurred."}`);
+  }
 }
