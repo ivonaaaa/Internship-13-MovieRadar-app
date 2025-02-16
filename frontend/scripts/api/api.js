@@ -152,7 +152,6 @@ async function getMovieList({ genre, year, sort } = {}) {
   }
 }
 
-//! je li ovo dobro, stavila sam da se salje taj token
 async function createMovie(movieData) {
   const token = getAuthToken();
   if (!token) {
@@ -184,7 +183,7 @@ async function updateMovie(movieId, movieData) {
 async function deleteMovie(movieId) {
   console.log(`Deleting movie with ID: ${movieId}`);
 
-  const token = getAuthToken(); // Dohvati token
+  const token = getAuthToken();
   if (!token) {
     throw new Error("Unauthorized: No token found.");
   }
@@ -196,7 +195,7 @@ async function deleteMovie(movieId) {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // Koristi dohvaćeni token
+          Authorization: `Bearer ${token}`,
         },
       }
     );
@@ -221,20 +220,24 @@ async function postMovie(movieData, token, movieId = null, method = "POST") {
     url = `http://localhost:50845/api/movie/${movieId}`;
   }
 
+  console.log("Original movieData:", movieData);
+
   const enrichedMovieData = {
     id: movieId || movieData.id,
     title: movieData.title,
     summary: movieData.summary,
     genre: movieData.genre,
-    release_year: movieData.release_year,
+    releaseYear: movieData.releaseYear,
     avg_rating: movieData.avg_rating ?? 0,
     created_at: movieData.created_at || new Date().toISOString(),
     last_modified_at: new Date().toISOString(),
   };
 
+  console.log("Enriched movieData before sending:", enrichedMovieData);
+  console.log("Release Year before sending:", enrichedMovieData.release_year);
+
   console.log("API Request URL:", url);
   console.log("Request Method:", method);
-  console.log("Movie Data to Send:", enrichedMovieData);
   console.log("Authorization Token:", token);
 
   try {
@@ -259,10 +262,9 @@ async function postMovie(movieData, token, movieId = null, method = "POST") {
       );
     }
 
-    //! ove poruke popravit ne znam
     if (response.status === 204) {
       console.log("Update successful (204 No Content)");
-      return null;
+      return enrichedMovieData;
     }
 
     const responseData = await response.json();
@@ -307,7 +309,6 @@ async function postComment(commentData, token) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        // Ako API očekuje Authorization header:
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(commentData),

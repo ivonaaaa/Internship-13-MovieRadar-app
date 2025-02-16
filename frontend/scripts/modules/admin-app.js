@@ -32,8 +32,7 @@ export function initAdminApp() {
       movieElement.classList.add("movie-item");
 
       movieElement.innerHTML = `
-        <h3>${movie.title} (${movie.release_year})</h3>
-        <p><strong>Genre:</strong> ${movie.genre}</p>
+        <h3>${movie.title} (${movie.releaseYear})</h3>
         <p>${movie.summary}</p>
         <button data-id="${movie.id}" class="view-details">Details</button>
         <button data-id="${movie.id}" class="edit-movie">Edit</button>
@@ -139,38 +138,46 @@ export function initAdminApp() {
       e.preventDefault();
       const movieData = {
         title: titleInput.value,
-        release_year: parseInt(yearInput.value, 10),
+        releaseYear: parseInt(yearInput.value, 10),
         summary: summaryInput.value,
         genre: genreSelect.value,
       };
 
       try {
-        let newMovie;
+        let resultMovie;
         if (movieId) {
-          newMovie = await updateMovie(movieId, movieData);
+          resultMovie = await updateMovie(movieId, movieData);
+
+          const movieElement = document.querySelector(
+            `[data-id='${movieId}']`
+          ).parentElement;
+          if (movieElement) {
+            movieElement.querySelector(
+              "h3"
+            ).textContent = `${resultMovie.title} (${resultMovie.releaseYear})`;
+            movieElement.querySelector("p").textContent = resultMovie.summary;
+          }
         } else {
-          newMovie = await createMovie(movieData);
+          resultMovie = await createMovie(movieData);
+
+          const moviesContainer = document.getElementById("movies-container");
+          const movieElement = document.createElement("div");
+          movieElement.classList.add("movie-item");
+
+          movieElement.innerHTML = `
+            <h3>${resultMovie.title} (${resultMovie.releaseYear})</h3>
+            <p>${resultMovie.summary}</p>
+            <button data-id="${resultMovie.id}" class="view-details">Details</button>
+            <button data-id="${resultMovie.id}" class="edit-movie">Edit</button>
+            <button data-id="${resultMovie.id}" class="delete-movie">Delete</button>
+          `;
+
+          moviesContainer.appendChild(movieElement);
         }
 
-        // Dodajemo film odmah u DOM bez ponovnog učitavanja stranice
-        const moviesContainer = document.getElementById("movies-container");
-        const movieElement = document.createElement("div");
-        movieElement.classList.add("movie-item");
-
-        movieElement.innerHTML = `
-          <h3>${newMovie.title} (${newMovie.release_year})</h3>
-          <p><strong>Genre:</strong> ${newMovie.genre}</p>
-          <p>${newMovie.summary}</p>
-          <button data-id="${newMovie.id}" class="view-details">Details</button>
-          <button data-id="${newMovie.id}" class="edit-movie">Edit</button>
-          <button data-id="${newMovie.id}" class="delete-movie">Delete</button>
-        `;
-
-        moviesContainer.appendChild(movieElement);
-
-        // Sakrijemo modal nakon uspješnog dodavanja
         modal.style.display = "none";
       } catch (error) {
+        console.error("Error saving movie:", error);
         alert("Error saving movie.");
       }
     };
