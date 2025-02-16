@@ -123,7 +123,7 @@ async function fetchMovies(url, options) {
 }
 
 async function getMovieList() {
-  const url = "https://localhost:50844/api/movie";
+  const url = "http://localhost:50845/api/movie";
   const options = {
     method: "GET",
     headers: {
@@ -217,6 +217,67 @@ async function deleteComment(commentId, token) {
   }
 }
 
+async function getAllReactions() {
+  try {
+    const response = await fetch("http://localhost:50845/api/ratingReactions", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+    if (!response.ok) {
+      throw new Error(`Greška pri dohvaćanju reakcija: ${response.statusText}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Greška pri dohvaćanju reakcija:", error);
+    return [];
+  }
+}
+
+async function postReaction(reactionData, token) {
+  try {
+    const response = await fetch("http://localhost:50845/api/ratingReactions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(reactionData),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText || "Error posting reaction");
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error posting reaction:", error);
+    throw error;
+  }
+}
+
+async function deleteReaction(reactionId, token) {
+  try {
+    const response = await fetch(`https://localhost:50844/api/ratingReactions/${reactionId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText || "Error deleting reaction");
+    }
+    return true;
+  } catch (error) {
+    console.error("Error deleting reaction:", error);
+    throw error;
+  }
+}
+
+
 export {
   getAllUsers,
   createUser,
@@ -227,4 +288,7 @@ export {
   getRatingsList,
   postComment,
   deleteComment,
+  getAllReactions,
+  postReaction,
+  deleteReaction
 };

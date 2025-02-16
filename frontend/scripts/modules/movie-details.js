@@ -1,5 +1,6 @@
-import { getAllUsers, getMovieList, getRatingsList, postComment, getUserById, deleteComment } from "../api/api.js";
+import { getAllUsers, getMovieList, getRatingsList, postComment, deleteComment,postReaction,deleteReaction,getAllReactions } from "../api/api.js";
 import { getAuthToken, decodeToken } from "./auth.js";
+import { getIsAdmin } from "./authState.js";
 
 const displayMovieDetails = async (movieId) => {
   try {
@@ -16,15 +17,13 @@ const displayMovieDetails = async (movieId) => {
     const token = getAuthToken();
     let currentUserId = null;
     let isLoggedIn = false;
-    let isAdmin = false;
+    const isAdmin = getIsAdmin();
     if (token) {
       try {
         const decoded = decodeToken(token);
         if (decoded && decoded[idKey]) {
           currentUserId = decoded[idKey];
           isLoggedIn = true;
-          const user = await getUserById(currentUserId);
-          isAdmin = user.isAdmin;
         }
       } catch (e) {
         console.error("Token decode failed:", e);
@@ -133,19 +132,34 @@ const displayMovieDetails = async (movieId) => {
     });
 
     if (isLoggedIn) {
+      // Like button
       const likeButtons = document.querySelectorAll(".like-button");
       likeButtons.forEach((button) => {
         button.addEventListener("click", async (e) => {
-          const ratingId = e.target.dataset.ratingId;
-          const reactionData = {
-            ratingId: Number(ratingId),
-            reactionType: "like",
-            userId: currentUserId
-          };
+          const ratingId = Number(e.currentTarget.dataset.ratingId);
           const currentToken = getAuthToken();
           try {
+            const allReactions = await getAllReactions();
+            const existingReaction = allReactions.find(
+              (r) => r.ratingId === ratingId && Number(r.userId) === Number(currentUserId)
+            );
+            if (existingReaction) {
+              if (existingReaction.reaction === "like") {
+                await deleteReaction(existingReaction.id, currentToken);
+                alert("Like removed!");
+                displayMovieDetails(movieId);
+                return;
+              } else {
+                await deleteReaction(existingReaction.id, currentToken);
+              }
+            }
+            const reactionData = {
+              ratingId: ratingId,
+              Reaction: "like",
+              userId: currentUserId
+            };
             await postReaction(reactionData, currentToken);
-            alert("Reaction added successfully!");
+            alert("Like added!");
             displayMovieDetails(movieId);
           } catch (err) {
             console.error("Error adding reaction:", err);
@@ -154,27 +168,41 @@ const displayMovieDetails = async (movieId) => {
         });
       });
 
-      const dislikeButtons = document.querySelectorAll(".dislike-button");
-      dislikeButtons.forEach((button) => {
-        button.addEventListener("click", async (e) => {
-          const ratingId = e.target.dataset.ratingId;
-          const reactionData = {
-            ratingId: Number(ratingId),
-            reactionType: "dislike",
-            userId: currentUserId
-          };
-          const currentToken = getAuthToken();
-          try {
-            await postReaction(reactionData, currentToken);
-            alert("Reaction added successfully!");
-            displayMovieDetails(movieId);
-          } catch (err) {
-            console.error("Error adding reaction:", err);
-            alert("Error adding reaction.");
-          }
+        const dislikeButtons = document.querySelectorAll(".dislike-button");
+        dislikeButtons.forEach((button) => {
+          button.addEventListener("click", async (e) => {
+            const ratingId = Number(e.target.dataset.ratingId);
+            const currentToken = getAuthToken();
+            try {
+              const allReactions = await getAllReactions();
+              const existingReaction = allReactions.find(
+                (r) => r.ratingId === ratingId && Number(r.userId) === Number(currentUserId)
+              );
+              if (existingReaction) {
+                if (existingReaction.reaction === "dislike") {
+                  await deleteReaction(existingReaction.id, currentToken);
+                  alert("Dislike removed!");
+                  displayMovieDetails(movieId);
+                  return;
+                } else {
+                  await deleteReaction(existingReaction.id, currentToken);
+                }
+              }
+              const reactionData = {
+                ratingId: ratingId,
+                Reaction: "dislike",
+                userId: currentUserId
+              };
+              await postReaction(reactionData, currentToken);
+              alert("Dislike added!");
+              displayMovieDetails(movieId);
+            } catch (err) {
+              console.error("Error adding reaction:", err);
+              alert("Error adding reaction.");
+            }
+          });
         });
-      });
-    }
+      }
   } catch (error) {
     console.error("Error:", error);
     document.getElementById("movies-container").innerHTML =

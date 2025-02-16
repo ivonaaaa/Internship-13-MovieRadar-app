@@ -2,6 +2,7 @@ import { saveAuthToken, decodeToken } from "./auth.js";
 import { initAdminApp } from "./admin-app.js";
 import { initUserApp } from "./user-app.js";
 import { loginUser } from "../api/api.js";
+import { setIsAdmin } from "./authState.js";
 
 document.addEventListener("DOMContentLoaded", function () {
   const loginContainer = document.getElementById("login-container");
@@ -28,6 +29,8 @@ document.addEventListener("DOMContentLoaded", function () {
       const {token,isAdmin} = data;
 
       saveAuthToken(token);
+
+      setIsAdmin(isAdmin);
 
       loginContainer.style.display = "none";
 
