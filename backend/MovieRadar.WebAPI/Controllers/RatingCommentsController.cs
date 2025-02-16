@@ -95,8 +95,14 @@ namespace MovieRadar.WebAPI.Controllers
             if (!int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var userId))
                 return Unauthorized();
 
-            
+            var ratingCommentToDelete = await ratingCommentService.GetById(id);
 
+            if(ratingCommentToDelete == null)
+                return NotFound();
+            
+            if (userId != ratingCommentToDelete.UserId)
+                return Forbid();
+            
             try
             {
                 var deleted = await ratingCommentService.DeleteById(id);

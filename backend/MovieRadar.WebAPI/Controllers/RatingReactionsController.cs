@@ -98,7 +98,13 @@ namespace MovieRadar.WebAPI.Controllers
             if (!int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var userId))
                 return Unauthorized();
 
-            
+            var reactionToDelete = await ratingReactionsService.GetById(id);
+
+            if(reactionToDelete == null)
+                return NotFound();
+
+            if (userId != reactionToDelete.UserId)
+                return Forbid();
 
             try
             {
