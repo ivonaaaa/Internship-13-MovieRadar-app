@@ -56,5 +56,14 @@ namespace MovieRadar.Infrastructure.Repositories
                    is_admin AS IsAdmin FROM users WHERE email = @Email";
             return await _connection.QueryFirstOrDefaultAsync<User>(query, new { Email = email });
         }
+
+        public async Task<bool> CheckAuthData(string email, string password)
+        {
+            string checkAuthDataQuery  = @$"SELECT EXISTS( SELECT 1 
+                                           FROM users
+                                           WHERE email = @Email AND password = @Password)";
+            return await _connection.ExecuteScalarAsync<bool>(checkAuthDataQuery, new { Email = email, Password = password });
+            
+        }
     }
 }
