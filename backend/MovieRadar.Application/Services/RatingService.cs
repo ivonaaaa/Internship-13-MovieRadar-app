@@ -1,6 +1,5 @@
 ﻿using MovieRadar.Domain.Entities;
 using MovieRadar.Domain.Interfaces;
-using MovieRadar.Application.Interfaces;
 
 namespace MovieRadar.Application.Services
 {
