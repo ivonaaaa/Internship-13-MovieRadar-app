@@ -39,7 +39,7 @@ namespace MovieRadar.Application.Services
 
         public async Task<int> Add(RatingsReactions ratingReactions)
         {
-            var reactionValidation = ReactionHelper.IsReactionValid(ratingReactions);
+            var reactionValidation = await ReactionHelper.IsReactionValid(ratingReactions, ratingReactionsRepository, isAdd: true);
             if(!reactionValidation.Item1)
                 throw new ArgumentException(reactionValidation.Item2);
 
@@ -55,7 +55,7 @@ namespace MovieRadar.Application.Services
 
         public async Task<bool> Update(RatingsReactions ratingReactions)
         {
-            var reactionValidation = ReactionHelper.IsReactionValid(ratingReactions);
+            var reactionValidation = await ReactionHelper.IsReactionValid(ratingReactions, ratingReactionsRepository, isAdd: false);
             if (!reactionValidation.Item1)
                 throw new ArgumentException(reactionValidation.Item2);
 

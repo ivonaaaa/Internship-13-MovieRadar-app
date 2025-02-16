@@ -2,6 +2,7 @@
 using MovieRadar.Application.Interfaces;
 using MovieRadar.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 namespace MovieRadar.WebAPI.Controllers
 {
@@ -73,6 +74,12 @@ namespace MovieRadar.WebAPI.Controllers
             if(id != updatedReaction.Id)
                 return BadRequest("Not matching id");
 
+            if (!int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var userId))
+                return Unauthorized();
+
+            if (userId != updatedReaction.UserId)
+                return Forbid();
+
             try
             {
                 var updated = await ratingReactionsService.Update(updatedReaction);
@@ -88,6 +95,12 @@ namespace MovieRadar.WebAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteReaction(int id)
         {
+            if (!int.TryParse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var userId))
+                return Unauthorized();
+
+            if (userId != id)
+                return Forbid();
+
             try
             {
                 var deleted = await ratingReactionsService.DeleteById(id);

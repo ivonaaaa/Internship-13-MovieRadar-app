@@ -51,7 +51,10 @@ CREATE TABLE ratings_comments (
 CREATE TABLE ratings_reactions(
   id SERIAL PRIMARY KEY,
   rating_id INT NOT NULL REFERENCES ratings(id) ON DELETE CASCADE,
+  user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   reaction reaction_type
+
+  CONSTRAINT unique_user_reaction_per_rating UNIQUE(rating_id, user_id)
 );
 
 

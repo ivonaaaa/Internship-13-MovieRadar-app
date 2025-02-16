@@ -35,10 +35,6 @@ namespace MovieRadar.Application.Services
         }
         public async Task<int> Add(RatingsComments ratingsComments)
         {
-            //var newMovieValidation = MovieHelper.IsMovieValid(ratingsComments);
-            //if (!newMovieValidation.Item1)
-            //    throw new ArgumentException(newMovieValidation.Item2);
-
             try
             {
                 return await ratingCommentsRepository.Add(ratingsComments);
