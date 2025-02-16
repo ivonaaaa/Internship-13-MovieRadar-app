@@ -4,7 +4,7 @@ using MovieRadar.Domain.Interfaces;
 
 namespace MovieRadar.Application.Features.RatingReactions.Handlers
 {
-    public class GetRatingReactionsByRatingIdHandler : IRequestHandler<GetRatingReactionsByRatingIdQuery, IEnumerable<RatingReaction>>
+    public class GetRatingReactionsByRatingIdHandler : IRequestHandler<GetFilteredRatingReactionsQuery, IEnumerable<RatingReaction>>
     {
         private readonly IRatingReactionRepository ratingReactionRepository;
 
@@ -13,15 +13,15 @@ namespace MovieRadar.Application.Features.RatingReactions.Handlers
             this.ratingReactionRepository = ratingReactionRepository;
         }
 
-        public async Task<IEnumerable<RatingReaction>> Handle(GetRatingReactionsByRatingIdQuery request, CancellationToken cancellationToken)
+        public async Task<IEnumerable<RatingReaction>> Handle(GetFilteredRatingReactionsQuery request, CancellationToken cancellationToken)
         {
             try
             {
-                return await ratingReactionRepository.GetAllByRatingId(request.id);
+                return await ratingReactionRepository.GetFiltered(request.filter, request.value);
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error while getting all reactions by rating id: {ex.Message}, inner: {ex.InnerException}");
+                throw new Exception($"Error getting filtered reactions: {ex.Message}, inner: {ex.InnerException}");
             }
         }
     }

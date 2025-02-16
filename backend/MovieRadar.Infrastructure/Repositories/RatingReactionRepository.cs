@@ -3,7 +3,6 @@ using MovieRadar.Domain.Entities;
 using MovieRadar.Domain.Interfaces;
 using System.Data;
 
-
 namespace MovieRadar.Infrastructure.Repositories
 {
     public class RatingReactionRepository : IRatingReactionRepository
@@ -56,12 +55,12 @@ namespace MovieRadar.Infrastructure.Repositories
             return await connection.ExecuteAsync(deleteReactionQuery, new { Id = id }) > 0;
         }
 
-        public async Task<IEnumerable<RatingReaction>> GetAllByRatingId(int id)
+        public async Task<IEnumerable<RatingReaction>> GetFiltered(string filter, string value)
         {
-            var allReactionsByRatingId = @"SELECT id AS Id, rating_id AS RatingId, reaction AS Reaction, user_id AS UserId
-                                           FROM ratings_reactions
-                                           WHERE rating_id = @Id";
-            return await connection.QueryAsync<RatingReaction>(allReactionsByRatingId, new { Id = id });
+            var getFilteredMoviesQuery = $@"SELECT id AS Id, rating_id AS RatingId, reaction AS Reaction, user_id AS UserId
+                                         FROM ratings_reactions
+                                            WHERE {filter} = '{value}'";
+            return await connection.QueryAsync<RatingReaction>(getFilteredMoviesQuery);
         }
     }
 }

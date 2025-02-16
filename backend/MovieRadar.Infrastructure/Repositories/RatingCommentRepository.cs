@@ -49,12 +49,12 @@ namespace MovieRadar.Infrastructure.Repositories
             return await connection.ExecuteAsync(deleteMovieQuery, new { Id = id }) > 0;
         }
 
-        public async Task<IEnumerable<RatingComment>> GetAllByRatingId(int id)
+        public async Task<IEnumerable<RatingComment>> GetFiltered(string filter, string value)
         {
-            var allReactionsByRatingId = @"SELECT id AS Id, rating_id AS RatingId, user_id AS UserId, comment AS Comment
-                                           FROM ratings_comments
-                                           WHERE rating_id = @Id";
-            return await connection.QueryAsync<RatingComment>(allReactionsByRatingId, new { Id = id });
+            var getFilteredMoviesQuery = $@"SELECT id AS Id, rating_id AS RatingId, user_id AS UserId, comment AS Comment
+                                            FROM ratings_comments
+                                            WHERE {filter} = '{value}'";
+            return await connection.QueryAsync<RatingComment>(getFilteredMoviesQuery);
         }
     }
 }

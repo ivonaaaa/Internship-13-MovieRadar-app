@@ -4,6 +4,6 @@ namespace MovieRadar.Domain.Interfaces
 {
     public interface IRatingReactionRepository : IRepository<RatingReaction>
     {
-        Task<IEnumerable<RatingReaction>> GetAllByRatingId(int id);
+        Task<IEnumerable<RatingReaction>> GetFiltered(string filter, string value);
     }
 }

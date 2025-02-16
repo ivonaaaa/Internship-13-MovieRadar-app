@@ -18,17 +18,32 @@ namespace MovieRadar.WebAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<RatingComment>>> GetAllRatingComments()
+        public async Task<ActionResult<IEnumerable<RatingComment>>> GetAllRatingComments([FromQuery] string? filter, [FromQuery] string? value)
         {
-            try
+            var validFilters = new HashSet<string> { "movie_id" };
+
+            if (string.IsNullOrEmpty(filter) && string.IsNullOrEmpty(value))
             {
-                var allRatingComments = await mediator.Send(new GetAllRatingCommentsQuery());
-                return Ok(allRatingComments);
+                try
+                {
+                    var allRatingComments = await mediator.Send(new GetAllRatingCommentsQuery());
+                    return Ok(allRatingComments);
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(500, $"Error getting all rating comments: , {ex.Message}, inner: , {ex.InnerException}");
+                }
             }
-            catch (Exception ex) 
-            {
-                return StatusCode(500, $"Error getting all rating comments: , {ex.Message}, inner: , {ex.InnerException}");
-            }
+
+            if (!validFilters.Contains(filter))
+                return BadRequest($"Invalid filter: '{filter}'");
+
+            if (string.IsNullOrWhiteSpace(value))
+                return BadRequest("Value cannot be empty");
+
+            var filteredComments = await mediator.Send(new GetFilteredRatingCommentsQuery(filter, value));
+
+            return (filteredComments == null || !filteredComments.Any()) ? NotFound() : Ok(filteredComments);
         }
 
         [HttpGet("{id}")]

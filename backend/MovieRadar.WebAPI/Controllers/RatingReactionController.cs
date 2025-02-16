@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using MovieRadar.Application.Interfaces;
 using MovieRadar.Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
@@ -19,7 +18,7 @@ namespace MovieRadar.WebAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<RatingReaction>>> GetAllReactions()
+        public async Task<ActionResult<IEnumerable<RatingReaction>>> GetAllReactions([FromQuery] string? filter, [FromQuery] string? value)
         {
             try
             {
@@ -128,7 +127,7 @@ namespace MovieRadar.WebAPI.Controllers
         {
             try
             {
-                var reactionsByRatingId = await mediator.Send(new GetRatingReactionsByRatingIdQuery(id));
+                var reactionsByRatingId = await mediator.Send(new GetFilteredRatingReactionsQuery(id));
                 return (reactionsByRatingId == null || !reactionsByRatingId.Any()) ? NotFound() : Ok(reactionsByRatingId);
             }
             catch (Exception ex)
