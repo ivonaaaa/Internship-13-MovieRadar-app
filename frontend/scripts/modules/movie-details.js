@@ -325,7 +325,7 @@ const displayMovieDetails = async (movieId) => {
     replyButtons.forEach((button) => {
       button.addEventListener("click", (e) => {
         const commentId = Number(button.dataset.commentId);
-        console.log(commentId);
+
         const rating = filteredRatings.find((r) => r.id === commentId);
         const ratingId = rating ? rating.id : null;
 
@@ -371,10 +371,6 @@ const displayMovieDetails = async (movieId) => {
                 userId: currentUserId,
               };
               try {
-                console.log(
-                  "Reply data being sent:",
-                  JSON.stringify(replyData)
-                );
                 await postRatingComment(replyData, currentToken);
                 alert("Reply added successfully!");
                 displayMovieDetails(movieId);

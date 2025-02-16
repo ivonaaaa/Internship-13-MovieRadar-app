@@ -225,8 +225,6 @@ async function updateMovie(movieId, movieData) {
 }
 
 async function deleteMovie(movieId) {
-  console.log(`Deleting movie with ID: ${movieId}`);
-
   const token = getAuthToken();
   if (!token) {
     throw new Error("Unauthorized: No token found.");
@@ -250,8 +248,6 @@ async function deleteMovie(movieId) {
         `Failed to delete movie. Server response: ${errorMessage}`
       );
     }
-
-    console.log(`Movie with ID ${movieId} deleted successfully.`);
   } catch (error) {
     console.error("Error deleting movie:", error);
     throw error;
@@ -263,8 +259,6 @@ async function postMovie(movieData, token, movieId = null, method = "POST") {
   if (movieId) {
     url = `http://localhost:50845/api/movie/${movieId}`;
   }
-
-  console.log("Original movieData:", movieData);
 
   const enrichedMovieData = {
     id: movieId || movieData.id,
@@ -278,13 +272,6 @@ async function postMovie(movieData, token, movieId = null, method = "POST") {
     imageLink: movieData.imageLink || "",
   };
 
-  console.log("Enriched movieData before sending:", enrichedMovieData);
-  console.log("Release Year before sending:", enrichedMovieData.release_year);
-
-  console.log("API Request URL:", url);
-  console.log("Request Method:", method);
-  console.log("Authorization Token:", token);
-
   try {
     const response = await fetch(url, {
       method: method,
@@ -294,8 +281,6 @@ async function postMovie(movieData, token, movieId = null, method = "POST") {
       },
       body: JSON.stringify(enrichedMovieData),
     });
-
-    console.log("Server Response Status:", response.status);
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -308,12 +293,10 @@ async function postMovie(movieData, token, movieId = null, method = "POST") {
     }
 
     if (response.status === 204) {
-      console.log("Update successful (204 No Content)");
       return enrichedMovieData;
     }
 
     const responseData = await response.json();
-    console.log("Server Response Data:", responseData);
 
     return responseData;
   } catch (error) {
@@ -358,7 +341,6 @@ async function postComment(commentData, token) {
       },
       body: JSON.stringify(commentData),
     });
-    console.log(response.status);
 
     if (response.status === 401) {
       alert("Your session is expired, Please login again.");

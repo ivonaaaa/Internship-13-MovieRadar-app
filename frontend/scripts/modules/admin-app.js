@@ -194,7 +194,7 @@ export function initAdminApp() {
     }
 
     const data = await response.json();
-    console.log("Cloudinary response:", data);
+
     return data.secure_url;
   }
 
