@@ -1,4 +1,13 @@
-import { getAllUsers, getMovieList, getRatingsList, postComment, deleteComment,postReaction,deleteReaction,getAllReactions } from "../api/api.js";
+import {
+  getAllUsers,
+  getMovieList,
+  getRatingsList,
+  postComment,
+  deleteComment,
+  postReaction,
+  deleteReaction,
+  getAllReactions,
+} from "../api/api.js";
 import { getAuthToken, decodeToken } from "./auth.js";
 import { getIsAdmin } from "./authState.js";
 import { initUserApp } from "./user-app.js";
@@ -6,15 +15,35 @@ import { initAdminApp } from "./admin-app.js";
 
 const displayMovieDetails = async (movieId) => {
   try {
-
     const usersBtn = document.getElementById("users-btn");
     if (usersBtn) {
       usersBtn.style.display = "none";
     }
 
+    const moviesHeader = document.getElementById("movies-header");
+    if (moviesHeader) {
+      moviesHeader.style.display = "none";
+    }
+
+    const addNewButton = document.querySelector(".add-new");
+    if (addNewButton) {
+      addNewButton.style.display = "none";
+    }
+
+    const filterContainer = document.querySelector(".filter-container");
+    if (filterContainer) {
+      filterContainer.style.display = "none";
+    }
+
+    const movieModal = document.getElementById("movie-modal");
+    if (movieModal) {
+      movieModal.style.display = "none";
+    }
+
     const movies = await getMovieList();
     const movieData = movies.find((m) => m.id === movieId);
-    const idKey = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier";
+    const idKey =
+      "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier";
 
     if (!movieData) {
       document.getElementById("movies-container").innerHTML =
@@ -39,8 +68,10 @@ const displayMovieDetails = async (movieId) => {
     }
 
     const allRatings = await getRatingsList();
-    
-    const filteredRatings = allRatings.filter((rating) => rating.movieId === movieId);
+
+    const filteredRatings = allRatings.filter(
+      (rating) => rating.movieId === movieId
+    );
     const users = await getAllUsers();
 
     const commentsHtml = filteredRatings.length
@@ -49,9 +80,13 @@ const displayMovieDetails = async (movieId) => {
             const user = users.find((u) => u.id === c.userId);
             const userName = user ? user.firstName : "Unknown user";
             let commentHtml = `<p><strong>${userName}:</strong> ${c.review} (⭐ ${c.grade})`;
-            if (isLoggedIn && Number(c.userId) === Number(currentUserId) && !isAdmin) {
+            if (
+              isLoggedIn &&
+              Number(c.userId) === Number(currentUserId) &&
+              !isAdmin
+            ) {
               commentHtml += ` <button class="delete-comment" data-comment-id="${c.id}">Delete</button>`;
-            }else if(!isAdmin) {
+            } else if (!isAdmin) {
               commentHtml += ` <button class="like-button" data-rating-id="${c.id}"> <i class="fas fa-thumbs-up"></i></button>
                                <button class="dislike-button" data-rating-id="${c.id}"> <i class="fas fa-thumbs-down fa-flip-horizontal"></i></button>`;
             }
@@ -61,7 +96,6 @@ const displayMovieDetails = async (movieId) => {
           .join("")
       : "<p>No available reviews.</p>";
 
-    
     let userHasReview = false;
     if (isLoggedIn) {
       userHasReview = filteredRatings.some(
@@ -69,9 +103,13 @@ const displayMovieDetails = async (movieId) => {
       );
     }
 
-   
     let htmlContent = `
       <h2>${movieData.title} (${movieData.releaseYear})</h2>
+      ${
+        movieData.imageLink
+          ? `<img src="${movieData.imageLink}" alt="${movieData.title}" class="movie-detail-image" />`
+          : ""
+      }
       <p>${movieData.summary}</p>
       <h3>Average grade: ${averageRating(filteredRatings)} / 10</h3>
       <h3>Reviews</h3>
@@ -100,29 +138,42 @@ const displayMovieDetails = async (movieId) => {
     backButton.addEventListener("click", async () => {
       window.location.hash = "";
       const moviesContainer = document.getElementById("movies-container");
-    
+
       const isAdmin = getIsAdmin();
-    
-      if (isAdmin) {
-        moviesContainer.innerHTML = ""; 
-        initAdminApp(); 
-      } else {
-        moviesContainer.innerHTML = ""; 
-        initUserApp(); 
+
+      if (moviesHeader) {
+        moviesHeader.style.display = "block";
       }
-    
+
+      if (addNewButton && isAdmin) {
+        addNewButton.style.display = "block";
+      }
+
+      if (filterContainer && !isAdmin) {
+        filterContainer.style.display = "block";
+      }
+
+      if (isAdmin) {
+        moviesContainer.innerHTML = "";
+        initAdminApp();
+      } else {
+        moviesContainer.innerHTML = "";
+        initUserApp();
+      }
+
       const usersBtn = document.getElementById("users-btn");
       if (usersBtn) {
         usersBtn.style.display = isAdmin ? "block" : "none";
       }
     });
 
-   
     const submitCommentButton = document.getElementById("submit-comment");
     if (submitCommentButton) {
       submitCommentButton.addEventListener("click", async () => {
         const content = document.getElementById("comment-content").value.trim();
-        const grade = parseFloat(document.getElementById("comment-grade").value);
+        const grade = parseFloat(
+          document.getElementById("comment-grade").value
+        );
         if (!content || isNaN(grade)) {
           alert("Please enter valid comment and grade.");
           return;
@@ -131,7 +182,7 @@ const displayMovieDetails = async (movieId) => {
           movieId: movieId,
           review: content,
           grade: grade,
-          userId: currentUserId  
+          userId: currentUserId,
         };
 
         try {
@@ -162,7 +213,6 @@ const displayMovieDetails = async (movieId) => {
     });
 
     if (isLoggedIn) {
-      // Like button
       const likeButtons = document.querySelectorAll(".like-button");
       likeButtons.forEach((button) => {
         button.addEventListener("click", async (e) => {
@@ -171,7 +221,9 @@ const displayMovieDetails = async (movieId) => {
           try {
             const allReactions = await getAllReactions();
             const existingReaction = allReactions.find(
-              (r) => r.ratingId === ratingId && Number(r.userId) === Number(currentUserId)
+              (r) =>
+                r.ratingId === ratingId &&
+                Number(r.userId) === Number(currentUserId)
             );
             if (existingReaction) {
               if (existingReaction.reaction === "like") {
@@ -186,7 +238,7 @@ const displayMovieDetails = async (movieId) => {
             const reactionData = {
               ratingId: ratingId,
               Reaction: "like",
-              userId: currentUserId
+              userId: currentUserId,
             };
             await postReaction(reactionData, currentToken);
             alert("Like added!");
@@ -198,41 +250,43 @@ const displayMovieDetails = async (movieId) => {
         });
       });
 
-        const dislikeButtons = document.querySelectorAll(".dislike-button");
-        dislikeButtons.forEach((button) => {
-          button.addEventListener("click", async (e) => {
-            const ratingId = Number(e.target.dataset.ratingId);
-            const currentToken = getAuthToken();
-            try {
-              const allReactions = await getAllReactions();
-              const existingReaction = allReactions.find(
-                (r) => r.ratingId === ratingId && Number(r.userId) === Number(currentUserId)
-              );
-              if (existingReaction) {
-                if (existingReaction.reaction === "dislike") {
-                  await deleteReaction(existingReaction.id, currentToken);
-                  alert("Dislike removed!");
-                  displayMovieDetails(movieId);
-                  return;
-                } else {
-                  await deleteReaction(existingReaction.id, currentToken);
-                }
+      const dislikeButtons = document.querySelectorAll(".dislike-button");
+      dislikeButtons.forEach((button) => {
+        button.addEventListener("click", async (e) => {
+          const ratingId = Number(e.target.dataset.ratingId);
+          const currentToken = getAuthToken();
+          try {
+            const allReactions = await getAllReactions();
+            const existingReaction = allReactions.find(
+              (r) =>
+                r.ratingId === ratingId &&
+                Number(r.userId) === Number(currentUserId)
+            );
+            if (existingReaction) {
+              if (existingReaction.reaction === "dislike") {
+                await deleteReaction(existingReaction.id, currentToken);
+                alert("Dislike removed!");
+                displayMovieDetails(movieId);
+                return;
+              } else {
+                await deleteReaction(existingReaction.id, currentToken);
               }
-              const reactionData = {
-                ratingId: ratingId,
-                Reaction: "dislike",
-                userId: currentUserId
-              };
-              await postReaction(reactionData, currentToken);
-              alert("Dislike added!");
-              displayMovieDetails(movieId);
-            } catch (err) {
-              console.error("Error adding reaction:", err);
-              alert("Error adding reaction.");
             }
-          });
+            const reactionData = {
+              ratingId: ratingId,
+              Reaction: "dislike",
+              userId: currentUserId,
+            };
+            await postReaction(reactionData, currentToken);
+            alert("Dislike added!");
+            displayMovieDetails(movieId);
+          } catch (err) {
+            console.error("Error adding reaction:", err);
+            alert("Error adding reaction.");
+          }
         });
-      }
+      });
+    }
   } catch (error) {
     console.error("Error:", error);
     document.getElementById("movies-container").innerHTML =

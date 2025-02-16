@@ -1,6 +1,7 @@
 import { getMovieList } from "../api/api.js";
 import { displayMovieDetails } from "./movie-details.js";
 import { createLogoutButton } from "./logout.js";
+
 export function initUserApp() {
   async function initialize() {
     const moviesContainer = document.getElementById("movies-container");
@@ -70,6 +71,9 @@ export function initUserApp() {
 
         movieElement.innerHTML = `
           <h3>${movie.title} (${movie.releaseYear})</h3>
+          <img src="${movie.imageLink || "placeholder.jpg"}" alt="${
+          movie.title
+        }" class="movie-cover" />
           <p>${movie.summary}</p>
           <button data-id="${movie.id}" class="view-details">Details</button>
         `;

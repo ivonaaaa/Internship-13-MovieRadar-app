@@ -155,6 +155,7 @@ async function getMovieList({ genre, year, sort } = {}) {
 
   try {
     const data = await fetchMovies(url, options);
+    console.log("Data from fetchMovies:", data);
     return data;
   } catch (error) {
     return null;
