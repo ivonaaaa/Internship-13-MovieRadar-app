@@ -1,5 +1,5 @@
-
 import { getAllUsers, getRatingsList } from "../api/api.js";
+import { getAuthToken } from "./auth.js";
 import { createLogoutButton } from "./logout.js";
 
 async function initUsersPage() {
@@ -9,7 +9,9 @@ async function initUsersPage() {
   const container = document.getElementById("users-container");
   container.innerHTML = "<h2>Users List</h2>";
 
-  const users = await getAllUsers();
+  const token = getAuthToken();
+
+  const users = await getAllUsers(token);
   const ratings = await getRatingsList();
 
   if (!users || users.length === 0) {
@@ -37,7 +39,9 @@ async function initUsersPage() {
     const commentsCount = userRatings.length;
     const averageRating =
       commentsCount > 0
-        ? (userRatings.reduce((sum, r) => sum + r.grade, 0) / commentsCount).toFixed(1)
+        ? (
+            userRatings.reduce((sum, r) => sum + r.grade, 0) / commentsCount
+          ).toFixed(1)
         : "N/A";
 
     const tr = document.createElement("tr");
