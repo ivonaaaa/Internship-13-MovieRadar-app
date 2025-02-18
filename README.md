@@ -58,4 +58,4 @@ In the same terminal where you cloned the repository, run one of the following c
 ### Example Login Credentials
 **Admin**: nino@milas.com / 12345678
 
-**User**: ivona@pmfst.hr / ivona123!
+**User**: ivona@pmfst.hr / Ivona123!
